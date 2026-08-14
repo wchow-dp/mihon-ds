@@ -25,6 +25,18 @@ A specialized fork of [Mihon](https://mihon.app) optimized for devices with seco
 *   **Customizable Setup:** New onboarding steps to select the target Display ID and rotation overrides.
 *   **Privacy Focused:** Telemetry and Crashlytics are disabled by default.
 
+---
+
+### Custom Enhancements (v1.0+)
+These features are unique to this build and separate it from the upstream [mis0suppe/mihon-ds](https://github.com/mis0suppe/mihon-ds):
+
+*   **Layout Memory (Manual Panel Training):** A "Human-in-the-Loop" solution for panel detection errors. Enter **Correction Mode** in the reader to drag-and-drop panel numbers and fix the reading order. The app calculates a fuzzy "Geometric DNA" for the page and remembers your fix globally across all manga titles.
+*   **Instant Synchronization:** Removed the hardcoded 30-second delay for SyncYomi. Synchronization now triggers **instantly** upon app launch, resume, or manual command.
+*   **Flicker-Free Reader Transitions:** Eliminated the 1-frame "flash" of the panel overlay during transitions. Visual effects are now hard-blocked and the view hierarchy is cleaned up when Focus Effects are disabled.
+*   **Stabilized Dual-Screen Sync:** Unified the rendering logic across both primary and secondary displays to prevent stale layout artifacts on multi-screen devices.
+
+---
+
 *Plus all the standard features of Mihon:*
 *   Local reading of content.
 *   A configurable reader with multiple viewers, reading directions and other settings.
