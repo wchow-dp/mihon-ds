@@ -14,6 +14,7 @@ import eu.kanade.presentation.components.AppBar
 import eu.kanade.presentation.util.Screen
 import eu.kanade.tachiyomi.data.backup.create.BackupOptions
 import eu.kanade.tachiyomi.data.sync.SyncDataJob
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.update
 import mihon.core.viewmodel.StateViewModel
@@ -52,13 +53,13 @@ class SyncSettingsSelector : Screen() {
             ) {
                 item {
                     SectionCard(MR.strings.label_library) {
-                        Options(BackupOptions.libraryOptions, state, model)
+                        Options(BackupOptions.libraryOptions.toImmutableList(), state, model)
                     }
                 }
 
                 item {
                     SectionCard(MR.strings.label_settings) {
-                        Options(BackupOptions.settingsOptions, state, model)
+                        Options(BackupOptions.settingsOptions.toImmutableList(), state, model)
                     }
                 }
             }
@@ -113,7 +114,7 @@ private class SyncSettingsSelectorModel(
                 tracking = syncSettings.tracking,
                 history = syncSettings.history,
                 appSettings = syncSettings.appSettings,
-                extensionRepoSettings = syncSettings.extensionRepoSettings,
+                extensionStores = syncSettings.extensionRepoSettings,
                 sourceSettings = syncSettings.sourceSettings,
                 privateSettings = syncSettings.privateSettings,
 
@@ -134,7 +135,7 @@ private class SyncSettingsSelectorModel(
                 tracking = backupOptions.tracking,
                 history = backupOptions.history,
                 appSettings = backupOptions.appSettings,
-                extensionRepoSettings = backupOptions.extensionRepoSettings,
+                extensionRepoSettings = backupOptions.extensionStores,
                 sourceSettings = backupOptions.sourceSettings,
                 privateSettings = backupOptions.privateSettings,
 

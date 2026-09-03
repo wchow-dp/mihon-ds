@@ -119,7 +119,7 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
         }
     }
 
-    val isSideBySideViewEnabled by screenModel.preferences.sideBySideMode().collectAsState()
+    val isSideBySideViewEnabled by viewModel.preferences.sideBySideMode().collectAsState()
 
     CheckboxItem(
         label = stringResource(MR.strings.pref_crop_borders),
@@ -275,33 +275,33 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
 
     CheckboxItem(
         label = stringResource(MR.strings.side_by_side_view),
-        pref = screenModel.preferences.sideBySideMode(),
+        pref = viewModel.preferences.sideBySideMode(),
     )
 
     if (isSideBySideViewEnabled) {
-        val manualHingeGap by screenModel.preferences.manualHingeGap().collectAsState()
+        val manualHingeGap by viewModel.preferences.manualHingeGap().collectAsState()
         SliderItem(
             label = stringResource(MR.strings.pref_hinge_gap),
             value = manualHingeGap,
             valueRange = 0..200,
             valueString = "${manualHingeGap}px",
-            onChange = { screenModel.preferences.manualHingeGap().set(it) },
+            onChange = { viewModel.preferences.manualHingeGap().set(it) },
         )
 
         SettingsChipRow(MR.strings.pref_hinge_presets) {
             FilterChip(
                 selected = manualHingeGap == 84,
-                onClick = { screenModel.preferences.manualHingeGap().set(84) },
+                onClick = { viewModel.preferences.manualHingeGap().set(84) },
                 label = { Text(stringResource(MR.strings.hinge_duo1)) },
             )
             FilterChip(
                 selected = manualHingeGap == 66,
-                onClick = { screenModel.preferences.manualHingeGap().set(66) },
+                onClick = { viewModel.preferences.manualHingeGap().set(66) },
                 label = { Text(stringResource(MR.strings.hinge_duo2)) },
             )
             FilterChip(
                 selected = manualHingeGap == 0,
-                onClick = { screenModel.preferences.manualHingeGap().set(0) },
+                onClick = { viewModel.preferences.manualHingeGap().set(0) },
                 label = { Text(stringResource(MR.strings.hinge_fold)) },
             )
         }
@@ -309,28 +309,28 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
 
     CheckboxItem(
         label = stringResource(MR.strings.pref_auto_enable_book_mode),
-        pref = screenModel.preferences.autoEnableSideBySide(),
+        pref = viewModel.preferences.autoEnableSideBySide(),
     )
     CheckboxItem(
         label = stringResource(MR.strings.pref_auto_disable_book_mode),
-        pref = screenModel.preferences.autoDisableSideBySide(),
+        pref = viewModel.preferences.autoDisableSideBySide(),
     )
     CheckboxItem(
         label = stringResource(MR.strings.pref_auto_adjust_hinge_gap),
-        pref = screenModel.preferences.autoAdjustHingeGap(),
+        pref = viewModel.preferences.autoAdjustHingeGap(),
     )
     CheckboxItem(
         label = stringResource(MR.strings.pref_auto_disable_on_start),
-        pref = screenModel.preferences.autoDisableSideBySideOnStart(),
+        pref = viewModel.preferences.autoDisableSideBySideOnStart(),
     )
     CheckboxItem(
         label = stringResource(MR.strings.pref_center_single_page),
-        pref = screenModel.preferences.centerSinglePage(),
+        pref = viewModel.preferences.centerSinglePage(),
     )
     if (isSideBySideViewEnabled) {
         CheckboxItem(
             label = stringResource(MR.strings.pref_side_by_side_page_offset),
-            pref = screenModel.preferences.sideBySidePageOffset(),
+            pref = viewModel.preferences.sideBySidePageOffset(),
         )
     }
 }

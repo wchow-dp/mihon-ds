@@ -540,7 +540,7 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
             readingModePreference = viewModel.getMangaReadingMode(resolveDefault = true),
         )
 
-        val settingsScreenModel = remember {
+        val settingsViewModel = remember {
             ReaderSettingsViewModel(
                 readerState = viewModel.state,
                 onChangeReadingMode = viewModel::setMangaReadingMode,
@@ -626,13 +626,13 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
                     onDismissRequest = onDismissRequest,
                     onShowMenus = { setMenuVisibility(true) },
                     onHideMenus = { setMenuVisibility(false) },
-                    viewModel = settingsviewModel,
+                    viewModel = settingsViewModel,
                 )
             }
             is ReaderViewModel.Dialog.ReadingModeSelect -> {
                 ReadingModeSelectDialog(
                     onDismissRequest = onDismissRequest,
-                    viewModel = settingsviewModel,
+                    viewModel = settingsViewModel,
                     onChange = { stringRes ->
                         menuToggleToast?.cancel()
                         if (!readerPreferences.showReadingMode.get()) {
@@ -644,7 +644,7 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
             is ReaderViewModel.Dialog.OrientationModeSelect -> {
                 OrientationSelectDialog(
                     onDismissRequest = onDismissRequest,
-                    viewModel = settingsviewModel,
+                    viewModel = settingsViewModel,
                     onChange = { stringRes ->
                         menuToggleToast?.cancel()
                         menuToggleToast = toast(stringRes)

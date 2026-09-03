@@ -82,8 +82,8 @@ fun ReaderAppBars(
     isPanelCorrectionMode: Boolean = false,
     onClickPanelCorrection: (() -> Unit)? = null,
 ) {
-    val isRtl = remember(viewer, readingMode) {
-        viewer is R2LPagerViewer || (viewer == null && readingMode == ReadingMode.RIGHT_TO_LEFT)
+    val isRtl = remember(readingMode) {
+        readingMode == ReadingMode.RIGHT_TO_LEFT
     }
     val backgroundColor = MaterialTheme.colorScheme
         .surfaceColorAtElevation(3.dp)

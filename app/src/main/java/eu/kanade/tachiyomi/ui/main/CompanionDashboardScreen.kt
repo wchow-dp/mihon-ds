@@ -52,7 +52,10 @@ import eu.kanade.presentation.util.formatChapterNumber
 import eu.kanade.tachiyomi.util.lang.toLocalDate
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.ZonedDateTime
+import kotlin.time.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -417,13 +420,16 @@ class CompanionDashboardScreenModel(
         }
 
         viewModelScope.launch {
-            val limit = ZonedDateTime.now().minusDays(7).toInstant()
+            val limit = Clock.System.now()
+                .minus(7, DateTimeUnit.DAY, TimeZone.currentSystemDefault())
             getUpdates.subscribe(
                 instant = limit,
                 unread = null,
                 started = null,
                 bookmarked = null,
-                hideExcludedScanlators = false
+                hideExcludedScanlators = false,
+                includedCategories = emptyList(),
+                excludedCategories = emptyList(),
             ).collectLatest { updates ->
                 mutableState.update { it.copy(recentUpdates = updates.take(10)) }
             }

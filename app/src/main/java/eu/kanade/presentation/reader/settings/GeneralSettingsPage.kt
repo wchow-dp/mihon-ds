@@ -149,7 +149,7 @@ internal fun ColumnScope.GeneralPage(viewModel: ReaderSettingsViewModel) {
         pref = viewModel.preferences.flashOnPageChange,
     )
 
-    val dualScreenEnabled by screenModel.basePreferences.enableDualScreenMode().collectAsState()
+    val dualScreenEnabled by viewModel.basePreferences.enableDualScreenMode().collectAsState()
     val navigator = LocalNavigator.current
     if (dualScreenEnabled && navigator != null) {
         HorizontalDivider(

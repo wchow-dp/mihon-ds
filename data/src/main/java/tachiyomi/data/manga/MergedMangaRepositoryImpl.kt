@@ -1,38 +1,36 @@
 package tachiyomi.data.manga
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import kotlinx.coroutines.flow.Flow
-import tachiyomi.data.DatabaseHandler
+import tachiyomi.data.Database
+import tachiyomi.data.subscribeToList
 import tachiyomi.domain.manga.model.MergedManga
 import tachiyomi.domain.manga.repository.MergedMangaRepository
 
 class MergedMangaRepositoryImpl(
-    private val handler: DatabaseHandler,
+    private val database: Database,
 ) : MergedMangaRepository {
 
     override suspend fun getMergedMangaForManga(mangaId: Long): List<MergedManga> {
-        return handler.awaitList {
-            manga_mergerQueries.getMergedMangaForManga(mangaId, MergedMangaMapper::mapMergedManga)
-        }
+        return database.manga_mergerQueries
+            .getMergedMangaForManga(mangaId, MergedMangaMapper::mapMergedManga)
+            .awaitAsList()
     }
 
     override fun getMergedMangaForMangaAsFlow(mangaId: Long): Flow<List<MergedManga>> {
-        return handler.subscribeToList {
-            manga_mergerQueries.getMergedMangaForManga(mangaId, MergedMangaMapper::mapMergedManga)
-        }
+        return database.manga_mergerQueries
+            .getMergedMangaForManga(mangaId, MergedMangaMapper::mapMergedManga)
+            .subscribeToList()
     }
 
     override suspend fun insert(mergedManga: MergedManga) {
-        handler.await {
-            manga_mergerQueries.insert(
-                mangaId = mergedManga.mangaId,
-                mergeMangaId = mergedManga.mergeMangaId,
-            )
-        }
+        database.manga_mergerQueries.insert(
+            mangaId = mergedManga.mangaId,
+            mergeMangaId = mergedManga.mergeMangaId,
+        )
     }
 
     override suspend fun deleteByMangaId(mangaId: Long) {
-        handler.await {
-            manga_mergerQueries.deleteByMangaId(mangaId)
-        }
+        database.manga_mergerQueries.deleteByMangaId(mangaId)
     }
 }

@@ -49,6 +49,8 @@ class MangaBaka(id: Long) : BaseTracker(id, "MangaBaka"), DeletableTracker {
 
     override fun getCompletionStatus(): Long = COMPLETED
 
+    override fun hasNotStartedReading(status: Long): Boolean = status == PLAN_TO_READ
+
     override fun getScoreList(): ImmutableList<String> {
         return when (scorePreference.get()) {
             // 1, 2, ..., 99, 100
@@ -120,6 +122,8 @@ class MangaBaka(id: Long) : BaseTracker(id, "MangaBaka"), DeletableTracker {
 
         return api.search(query)
     }
+
+    override suspend fun fetchRemoteTrack(track: Track): Track? = api.findLibManga(track)
 
     override suspend fun refresh(track: Track): Track {
         val remoteTrack = api.findLibManga(track) ?: throw Exception("Could not find manga")

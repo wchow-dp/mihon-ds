@@ -94,7 +94,7 @@ class Shikimori(id: Long) : BaseTracker(id, "Shikimori"), DeletableTracker {
     }
 
     override suspend fun fetchRemoteTrack(track: Track): Track? {
-        val remoteTrack = api.findLibManga(track, getUsername()) ?: return null
+        val remoteTrack = api.findLibManga(track) ?: return null
         track.library_id = remoteTrack.library_id
         track.copyPersonalFrom(remoteTrack)
         track.total_chapters = remoteTrack.total_chapters

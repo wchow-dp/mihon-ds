@@ -66,6 +66,8 @@ class Hikka(id: Long) : BaseTracker(id, "Hikka"), DeletableTracker {
 
     override fun getCompletionStatus(): Long = COMPLETED
 
+    override fun hasNotStartedReading(status: Long): Boolean = status == PLAN_TO_READ
+
     override fun getScoreList(): ImmutableList<String> = SCORE_LIST
 
     override fun displayScore(track: DomainTrack): String {
@@ -119,6 +121,9 @@ class Hikka(id: Long) : BaseTracker(id, "Hikka"), DeletableTracker {
     }
 
     override suspend fun search(query: String): List<TrackSearch> = api.searchManga(query)
+
+    override suspend fun fetchRemoteTrack(track: Track): Track? =
+        runCatching { api.getManga(track) }.getOrNull()
 
     override suspend fun refresh(track: Track): Track {
         val remoteTrack = api.getManga(track)

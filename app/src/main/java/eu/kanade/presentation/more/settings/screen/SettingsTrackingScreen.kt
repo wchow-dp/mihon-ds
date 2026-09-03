@@ -134,24 +134,6 @@ object SettingsTrackingScreen : SearchableSettings {
         val trackerManager = remember { Injekt.get<TrackerManager>() }
         val sourceManager = remember { Injekt.get<SourceManager>() }
 
-        var dialog by remember { mutableStateOf<Any?>(null) }
-        dialog?.run {
-            when (this) {
-                is LoginDialog -> {
-                    TrackingLoginDialog(
-                        tracker = tracker,
-                        uNameStringRes = uNameStringRes,
-                        onDismissRequest = { dialog = null },
-                    )
-                }
-                is LogoutDialog -> {
-                    TrackingLogoutDialog(
-                        tracker = tracker,
-                        onDismissRequest = { dialog = null },
-                    )
-                }
-            }
-        }
 
         val enhancedTrackers = trackerManager.trackers
             .filter { it is EnhancedTracker }
@@ -193,7 +175,7 @@ object SettingsTrackingScreen : SearchableSettings {
                     Preference.PreferenceItem.TrackerPreference(
                         tracker = trackerManager.mangaBaka,
                         login = { context.openInBrowser(MangaBakaApi.authUrl(), forceDefaultBrowser = true) },
-                        logout = { dialog = LogoutDialog(trackerManager.mangaBaka) },
+                        logout = { onShowDialog(TrackingDialog.Logout(trackerManager.mangaBaka)) },
                     ),
                     Preference.PreferenceItem.TrackerPreference(
                         tracker = trackerManager.myAnimeList,
@@ -238,7 +220,7 @@ object SettingsTrackingScreen : SearchableSettings {
                     Preference.PreferenceItem.TrackerPreference(
                         tracker = trackerManager.hikka,
                         login = { context.openInBrowser(HikkaApi.authUrl(), forceDefaultBrowser = true) },
-                        logout = { dialog = LogoutDialog(trackerManager.hikka) },
+                        logout = { onShowDialog(TrackingDialog.Logout(trackerManager.hikka)) },
                     ),
                     Preference.PreferenceItem.InfoPreference(stringResource(MR.strings.tracking_info)),
                 ),
