@@ -17,25 +17,24 @@ import eu.kanade.tachiyomi.ui.reader.input.ReaderAction
 import eu.kanade.tachiyomi.ui.reader.model.ChapterTransition
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.model.ViewerChapters
+import eu.kanade.tachiyomi.ui.reader.panel.matchesPanelKey
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.ui.reader.viewer.Viewer
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.NavigationRegion
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import eu.kanade.tachiyomi.ui.reader.panel.matchesPanelKey
 import tachiyomi.core.common.util.system.logcat
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
-import kotlin.math.max
-import kotlin.math.min
 
 internal enum class WebtoonReaderActionRoute {
     SCROLL_DOWN,
@@ -109,7 +108,7 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
 
     private val threshold: Int =
         Injekt.get<ReaderPreferences>()
-            .readerHideThreshold()
+            .readerHideThreshold
             .get()
             .threshold
 

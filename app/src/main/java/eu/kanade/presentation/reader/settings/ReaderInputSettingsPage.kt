@@ -27,6 +27,7 @@ import eu.kanade.tachiyomi.ui.reader.input.ReaderInputProfile
 import eu.kanade.tachiyomi.ui.reader.input.ReaderInputProfileResolver
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderInputSettingsScreenModel
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
+import java.text.NumberFormat
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.CheckboxItem
 import tachiyomi.presentation.core.components.HeadingItem
@@ -35,14 +36,13 @@ import tachiyomi.presentation.core.components.SettingsItemsPaddings
 import tachiyomi.presentation.core.components.SliderItem
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.collectAsState
-import java.text.NumberFormat
 
 @Composable
 internal fun ColumnScope.ReaderInputSettingsPage(screenModel: ReaderInputSettingsScreenModel) {
     val profile by screenModel.readerInputProfile.collectAsState()
     val captureState by screenModel.inputCaptureState.collectAsState()
-    val volumeKeysEnabled by screenModel.preferences.readWithVolumeKeys().collectAsState()
-    val volumeKeysInverted by screenModel.preferences.readWithVolumeKeysInverted().collectAsState()
+    val volumeKeysEnabled by screenModel.preferences.readWithVolumeKeys.collectAsState()
+    val volumeKeysInverted by screenModel.preferences.readWithVolumeKeysInverted.collectAsState()
     val defaultOptions = ReaderInputDefaultOptions(
         volumeKeysEnabled = volumeKeysEnabled,
         volumeKeysInverted = volumeKeysInverted,

@@ -23,13 +23,13 @@ import eu.kanade.tachiyomi.util.system.cancelNotification
 import eu.kanade.tachiyomi.util.system.isRunning
 import eu.kanade.tachiyomi.util.system.setForegroundSafely
 import eu.kanade.tachiyomi.util.system.workManager
+import java.util.concurrent.TimeUnit
 import logcat.LogPriority
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.backup.service.BackupPreferences
 import tachiyomi.domain.storage.service.StorageManager
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
-import java.util.concurrent.TimeUnit
 
 class BackupCreateJob(private val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams) {
@@ -89,7 +89,7 @@ class BackupCreateJob(private val context: Context, workerParams: WorkerParamete
 
         fun setupTask(context: Context, prefInterval: Int? = null) {
             val backupPreferences = Injekt.get<BackupPreferences>()
-            val interval = prefInterval ?: backupPreferences.backupInterval().get()
+            val interval = prefInterval ?: backupPreferences.backupInterval.get()
             if (interval > 0) {
                 val constraints = Constraints(
                     requiresBatteryNotLow = true,

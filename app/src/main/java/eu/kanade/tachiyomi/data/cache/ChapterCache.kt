@@ -6,6 +6,8 @@ import com.jakewharton.disklrucache.DiskLruCache
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.util.storage.DiskUtil
 import eu.kanade.tachiyomi.util.storage.saveTo
+import java.io.File
+import java.io.IOException
 import kotlinx.serialization.json.Json
 import logcat.LogPriority
 import okhttp3.Response
@@ -13,8 +15,6 @@ import okio.buffer
 import okio.sink
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.chapter.model.Chapter
-import java.io.File
-import java.io.IOException
 
 /**
  * Class used to create chapter cache
@@ -113,7 +113,13 @@ class ChapterCache(
      */
     fun isImageInCache(imageUrl: String): Boolean {
         return try {
-            diskCache.get(DiskUtil.hashKeyForDisk(imageUrl)).use { it != null }
+            val key = DiskUtil.hashKeyForDisk(imageUrl)
+            val inJournal = diskCache.get(key).use { it != null }
+            val fileExists = getImageFile(imageUrl).exists()
+            if (inJournal && !fileExists) {
+                logcat(LogPriority.WARN) { "Image is in journal but file is missing: $imageUrl" }
+            }
+            inJournal && fileExists
         } catch (_: IOException) {
             false
         }

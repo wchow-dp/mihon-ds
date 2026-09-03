@@ -17,10 +17,10 @@ import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.lang.withUIContext
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.track.interactor.InsertTrack
+import tachiyomi.domain.track.model.Track as DomainTrack
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
-import tachiyomi.domain.track.model.Track as DomainTrack
 
 abstract class BaseTracker(
     override val id: Long,
@@ -68,6 +68,10 @@ abstract class BaseTracker(
     }
 
     override fun getUsername() = trackPreferences.trackUsername(this).get()
+
+    override fun getDisplayUsername(): String = trackPreferences.trackDisplayUsername(this).get()
+
+    override fun saveDisplayUsername(displayName: String) = trackPreferences.trackDisplayUsername(this).set(displayName)
 
     override fun getPassword() = trackPreferences.trackPassword(this).get()
 

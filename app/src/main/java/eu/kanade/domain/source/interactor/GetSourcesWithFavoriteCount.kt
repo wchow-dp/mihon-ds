@@ -1,13 +1,13 @@
 package eu.kanade.domain.source.interactor
 
 import eu.kanade.domain.source.service.SourcePreferences
+import java.util.Collections
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import tachiyomi.core.common.util.lang.compareToWithCollator
 import tachiyomi.domain.source.model.Source
 import tachiyomi.domain.source.repository.SourceRepository
 import tachiyomi.source.local.isLocal
-import java.util.Collections
 
 class GetSourcesWithFavoriteCount(
     private val repository: SourceRepository,
@@ -16,8 +16,8 @@ class GetSourcesWithFavoriteCount(
 
     fun subscribe(): Flow<List<Pair<Source, Long>>> {
         return combine(
-            preferences.migrationSortingDirection().changes(),
-            preferences.migrationSortingMode().changes(),
+            preferences.migrationSortingDirection.changes(),
+            preferences.migrationSortingMode.changes(),
             repository.getSourcesWithFavoriteCount(),
         ) { direction, mode, list ->
             list

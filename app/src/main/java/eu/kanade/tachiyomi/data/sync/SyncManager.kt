@@ -12,6 +12,10 @@ import eu.kanade.tachiyomi.data.backup.restore.BackupRestoreJob
 import eu.kanade.tachiyomi.data.backup.restore.RestoreOptions
 import eu.kanade.tachiyomi.data.backup.restore.restorers.MangaRestorer
 import eu.kanade.tachiyomi.data.sync.service.SyncYomiSyncService
+import java.io.File
+import java.io.IOException
+import java.util.Date
+import kotlin.system.measureTimeMillis
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.protobuf.ProtoBuf
 import logcat.LogPriority
@@ -24,10 +28,6 @@ import tachiyomi.domain.category.interactor.GetCategories
 import tachiyomi.domain.manga.model.Manga
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
-import java.io.File
-import java.io.IOException
-import java.util.Date
-import kotlin.system.measureTimeMillis
 
 /**
  * A manager to handle synchronization tasks in the app, such as updating
@@ -93,7 +93,7 @@ class SyncManager(
                 chapters = syncOptions.chapters,
                 tracking = syncOptions.tracking,
                 history = syncOptions.history,
-                extensionRepoSettings = syncOptions.extensionRepoSettings,
+                extensionStores = syncOptions.extensionRepoSettings,
                 appSettings = syncOptions.appSettings,
                 sourceSettings = syncOptions.sourceSettings,
                 privateSettings = syncOptions.privateSettings,
@@ -159,7 +159,7 @@ class SyncManager(
             remoteBackup.backupSources.isEmpty() &&
             remoteBackup.backupPreferences.isEmpty() &&
             remoteBackup.backupSourcePreferences.isEmpty() &&
-            remoteBackup.backupExtensionRepo.isEmpty()
+            remoteBackup.backupExtensionStores.isEmpty()
         ) {
             logcat(LogPriority.DEBUG) { "No changes to restore from remote" }
             syncPreferences.lastSyncTimestamp.set(syncStartTime)
@@ -200,7 +200,7 @@ class SyncManager(
                     sourceSettings = syncOptions.sourceSettings,
                     libraryEntries = syncOptions.libraryEntries,
                     categories = syncOptions.categories,
-                    extensionRepoSettings = syncOptions.extensionRepoSettings,
+                    extensionStores = syncOptions.extensionRepoSettings,
                 ),
             )
 
@@ -261,7 +261,7 @@ class SyncManager(
                     backupSources = backupCreator.backupSources(newMangaList),
                     backupPreferences = backupCreator.backupAppPreferences(backupOptions),
                     backupSourcePreferences = backupCreator.backupSourcePreferences(backupOptions),
-                    backupExtensionRepo = backupCreator.backupExtensionRepos(backupOptions),
+                    backupExtensionStores = backupCreator.backupExtensionStores(backupOptions),
                 )
             } catch (e: Exception) {
                 logcat(LogPriority.ERROR, e) { "Failed to load incremental cache, falling back to full backup" }
@@ -278,7 +278,7 @@ class SyncManager(
             backupSources = backupCreator.backupSources(backupManga),
             backupPreferences = backupCreator.backupAppPreferences(backupOptions),
             backupSourcePreferences = backupCreator.backupSourcePreferences(backupOptions),
-            backupExtensionRepo = backupCreator.backupExtensionRepos(backupOptions),
+            backupExtensionStores = backupCreator.backupExtensionStores(backupOptions),
         )
         saveBackupToCache(fullBackup)
         return fullBackup

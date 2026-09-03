@@ -8,18 +8,18 @@ import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.core.security.SecurityPreferences
 import eu.kanade.tachiyomi.data.notification.NotificationReceiver
 import eu.kanade.tachiyomi.data.notification.Notifications
+import eu.kanade.tachiyomi.ui.main.ProcessBannerState
 import eu.kanade.tachiyomi.util.storage.getUriCompat
 import eu.kanade.tachiyomi.util.system.cancelNotification
 import eu.kanade.tachiyomi.util.system.notificationBuilder
 import eu.kanade.tachiyomi.util.system.notify
+import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 import tachiyomi.core.common.i18n.pluralStringResource
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.core.common.storage.displayablePath
 import tachiyomi.i18n.MR
-import eu.kanade.tachiyomi.ui.main.ProcessBannerState
 import uy.kohesive.injekt.injectLazy
-import java.io.File
-import java.util.concurrent.TimeUnit
 
 class BackupNotifier(private val context: Context) {
 
@@ -103,14 +103,14 @@ class BackupNotifier(private val context: Context) {
         ProcessBannerState.show(
             id = ProcessBannerState.BACKUP_RESTORE_ID,
             title = contentTitle,
-            subtitle = content.takeIf { !preferences.hideNotificationContent().get() },
+            subtitle = content.takeIf { !preferences.hideNotificationContent.get() },
             progress = progress.toFloat() / maxAmount.coerceAtLeast(1),
         )
 
         val builder = with(progressNotificationBuilder) {
             setContentTitle(contentTitle)
 
-            if (!preferences.hideNotificationContent().get()) {
+            if (!preferences.hideNotificationContent.get()) {
                 setContentText(content)
             }
 
@@ -160,10 +160,8 @@ class BackupNotifier(private val context: Context) {
 
         val timeString = context.stringResource(
             MR.strings.restore_duration,
-            TimeUnit.MILLISECONDS.toMinutes(time),
-            TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(
-                TimeUnit.MILLISECONDS.toMinutes(time),
-            ),
+            time.milliseconds.inWholeMinutes,
+            time.milliseconds.inWholeSeconds - (time.milliseconds.inWholeMinutes * 60),
         )
 
         with(completeNotificationBuilder) {

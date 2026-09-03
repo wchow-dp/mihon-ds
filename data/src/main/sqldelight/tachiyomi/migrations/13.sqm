@@ -1,0 +1,16 @@
+import kotlin.Boolean;
+
+-- Mihon DS shipped its own 11.sqm (manga_merger), so DS installs are stamped at
+-- version 11 without ever having run upstream's 11.sqm. Recreate what they missed
+-- before altering the table. No-ops on databases that did run upstream's 11.sqm.
+CREATE TABLE IF NOT EXISTS extension_store(
+    index_url TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    badge_label TEXT NOT NULL,
+    signing_key TEXT NOT NULL,
+    contact_website TEXT NOT NULL,
+    contact_discord TEXT,
+    is_legacy INTEGER AS Boolean NOT NULL
+);
+
+ALTER TABLE extension_store ADD COLUMN extension_list_url TEXT;

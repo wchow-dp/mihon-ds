@@ -2,11 +2,11 @@ package eu.kanade.tachiyomi.data.track.myanimelist
 
 import eu.kanade.tachiyomi.data.track.myanimelist.dto.MALOAuth
 import eu.kanade.tachiyomi.network.parseAs
+import java.io.IOException
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.Response
 import uy.kohesive.injekt.injectLazy
-import java.io.IOException
 
 class MyAnimeListInterceptor(private val myanimelist: MyAnimeList) : Interceptor {
 
@@ -80,5 +80,6 @@ class MyAnimeListInterceptor(private val myanimelist: MyAnimeList) : Interceptor
     }
 }
 
+class MALTitleNotApproved : IOException("MAL: This title can't be added because it is waiting for approval.")
 class MALTokenRefreshFailed : IOException("MAL: Failed to refresh account token")
 class MALTokenExpired : IOException("MAL: Login has expired")

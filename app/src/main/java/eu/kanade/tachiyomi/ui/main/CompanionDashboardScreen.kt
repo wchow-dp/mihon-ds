@@ -42,19 +42,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.StateScreenModel
-import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import coil3.compose.AsyncImage
 import eu.kanade.presentation.components.relativeDateText
 import eu.kanade.presentation.manga.components.MangaCover
 import eu.kanade.presentation.util.formatChapterNumber
 import eu.kanade.tachiyomi.util.lang.toLocalDate
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mihon.core.dualscreen.DualScreenState
+import mihon.core.viewmodel.StateViewModel
 import tachiyomi.domain.history.interactor.GetHistory
 import tachiyomi.domain.history.model.HistoryWithRelations
 import tachiyomi.domain.manga.model.asMangaCover
@@ -64,16 +67,13 @@ import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZonedDateTime
 
 object CompanionDashboardScreen : Screen {
 
     @Composable
     override fun Content() {
-        val screenModel = rememberScreenModel { CompanionDashboardScreenModel() }
-        val state = screenModel.state.collectAsState().value
+        val viewModel = viewModel<CompanionDashboardScreenModel>()
+        val state = viewModel.state.collectAsState().value
 
         Box(modifier = Modifier.fillMaxSize()) {
             if (state.lastRead != null) {
@@ -396,10 +396,10 @@ class CompanionDashboardScreenModel(
     private val getHistory: GetHistory = Injekt.get(),
     private val getUpdates: GetUpdates = Injekt.get(),
     private val downloadManager: eu.kanade.tachiyomi.data.download.DownloadManager = Injekt.get(),
-) : StateScreenModel<CompanionDashboardScreenModel.State>(State()) {
+) : StateViewModel<CompanionDashboardScreenModel.State>(State()) {
 
     init {
-        screenModelScope.launch {
+        viewModelScope.launch {
             getHistory.subscribe("")
                 .collectLatest { history ->
                     val lastRead = history.firstOrNull()
@@ -416,7 +416,7 @@ class CompanionDashboardScreenModel(
                 }
         }
 
-        screenModelScope.launch {
+        viewModelScope.launch {
             val limit = ZonedDateTime.now().minusDays(7).toInstant()
             getUpdates.subscribe(
                 instant = limit,
@@ -429,7 +429,7 @@ class CompanionDashboardScreenModel(
             }
         }
 
-        screenModelScope.launch {
+        viewModelScope.launch {
             downloadManager.queueState.collectLatest { downloads ->
                 mutableState.update { it.copy(downloadQueue = downloads) }
             }

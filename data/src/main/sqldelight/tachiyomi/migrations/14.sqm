@@ -1,0 +1,13 @@
+-- Mihon DS: manga_merger. Previously shipped as 11.sqm, which collided with
+-- upstream's 11.sqm in v0.20.0. Guarded so existing DS installs skip it cleanly.
+
+CREATE TABLE IF NOT EXISTS manga_merger(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    manga_id INTEGER NOT NULL,
+    merge_manga_id INTEGER NOT NULL,
+    FOREIGN KEY(manga_id) REFERENCES mangas(_id) ON DELETE CASCADE,
+    FOREIGN KEY(merge_manga_id) REFERENCES mangas(_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_manga_merger_manga_id ON manga_merger(manga_id);
+CREATE INDEX IF NOT EXISTS idx_manga_merger_merge_manga_id ON manga_merger(merge_manga_id);

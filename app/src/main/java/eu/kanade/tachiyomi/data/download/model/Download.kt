@@ -2,6 +2,7 @@ package eu.kanade.tachiyomi.data.download.model
 
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.online.HttpSource
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,7 +48,7 @@ data class Download(
         if (pages == null) {
             emit(0)
             while (pages == null) {
-                delay(50)
+                delay(50.milliseconds)
             }
         }
 
@@ -55,7 +56,7 @@ data class Download(
         emitAll(combine(progressFlows) { it.average().toInt() })
     }
         .distinctUntilChanged()
-        .debounce(50)
+        .debounce(50.milliseconds)
 
     val progress: Int
         get() {

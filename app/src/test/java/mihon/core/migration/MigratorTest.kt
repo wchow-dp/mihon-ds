@@ -4,6 +4,7 @@ import io.kotest.assertions.nondeterministic.eventually
 import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.time.Duration.Companion.seconds
 
 class MigratorTest {
 
@@ -30,7 +30,7 @@ class MigratorTest {
 
     @BeforeEach
     fun initialize() {
-        migrationContext = MigrationContext(false)
+        migrationContext = MigrationContext(false, 0)
         migrationJobFactory = spyk(MigrationJobFactory(migrationContext, CoroutineScope(Dispatchers.Main + Job())))
         migrationCompletedListener = spyk<MigrationCompletedListener>(block = {})
         migrationStrategyFactory = spyk(MigrationStrategyFactory(migrationJobFactory, migrationCompletedListener))

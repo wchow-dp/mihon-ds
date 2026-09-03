@@ -40,7 +40,7 @@ These features are unique to this build and separate it from the upstream [mis0s
 *Plus all the standard features of Mihon:*
 *   Local reading of content.
 *   A configurable reader with multiple viewers, reading directions and other settings.
-*   Tracker support: MyAnimeList, AniList, Kitsu, MangaUpdates, Shikimori, and Bangumi.
+*   Tracker support: MangaBaka, MyAnimeList, AniList, Kitsu, MangaUpdates, Shikimori, Bangumi, and Hikka.
 *   Categories to organize your library.
 *   Light and dark themes.
 

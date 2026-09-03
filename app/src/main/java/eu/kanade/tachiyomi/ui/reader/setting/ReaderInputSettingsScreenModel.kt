@@ -2,8 +2,8 @@ package eu.kanade.tachiyomi.ui.reader.setting
 
 import android.view.KeyEvent
 import android.view.MotionEvent
-import cafe.adriel.voyager.core.model.ScreenModel
-import eu.kanade.presentation.util.ioCoroutineScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import eu.kanade.tachiyomi.ui.reader.input.CapturedReaderInput
 import eu.kanade.tachiyomi.ui.reader.input.ReaderAction
 import eu.kanade.tachiyomi.ui.reader.input.ReaderInputCaptureController
@@ -22,7 +22,7 @@ import uy.kohesive.injekt.api.get
 class ReaderInputSettingsScreenModel(
     val preferences: ReaderPreferences = Injekt.get(),
     private val inputCaptureController: ReaderInputCaptureController = ReaderInputCaptureController(),
-) : ScreenModel {
+) : ViewModel() {
 
     private val readerInputProfilePreference = preferences.readerInputProfile()
 
@@ -30,7 +30,7 @@ class ReaderInputSettingsScreenModel(
 
     val readerInputProfile = readerInputProfilePreference
         .changes()
-        .stateIn(ioCoroutineScope, SharingStarted.Lazily, readerInputProfilePreference.get())
+        .stateIn(viewModelScope, SharingStarted.Lazily, readerInputProfilePreference.get())
 
     fun startInputCapture(layer: ReaderInputLayer?, action: ReaderAction) {
         inputCaptureController.startCapture(layer, action)
@@ -102,8 +102,8 @@ class ReaderInputSettingsScreenModel(
 
     private fun currentDefaultOptions(): ReaderInputDefaultOptions {
         return ReaderInputDefaultOptions(
-            volumeKeysEnabled = preferences.readWithVolumeKeys().get(),
-            volumeKeysInverted = preferences.readWithVolumeKeysInverted().get(),
+            volumeKeysEnabled = preferences.readWithVolumeKeys.get(),
+            volumeKeysInverted = preferences.readWithVolumeKeysInverted.get(),
         )
     }
 

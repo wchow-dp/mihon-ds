@@ -3,7 +3,7 @@ package eu.kanade.presentation.more.settings.screen
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import cafe.adriel.voyager.core.model.rememberScreenModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import eu.kanade.presentation.more.settings.Preference
 import eu.kanade.presentation.reader.settings.ReaderInputSettingsPage
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderInputSettingsScreenModel
@@ -24,9 +24,9 @@ object SettingsReaderControlsScreen : SearchableSettings {
                 title = stringResource(MR.strings.reader_controls),
                 subtitle = stringResource(MR.strings.reader_controls_summary),
                 content = {
-                    val screenModel = rememberScreenModel { ReaderInputSettingsScreenModel() }
+                    val viewModel = viewModel<ReaderInputSettingsScreenModel>()
                     Column {
-                        ReaderInputSettingsPage(screenModel)
+                        ReaderInputSettingsPage(viewModel)
                     }
                 },
             ),

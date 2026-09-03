@@ -14,17 +14,17 @@ import androidx.core.net.toUri
 import eu.kanade.tachiyomi.util.storage.DiskUtil
 import eu.kanade.tachiyomi.util.storage.cacheImageDir
 import eu.kanade.tachiyomi.util.storage.getUriCompat
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.InputStream
+import kotlin.time.Clock
 import logcat.LogPriority
 import okio.IOException
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.core.common.util.system.ImageUtil
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.i18n.MR
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.InputStream
-import java.time.Instant
 
 class ImageSaver(
     val context: Context,
@@ -85,7 +85,7 @@ class ImageSaver(
             MediaStore.MediaColumns.RELATIVE_PATH to relativePath,
             MediaStore.MediaColumns.DISPLAY_NAME to if (isMimeTypeSupported) image.name else filename,
             MediaStore.MediaColumns.MIME_TYPE to type.mime,
-            MediaStore.MediaColumns.DATE_MODIFIED to Instant.now().epochSecond,
+            MediaStore.MediaColumns.DATE_MODIFIED to Clock.System.now().epochSeconds,
         )
 
         val picture = findUriOrDefault(relativePath, filename) {

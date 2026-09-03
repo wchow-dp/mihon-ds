@@ -63,6 +63,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastSumBy
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -216,10 +218,10 @@ private fun Modifier.drawScrollbar(
     val alpha = remember { Animatable(0f) }
     LaunchedEffect(scrolled, alpha) {
         scrolled
-            .sample(100)
+            .sample(0.1.seconds)
             .collectLatest {
                 alpha.snapTo(1f)
-                delay(ScrollBarVisibilityDurationMillis)
+                delay(ScrollBarVisibilityDurationMillis.milliseconds)
                 alpha.animateTo(0f, animationSpec = ImmediateFadeOutAnimationSpec)
             }
     }
