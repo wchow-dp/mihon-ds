@@ -36,4 +36,5 @@ jobs:
         with:
           tag_name: build-${{ github.run_number }}
           name: Mihon DS (frazse) build ${{ github.run_number }}
+          body_path: RELEASE_NOTES.md
           files: out/*.apk
