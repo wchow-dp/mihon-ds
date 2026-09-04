@@ -108,7 +108,9 @@ android {
         create("preview") {
             initWith(release)
 
-            applicationIdSuffix = ".debug"
+            // Not ".debug": these are the builds published from main, and a package id
+            // reading "debug" misleads anyone who installs one without context.
+            applicationIdSuffix = ".dualscreen"
 
             versionNameSuffix = debug.versionNameSuffix
 
