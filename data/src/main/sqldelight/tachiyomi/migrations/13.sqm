@@ -1,8 +1,10 @@
 import kotlin.Boolean;
 
--- Mihon DS shipped its own 11.sqm (manga_merger), so DS installs are stamped at
--- version 11 without ever having run upstream's 11.sqm. Recreate what they missed
--- before altering the table. No-ops on databases that did run upstream's 11.sqm.
+-- Mihon DS shipped its own 11.sqm (manga_merger), which advanced DS databases past the
+-- version at which upstream's 11.sqm runs. Those databases therefore never got
+-- extension_store, nor the extension_repos -> extension_store data migration that came
+-- with it. Do both here, guarded, so this is a no-op on databases that did run
+-- upstream's 11.sqm.
 CREATE TABLE IF NOT EXISTS extension_store(
     index_url TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -12,5 +14,22 @@ CREATE TABLE IF NOT EXISTS extension_store(
     contact_discord TEXT,
     is_legacy INTEGER AS Boolean NOT NULL
 );
+
+-- Recreated empty when already dropped, so the copy below is valid on both upgrade paths.
+CREATE TABLE IF NOT EXISTS extension_repos(
+    base_url TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    short_name TEXT,
+    website TEXT NOT NULL,
+    signing_key_fingerprint TEXT NOT NULL
+);
+
+INSERT OR IGNORE INTO extension_store(
+    index_url, name, badge_label, signing_key, contact_website, contact_discord, is_legacy
+)
+SELECT base_url || '/repo.json', name, coalesce(short_name, name), signing_key_fingerprint, website, NULL, 1
+FROM extension_repos;
+
+DROP TABLE extension_repos;
 
 ALTER TABLE extension_store ADD COLUMN extension_list_url TEXT;
