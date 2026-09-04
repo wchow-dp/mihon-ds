@@ -26,7 +26,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import eu.kanade.domain.base.BasePreferences
-import eu.kanade.presentation.util.DefaultNavigatorScreenTransition
+import cafe.adriel.voyager.navigator.CurrentScreen
 import eu.kanade.tachiyomi.ui.base.activity.BaseActivity
 import eu.kanade.tachiyomi.ui.reader.input.ReaderInputCaptureRegistry
 import eu.kanade.tachiyomi.util.view.setComposeContent
@@ -97,14 +97,30 @@ class DualScreenActivity : BaseActivity() {
                     Navigator(
                         screen = CompanionDashboardScreen,
                     ) { navigator ->
-                        DefaultNavigatorScreenTransition(navigator = navigator)
+                        // No screen transition here on purpose. Voyager shares one
+                        // SaveableStateHolder across nested navigators, and an animated
+                        // replace keeps the outgoing screen composed alongside the incoming
+                        // one. Two SettingsScreens overlapping means two nested navigators
+                        // rooted at the same `object` screen (e.g. SettingsDataScreen), which
+                        // registers one key twice and throws
+                        // "Key <screen>:transition was used multiple times".
+                        // Rendering the current screen directly disposes the outgoing one
+                        // immediately, so the keys never overlap.
+                        CurrentScreen()
 
                         androidx.compose.runtime.LaunchedEffect(navigator) {
                             launch {
                                 DualScreenState.activeScreen.collectLatest { screen ->
                                     val currentScreen = navigator.lastItem
                                     if (screen != null) {
-                                        if (currentScreen != screen) {
+                                        // DualScreenState holds a live Screen instance, and this
+                                        // activity is singleInstance, so re-fronting it recomposes
+                                        // and re-collects the same instance. Voyager 2 registers
+                                        // transition state per screen key and throws
+                                        // "Key ...:transition was used multiple times" if that key
+                                        // is still held by an in-flight transition. Checking the
+                                        // whole stack (not just lastItem) keeps that from happening.
+                                        if (navigator.items.none { it.key == screen.key }) {
                                             navigator.replace(screen)
                                         }
                                     } else {
