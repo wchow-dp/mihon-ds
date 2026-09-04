@@ -19,12 +19,21 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Build APK
         run: ./gradlew assemblePreview
+      - name: Read version
+        id: version
+        run: |
+          set -e
+          VERSION=$(grep -m1 'versionName = ' app/build.gradle.kts | sed 's/.*"\(.*\)".*/\1/')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Version: $VERSION"
+
       - name: Collect APK
         run: |
           set -e
           ls -R app/build/outputs/apk
           mkdir -p out
-          cp app/build/outputs/apk/preview/*universal*.apk out/mihon-ds-frazse-universal.apk
+          cp app/build/outputs/apk/preview/*universal*.apk \
+            "out/mihon-ds-${{ steps.version.outputs.version }}-universal.apk"
       - uses: actions/upload-artifact@v4
         with:
           name: mihon-ds-apk
@@ -34,7 +43,7 @@ jobs:
       - uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: build-${{ github.run_number }}
-          name: Mihon DS (frazse) build ${{ github.run_number }}
+          tag_name: v${{ steps.version.outputs.version }}-${{ github.run_number }}
+          name: Mihon DS ${{ steps.version.outputs.version }} (build ${{ github.run_number }})
           body_path: RELEASE_NOTES.md
           files: out/*.apk
