@@ -28,7 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberScreenModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import eu.kanade.presentation.components.AppBar
 import eu.kanade.presentation.library.DisplayPage
@@ -36,7 +36,7 @@ import eu.kanade.presentation.library.FilterPage
 import eu.kanade.presentation.library.SortPage
 import eu.kanade.tachiyomi.source.model.FilterList
 import eu.kanade.tachiyomi.ui.browse.source.browse.FilterItem
-import eu.kanade.tachiyomi.ui.library.LibrarySettingsScreenModel
+import eu.kanade.tachiyomi.ui.library.LibrarySettingsViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import mihon.core.dualscreen.DualScreenState
@@ -55,7 +55,7 @@ sealed class FilterCompanionScreen : Screen {
     data class Library(val categoryId: Long?) : FilterCompanionScreen() {
         @Composable
         override fun Content() {
-            val settingsScreenModel = rememberScreenModel { LibrarySettingsScreenModel() }
+            val settingsScreenModel = viewModel<LibrarySettingsViewModel>()
             val scope = rememberCoroutineScope()
             
             val categories by Injekt.get<GetCategories>().subscribe().collectAsState(emptyList())
@@ -106,9 +106,9 @@ sealed class FilterCompanionScreen : Screen {
                                 .padding(vertical = 8.dp)
                         ) {
                             when (page) {
-                                0 -> FilterPage(screenModel = settingsScreenModel)
-                                1 -> SortPage(category = category, screenModel = settingsScreenModel)
-                                2 -> DisplayPage(screenModel = settingsScreenModel)
+                                0 -> FilterPage(viewModel = settingsScreenModel)
+                                1 -> SortPage(category = category, viewModel = settingsScreenModel)
+                                2 -> DisplayPage(viewModel = settingsScreenModel)
                             }
                         }
                     }

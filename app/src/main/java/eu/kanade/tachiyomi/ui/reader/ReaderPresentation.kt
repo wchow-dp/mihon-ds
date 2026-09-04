@@ -63,6 +63,7 @@ import eu.kanade.tachiyomi.ui.reader.panel.PanelPageKey
 import eu.kanade.tachiyomi.ui.reader.panel.PanelReadingSettings
 import eu.kanade.tachiyomi.ui.reader.panel.hasSameLogicalPage
 import eu.kanade.tachiyomi.ui.reader.panel.panelPageKey
+import eu.kanade.presentation.reader.components.ChapterNavigatorType
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
@@ -355,7 +356,12 @@ class ReaderPresentation(
                     onOpenInWebView = null,
                     onOpenInBrowser = null,
                     onShare = null,
-                    viewer = null,
+                    chapterNavigatorType = if (readingMode == ReadingMode.RIGHT_TO_LEFT) {
+                        ChapterNavigatorType.HORIZONTAL_RTL
+                    } else {
+                        ChapterNavigatorType.HORIZONTAL_LTR
+                    },
+                    verticalNavigatorHeight = 1f,
                     onNextChapter = { activity.loadNextChapter() },
                     enabledNext = state.viewerChapters?.nextChapter != null,
                     onPreviousChapter = { activity.loadPreviousChapter() },
@@ -376,6 +382,7 @@ class ReaderPresentation(
                         }
                         activity.moveToPageIndex(primaryPageIndex.coerceIn(0, state.totalPages - 1))
                     },
+                    onPageIndexChangeFinished = { },
                     readingMode = readingMode,
                     onClickReadingMode = { activity.viewModel.openReadingModeSelectDialog() },
                     orientation = eu.kanade.tachiyomi.ui.reader.setting.ReaderOrientation.fromPreference(

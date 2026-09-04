@@ -4,12 +4,12 @@ import android.content.Context
 import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
-import java.time.Instant
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 
 fun Duration.toDurationString(context: Context, fallback: String): String {
     return toComponents { days, hours, minutes, seconds, _ ->
@@ -29,7 +29,7 @@ fun Duration.toDurationString(context: Context, fallback: String): String {
 @Composable
 @ReadOnlyComposable
 fun relativeTimeSpanString(epochMillis: Long): String {
-    val now = Instant.now().toEpochMilli()
+    val now = Clock.System.now().toEpochMilliseconds()
     return when {
         epochMillis <= 0L -> stringResource(MR.strings.relative_time_span_never)
         now - epochMillis < 1.minutes.inWholeMilliseconds -> stringResource(

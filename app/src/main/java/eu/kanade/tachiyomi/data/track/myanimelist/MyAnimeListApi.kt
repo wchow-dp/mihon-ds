@@ -12,10 +12,14 @@ import eu.kanade.tachiyomi.data.track.myanimelist.dto.MALSearchResult
 import eu.kanade.tachiyomi.data.track.myanimelist.dto.MALUser
 import eu.kanade.tachiyomi.network.DELETE
 import eu.kanade.tachiyomi.network.GET
+import eu.kanade.tachiyomi.network.HttpException
 import eu.kanade.tachiyomi.network.POST
+import eu.kanade.tachiyomi.network.await
 import eu.kanade.tachiyomi.network.awaitSuccess
 import eu.kanade.tachiyomi.network.parseAs
 import eu.kanade.tachiyomi.util.PkceUtil
+import java.text.SimpleDateFormat
+import java.util.Locale
 import kotlinx.serialization.json.Json
 import okhttp3.FormBody
 import okhttp3.Headers
@@ -23,10 +27,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import tachiyomi.core.common.util.lang.withIOContext
-import uy.kohesive.injekt.injectLazy
-import java.text.SimpleDateFormat
-import java.util.Locale
 import tachiyomi.domain.track.model.Track as DomainTrack
+import uy.kohesive.injekt.injectLazy
 
 class MyAnimeListApi(
     private val trackId: Long,
@@ -138,8 +140,23 @@ class MyAnimeListApi(
                 .put(formBodyBuilder.build())
                 .build()
             with(json) {
-                authClient.newCall(request)
-                    .awaitSuccess()
+                val response = authClient
+                    .newCall(request)
+                    .await()
+
+                if (!response.isSuccessful) {
+                    if (response.body.string().contains("invalid_content")) {
+                        // MAL returns unapproved titles in search but does not allow adding them to the list
+                        // returns 400 with this body: {"message":"Invalid content","error":"invalid_content"}
+                        // These unapproved titles cannot be filtered out in search and are also returned by the
+                        // endpoint we use for id prefix search
+                        throw MALTitleNotApproved()
+                    } else {
+                        throw HttpException(response.code)
+                    }
+                }
+
+                response
                     .parseAs<MALListItemStatus>()
                     .let { parseMangaItem(it, track) }
             }
@@ -244,7 +261,13 @@ class MyAnimeListApi(
     }
 
     private fun parseDate(isoDate: String): Long {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(isoDate)?.time ?: 0L
+        val pattern = when (isoDate.length) {
+            10 -> "yyyy-MM-dd"
+            7 -> "yyyy-MM"
+            4 -> "yyyy"
+            else -> throw IllegalArgumentException("Unsupported date format: \"$isoDate\"")
+        }
+        return SimpleDateFormat(pattern, Locale.US).parse(isoDate)?.time ?: 0L
     }
 
     private fun convertToIsoDate(epochTime: Long): String? {

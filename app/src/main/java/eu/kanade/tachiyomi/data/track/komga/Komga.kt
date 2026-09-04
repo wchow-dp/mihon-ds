@@ -7,13 +7,11 @@ import eu.kanade.tachiyomi.data.track.BaseTracker
 import eu.kanade.tachiyomi.data.track.EnhancedTracker
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
 import eu.kanade.tachiyomi.source.Source
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import okhttp3.Dns
 import okhttp3.OkHttpClient
 import tachiyomi.domain.manga.model.Manga
-import tachiyomi.i18n.MR
 import tachiyomi.domain.track.model.Track as DomainTrack
+import tachiyomi.i18n.MR
 
 class Komga(id: Long) : BaseTracker(id, "Komga"), EnhancedTracker {
 
@@ -49,7 +47,7 @@ class Komga(id: Long) : BaseTracker(id, "Komga"), EnhancedTracker {
 
     override fun hasNotStartedReading(status: Long): Boolean = status == UNREAD
 
-    override fun getScoreList(): ImmutableList<String> = persistentListOf()
+    override fun getScoreList(): List<String> = listOf()
 
     override fun displayScore(track: DomainTrack): String = ""
 

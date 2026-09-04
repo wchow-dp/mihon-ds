@@ -15,9 +15,10 @@ import eu.kanade.tachiyomi.ui.reader.panel.PanelReadingSettings
 import eu.kanade.tachiyomi.ui.reader.panel.PanelSortingAlgorithm
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderOrientation
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
-import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsScreenModel
+import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsViewModel
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
+import java.text.NumberFormat
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.CheckboxItem
 import tachiyomi.presentation.core.components.HeadingItem
@@ -25,19 +26,18 @@ import tachiyomi.presentation.core.components.SettingsChipRow
 import tachiyomi.presentation.core.components.SliderItem
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.collectAsState
-import java.text.NumberFormat
 
 @Composable
-internal fun ColumnScope.ReadingModePage(screenModel: ReaderSettingsScreenModel) {
+internal fun ColumnScope.ReadingModePage(viewModel: ReaderSettingsViewModel) {
     HeadingItem(MR.strings.pref_category_for_this_series)
-    val manga by screenModel.mangaFlow.collectAsState()
+    val manga by viewModel.mangaFlow.collectAsState()
 
     val readingMode = remember(manga) { ReadingMode.fromPreference(manga?.readingMode?.toInt()) }
     SettingsChipRow(MR.strings.pref_category_reading_mode) {
         ReadingMode.entries.map {
             FilterChip(
                 selected = it == readingMode,
-                onClick = { screenModel.onChangeReadingMode(it) },
+                onClick = { viewModel.onChangeReadingMode(it) },
                 label = { Text(stringResource(it.stringRes)) },
             )
         }
@@ -48,27 +48,27 @@ internal fun ColumnScope.ReadingModePage(screenModel: ReaderSettingsScreenModel)
         ReaderOrientation.entries.map {
             FilterChip(
                 selected = it == orientation,
-                onClick = { screenModel.onChangeOrientation(it) },
+                onClick = { viewModel.onChangeOrientation(it) },
                 label = { Text(stringResource(it.stringRes)) },
             )
         }
     }
 
     HeadingItem(MR.strings.pref_category_secondary_display)
-    SecondaryDisplayScrollSensitivityItem(screenModel)
+    SecondaryDisplayScrollSensitivityItem(viewModel)
 
-    val viewer by screenModel.viewerFlow.collectAsState()
+    val viewer by viewModel.viewerFlow.collectAsState()
     if (viewer is WebtoonViewer) {
-        WebtoonViewerSettings(screenModel)
+        WebtoonViewerSettings(viewModel)
     } else {
-        PagerViewerSettings(screenModel)
+        PagerViewerSettings(viewModel)
     }
 }
 
 @Composable
-private fun ColumnScope.SecondaryDisplayScrollSensitivityItem(screenModel: ReaderSettingsScreenModel) {
+private fun ColumnScope.SecondaryDisplayScrollSensitivityItem(viewModel: ReaderSettingsViewModel) {
     val numberFormat = remember { NumberFormat.getPercentInstance() }
-    val secondaryDisplayScrollSensitivity by screenModel.preferences.secondaryDisplayScrollSensitivity().collectAsState()
+    val secondaryDisplayScrollSensitivity by viewModel.preferences.secondaryDisplayScrollSensitivity().collectAsState()
 
     SliderItem(
         value = secondaryDisplayScrollSensitivity,
@@ -78,85 +78,85 @@ private fun ColumnScope.SecondaryDisplayScrollSensitivityItem(screenModel: Reade
         label = stringResource(MR.strings.pref_secondary_display_scroll_sensitivity),
         valueString = numberFormat.format(secondaryDisplayScrollSensitivity / 100f),
         onChange = {
-            screenModel.preferences.secondaryDisplayScrollSensitivity().set(it)
+            viewModel.preferences.secondaryDisplayScrollSensitivity().set(it)
         },
         pillColor = MaterialTheme.colorScheme.surfaceContainerHighest,
     )
 }
 
 @Composable
-private fun ColumnScope.PagerViewerSettings(screenModel: ReaderSettingsScreenModel) {
+private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) {
     HeadingItem(MR.strings.pager_viewer)
 
-    val navigationModePager by screenModel.preferences.navigationModePager().collectAsState()
-    val pagerNavInverted by screenModel.preferences.pagerNavInverted().collectAsState()
+    val navigationModePager by viewModel.preferences.navigationModePager.collectAsState()
+    val pagerNavInverted by viewModel.preferences.pagerNavInverted.collectAsState()
     TapZonesItems(
         selected = navigationModePager,
-        onSelect = screenModel.preferences.navigationModePager()::set,
+        onSelect = viewModel.preferences.navigationModePager::set,
         invertMode = pagerNavInverted,
-        onSelectInvertMode = screenModel.preferences.pagerNavInverted()::set,
+        onSelectInvertMode = viewModel.preferences.pagerNavInverted::set,
     )
 
-    val imageScaleType by screenModel.preferences.imageScaleType().collectAsState()
+    val imageScaleType by viewModel.preferences.imageScaleType.collectAsState()
     SettingsChipRow(MR.strings.pref_image_scale_type) {
         ReaderPreferences.ImageScaleType.mapIndexed { index, it ->
             FilterChip(
                 selected = imageScaleType == index + 1,
-                onClick = { screenModel.preferences.imageScaleType().set(index + 1) },
+                onClick = { viewModel.preferences.imageScaleType.set(index + 1) },
                 label = { Text(stringResource(it)) },
             )
         }
     }
 
-    val zoomStart by screenModel.preferences.zoomStart().collectAsState()
+    val zoomStart by viewModel.preferences.zoomStart.collectAsState()
     SettingsChipRow(MR.strings.pref_zoom_start) {
         ReaderPreferences.ZoomStart.mapIndexed { index, it ->
             FilterChip(
                 selected = zoomStart == index + 1,
-                onClick = { screenModel.preferences.zoomStart().set(index + 1) },
+                onClick = { viewModel.preferences.zoomStart.set(index + 1) },
                 label = { Text(stringResource(it)) },
             )
         }
     }
 
-    val isSideBySideViewEnabled by screenModel.preferences.sideBySideMode().collectAsState()
+    val isSideBySideViewEnabled by viewModel.preferences.sideBySideMode().collectAsState()
 
     CheckboxItem(
         label = stringResource(MR.strings.pref_crop_borders),
-        pref = screenModel.preferences.cropBorders(),
+        pref = viewModel.preferences.cropBorders,
     )
 
     CheckboxItem(
         label = stringResource(MR.strings.pref_landscape_zoom),
-        pref = screenModel.preferences.landscapeZoom(),
+        pref = viewModel.preferences.landscapeZoom,
     )
 
     CheckboxItem(
         label = stringResource(MR.strings.pref_navigate_pan),
-        pref = screenModel.preferences.navigateToPan(),
+        pref = viewModel.preferences.navigateToPan,
     )
 
     HeadingItem(MR.strings.pref_guided_reading)
 
-    val panelReadingEnabled by screenModel.preferences.panelReadingPaged().collectAsState()
+    val panelReadingEnabled by viewModel.preferences.panelReadingPaged().collectAsState()
     CheckboxItem(
         label = stringResource(MR.strings.pref_panel_reading),
-        pref = screenModel.preferences.panelReadingPaged(),
+        pref = viewModel.preferences.panelReadingPaged(),
     )
 
     if (panelReadingEnabled) {
-        val panelSortingAlgorithm by screenModel.preferences.panelSortingAlgorithm().collectAsState()
+        val panelSortingAlgorithm by viewModel.preferences.panelSortingAlgorithm().collectAsState()
         SettingsChipRow(MR.strings.pref_panel_sorting_algorithm) {
             PanelSortingAlgorithm.entries.map { algorithm ->
                 FilterChip(
                     selected = panelSortingAlgorithm == algorithm,
-                    onClick = { screenModel.preferences.panelSortingAlgorithm().set(algorithm) },
+                    onClick = { viewModel.preferences.panelSortingAlgorithm().set(algorithm) },
                     label = { Text(stringResource(algorithm.titleRes)) },
                 )
             }
         }
 
-        val panelTransitionMillis by screenModel.preferences.panelReadingTransitionMillis().collectAsState()
+        val panelTransitionMillis by viewModel.preferences.panelReadingTransitionMillis().collectAsState()
         SliderItem(
             label = stringResource(MR.strings.pref_panel_transition_duration),
             value = panelTransitionMillis,
@@ -168,17 +168,17 @@ private fun ColumnScope.PagerViewerSettings(screenModel: ReaderSettingsScreenMod
                 "${panelTransitionMillis}ms"
             },
             onChange = {
-                screenModel.preferences.panelReadingTransitionMillis()
+                viewModel.preferences.panelReadingTransitionMillis()
                     .set(PanelReadingSettings.normalizeTransitionMillis(it))
             },
         )
 
         CheckboxItem(
             label = stringResource(MR.strings.pref_panel_primary_overlay),
-            pref = screenModel.preferences.panelReadingPrimaryOverlay(),
+            pref = viewModel.preferences.panelReadingPrimaryOverlay(),
         )
 
-        val panelFocusEffect by screenModel.preferences.panelReadingFocusEffect().collectAsState()
+        val panelFocusEffect by viewModel.preferences.panelReadingFocusEffect().collectAsState()
         SettingsChipRow(MR.strings.pref_panel_focus_effect) {
             listOf(
                 PanelFocusEffect.OFF to MR.strings.off,
@@ -186,7 +186,7 @@ private fun ColumnScope.PagerViewerSettings(screenModel: ReaderSettingsScreenMod
             ).map { (effect, title) ->
                 FilterChip(
                     selected = panelFocusEffect == effect,
-                    onClick = { screenModel.preferences.panelReadingFocusEffect().set(effect) },
+                    onClick = { viewModel.preferences.panelReadingFocusEffect().set(effect) },
                     label = { Text(stringResource(title)) },
                 )
             }
@@ -194,10 +194,10 @@ private fun ColumnScope.PagerViewerSettings(screenModel: ReaderSettingsScreenMod
 
         CheckboxItem(
             label = stringResource(MR.strings.pref_panel_secondary_overlay),
-            pref = screenModel.preferences.panelReadingSecondaryOverlay(),
+            pref = viewModel.preferences.panelReadingSecondaryOverlay(),
         )
 
-        val panelFocusEffectSecondary by screenModel.preferences.panelReadingFocusEffectSecondary().collectAsState()
+        val panelFocusEffectSecondary by viewModel.preferences.panelReadingFocusEffectSecondary().collectAsState()
         SettingsChipRow(MR.strings.pref_panel_focus_effect_secondary) {
             listOf(
                 PanelFocusEffect.OFF to MR.strings.off,
@@ -205,14 +205,14 @@ private fun ColumnScope.PagerViewerSettings(screenModel: ReaderSettingsScreenMod
             ).map { (effect, title) ->
                 FilterChip(
                     selected = panelFocusEffectSecondary == effect,
-                    onClick = { screenModel.preferences.panelReadingFocusEffectSecondary().set(effect) },
+                    onClick = { viewModel.preferences.panelReadingFocusEffectSecondary().set(effect) },
                     label = { Text(stringResource(title)) },
                 )
             }
         }
 
         if (panelFocusEffect != PanelFocusEffect.OFF) {
-            val panelFocusStrength by screenModel.preferences.panelReadingFocusStrength().collectAsState()
+            val panelFocusStrength by viewModel.preferences.panelReadingFocusStrength().collectAsState()
             SliderItem(
                 label = stringResource(MR.strings.pref_panel_focus_strength),
                 value = panelFocusStrength,
@@ -220,13 +220,13 @@ private fun ColumnScope.PagerViewerSettings(screenModel: ReaderSettingsScreenMod
                 steps = 19,
                 valueString = "$panelFocusStrength%",
                 onChange = {
-                    screenModel.preferences.panelReadingFocusStrength()
+                    viewModel.preferences.panelReadingFocusStrength()
                         .set(PanelReadingSettings.normalizeFocusStrength(it))
                 },
             )
         }
 
-        val panelReadingDirection by screenModel.preferences.panelReadingDirection().collectAsState()
+        val panelReadingDirection by viewModel.preferences.panelReadingDirection().collectAsState()
         SettingsChipRow(MR.strings.pref_panel_reading_direction) {
             val directions = remember {
                 listOf(
@@ -237,37 +237,37 @@ private fun ColumnScope.PagerViewerSettings(screenModel: ReaderSettingsScreenMod
             directions.map { (direction, title) ->
                 FilterChip(
                     selected = panelReadingDirection == direction,
-                    onClick = { screenModel.preferences.panelReadingDirection().set(direction) },
+                    onClick = { viewModel.preferences.panelReadingDirection().set(direction) },
                     label = { Text(stringResource(title)) },
                 )
             }
         }
     }
 
-    val dualPageSplitPaged by screenModel.preferences.dualPageSplitPaged().collectAsState()
+    val dualPageSplitPaged by viewModel.preferences.dualPageSplitPaged.collectAsState()
     CheckboxItem(
         label = stringResource(MR.strings.pref_dual_page_split),
-        pref = screenModel.preferences.dualPageSplitPaged(),
+        pref = viewModel.preferences.dualPageSplitPaged,
         enabled = !isSideBySideViewEnabled,
     )
 
     if (dualPageSplitPaged) {
         CheckboxItem(
             label = stringResource(MR.strings.pref_dual_page_invert),
-            pref = screenModel.preferences.dualPageInvertPaged(),
+            pref = viewModel.preferences.dualPageInvertPaged,
         )
     }
 
-    val dualPageRotateToFit by screenModel.preferences.dualPageRotateToFit().collectAsState()
+    val dualPageRotateToFit by viewModel.preferences.dualPageRotateToFit.collectAsState()
     CheckboxItem(
         label = stringResource(MR.strings.pref_page_rotate),
-        pref = screenModel.preferences.dualPageRotateToFit(),
+        pref = viewModel.preferences.dualPageRotateToFit,
     )
 
     if (dualPageRotateToFit) {
         CheckboxItem(
             label = stringResource(MR.strings.pref_page_rotate_invert),
-            pref = screenModel.preferences.dualPageRotateToFitInvert(),
+            pref = viewModel.preferences.dualPageRotateToFitInvert,
         )
     }
 
@@ -275,33 +275,33 @@ private fun ColumnScope.PagerViewerSettings(screenModel: ReaderSettingsScreenMod
 
     CheckboxItem(
         label = stringResource(MR.strings.side_by_side_view),
-        pref = screenModel.preferences.sideBySideMode(),
+        pref = viewModel.preferences.sideBySideMode(),
     )
 
     if (isSideBySideViewEnabled) {
-        val manualHingeGap by screenModel.preferences.manualHingeGap().collectAsState()
+        val manualHingeGap by viewModel.preferences.manualHingeGap().collectAsState()
         SliderItem(
             label = stringResource(MR.strings.pref_hinge_gap),
             value = manualHingeGap,
             valueRange = 0..200,
             valueString = "${manualHingeGap}px",
-            onChange = { screenModel.preferences.manualHingeGap().set(it) },
+            onChange = { viewModel.preferences.manualHingeGap().set(it) },
         )
 
         SettingsChipRow(MR.strings.pref_hinge_presets) {
             FilterChip(
                 selected = manualHingeGap == 84,
-                onClick = { screenModel.preferences.manualHingeGap().set(84) },
+                onClick = { viewModel.preferences.manualHingeGap().set(84) },
                 label = { Text(stringResource(MR.strings.hinge_duo1)) },
             )
             FilterChip(
                 selected = manualHingeGap == 66,
-                onClick = { screenModel.preferences.manualHingeGap().set(66) },
+                onClick = { viewModel.preferences.manualHingeGap().set(66) },
                 label = { Text(stringResource(MR.strings.hinge_duo2)) },
             )
             FilterChip(
                 selected = manualHingeGap == 0,
-                onClick = { screenModel.preferences.manualHingeGap().set(0) },
+                onClick = { viewModel.preferences.manualHingeGap().set(0) },
                 label = { Text(stringResource(MR.strings.hinge_fold)) },
             )
         }
@@ -309,97 +309,97 @@ private fun ColumnScope.PagerViewerSettings(screenModel: ReaderSettingsScreenMod
 
     CheckboxItem(
         label = stringResource(MR.strings.pref_auto_enable_book_mode),
-        pref = screenModel.preferences.autoEnableSideBySide(),
+        pref = viewModel.preferences.autoEnableSideBySide(),
     )
     CheckboxItem(
         label = stringResource(MR.strings.pref_auto_disable_book_mode),
-        pref = screenModel.preferences.autoDisableSideBySide(),
+        pref = viewModel.preferences.autoDisableSideBySide(),
     )
     CheckboxItem(
         label = stringResource(MR.strings.pref_auto_adjust_hinge_gap),
-        pref = screenModel.preferences.autoAdjustHingeGap(),
+        pref = viewModel.preferences.autoAdjustHingeGap(),
     )
     CheckboxItem(
         label = stringResource(MR.strings.pref_auto_disable_on_start),
-        pref = screenModel.preferences.autoDisableSideBySideOnStart(),
+        pref = viewModel.preferences.autoDisableSideBySideOnStart(),
     )
     CheckboxItem(
         label = stringResource(MR.strings.pref_center_single_page),
-        pref = screenModel.preferences.centerSinglePage(),
+        pref = viewModel.preferences.centerSinglePage(),
     )
     if (isSideBySideViewEnabled) {
         CheckboxItem(
             label = stringResource(MR.strings.pref_side_by_side_page_offset),
-            pref = screenModel.preferences.sideBySidePageOffset(),
+            pref = viewModel.preferences.sideBySidePageOffset(),
         )
     }
 }
 
 @Composable
-private fun ColumnScope.WebtoonViewerSettings(screenModel: ReaderSettingsScreenModel) {
+private fun ColumnScope.WebtoonViewerSettings(viewModel: ReaderSettingsViewModel) {
     val numberFormat = remember { NumberFormat.getPercentInstance() }
 
     HeadingItem(MR.strings.webtoon_viewer)
 
-    val navigationModeWebtoon by screenModel.preferences.navigationModeWebtoon().collectAsState()
-    val webtoonNavInverted by screenModel.preferences.webtoonNavInverted().collectAsState()
+    val navigationModeWebtoon by viewModel.preferences.navigationModeWebtoon.collectAsState()
+    val webtoonNavInverted by viewModel.preferences.webtoonNavInverted.collectAsState()
     TapZonesItems(
         selected = navigationModeWebtoon,
-        onSelect = screenModel.preferences.navigationModeWebtoon()::set,
+        onSelect = viewModel.preferences.navigationModeWebtoon::set,
         invertMode = webtoonNavInverted,
-        onSelectInvertMode = screenModel.preferences.webtoonNavInverted()::set,
+        onSelectInvertMode = viewModel.preferences.webtoonNavInverted::set,
     )
 
-    val webtoonSidePadding by screenModel.preferences.webtoonSidePadding().collectAsState()
+    val webtoonSidePadding by viewModel.preferences.webtoonSidePadding.collectAsState()
     SliderItem(
         value = webtoonSidePadding,
         valueRange = ReaderPreferences.let { it.WEBTOON_PADDING_MIN..it.WEBTOON_PADDING_MAX },
         label = stringResource(MR.strings.pref_webtoon_side_padding),
         valueString = numberFormat.format(webtoonSidePadding / 100f),
         onChange = {
-            screenModel.preferences.webtoonSidePadding().set(it)
+            viewModel.preferences.webtoonSidePadding.set(it)
         },
         pillColor = MaterialTheme.colorScheme.surfaceContainerHighest,
     )
 
     CheckboxItem(
         label = stringResource(MR.strings.pref_crop_borders),
-        pref = screenModel.preferences.cropBordersWebtoon(),
+        pref = viewModel.preferences.cropBordersWebtoon,
     )
 
-    val dualPageSplitWebtoon by screenModel.preferences.dualPageSplitWebtoon().collectAsState()
+    val dualPageSplitWebtoon by viewModel.preferences.dualPageSplitWebtoon.collectAsState()
     CheckboxItem(
         label = stringResource(MR.strings.pref_dual_page_split),
-        pref = screenModel.preferences.dualPageSplitWebtoon(),
+        pref = viewModel.preferences.dualPageSplitWebtoon,
     )
 
     if (dualPageSplitWebtoon) {
         CheckboxItem(
             label = stringResource(MR.strings.pref_dual_page_invert),
-            pref = screenModel.preferences.dualPageInvertWebtoon(),
+            pref = viewModel.preferences.dualPageInvertWebtoon,
         )
     }
 
-    val dualPageRotateToFitWebtoon by screenModel.preferences.dualPageRotateToFitWebtoon().collectAsState()
+    val dualPageRotateToFitWebtoon by viewModel.preferences.dualPageRotateToFitWebtoon.collectAsState()
     CheckboxItem(
         label = stringResource(MR.strings.pref_page_rotate),
-        pref = screenModel.preferences.dualPageRotateToFitWebtoon(),
+        pref = viewModel.preferences.dualPageRotateToFitWebtoon,
     )
 
     if (dualPageRotateToFitWebtoon) {
         CheckboxItem(
             label = stringResource(MR.strings.pref_page_rotate_invert),
-            pref = screenModel.preferences.dualPageRotateToFitInvertWebtoon(),
+            pref = viewModel.preferences.dualPageRotateToFitInvertWebtoon,
         )
     }
 
     CheckboxItem(
         label = stringResource(MR.strings.pref_double_tap_zoom),
-        pref = screenModel.preferences.webtoonDoubleTapZoomEnabled(),
+        pref = viewModel.preferences.webtoonDoubleTapZoomEnabled,
     )
     CheckboxItem(
         label = stringResource(MR.strings.pref_webtoon_disable_zoom_out),
-        pref = screenModel.preferences.webtoonDisableZoomOut(),
+        pref = viewModel.preferences.webtoonDisableZoomOut,
     )
 }
 

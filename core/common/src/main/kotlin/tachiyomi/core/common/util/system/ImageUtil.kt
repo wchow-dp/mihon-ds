@@ -9,7 +9,6 @@ import android.graphics.BitmapRegionDecoder
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Rect
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
@@ -18,21 +17,22 @@ import androidx.core.graphics.alpha
 import androidx.core.graphics.applyCanvas
 import androidx.core.graphics.blue
 import androidx.core.graphics.createBitmap
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.get
 import androidx.core.graphics.green
 import androidx.core.graphics.red
 import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.util.system.GLUtil
-import logcat.LogPriority
-import okio.Buffer
-import okio.BufferedSource
-import tachiyomi.decoder.Format
-import tachiyomi.decoder.ImageDecoder
 import java.io.InputStream
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import logcat.LogPriority
+import okio.Buffer
+import okio.BufferedSource
+import tachiyomi.decoder.Format
+import tachiyomi.decoder.ImageDecoder
 
 object ImageUtil {
 
@@ -215,7 +215,11 @@ object ImageUtil {
      */
     private fun isTallImage(imageSource: BufferedSource): Boolean {
         val options = extractImageOptions(imageSource)
-        return (options.outHeight / options.outWidth) > 3
+        return TallImageSplitCalculator.shouldSplit(
+            imageWidth = options.outWidth,
+            imageHeight = options.outHeight,
+            optimalImageHeight = optimalImageHeight,
+        )
     }
 
     /**
@@ -236,7 +240,6 @@ object ImageUtil {
         val options = extractImageOptions(imageSource).apply {
             inJustDecodeBounds = false
         }
-
         val splitDataList = options.splitData
 
         return try {
@@ -283,8 +286,7 @@ object ImageUtil {
             val imageHeight = outHeight
             val imageWidth = outWidth
 
-            // -1 so it doesn't try to split when imageHeight = optimalImageHeight
-            val partCount = (imageHeight - 1) / optimalImageHeight + 1
+            val partCount = TallImageSplitCalculator.calculatePartCount(imageHeight, optimalImageHeight)
             val optimalSplitHeight = imageHeight / partCount
 
             logcat {
@@ -346,9 +348,9 @@ object ImageUtil {
         decoder?.recycle()
 
         val whiteColor = Color.WHITE
-        if (image == null) return ColorDrawable(whiteColor)
+        if (image == null) return whiteColor.toDrawable()
         if (image.width < 50 || image.height < 50) {
-            return ColorDrawable(whiteColor)
+            return whiteColor.toDrawable()
         }
 
         val top = 5
@@ -389,7 +391,7 @@ object ImageUtil {
             !color.isWhite() && color.isCloseTo(other)
         }
         if (isNotWhiteAndCloseTo.all { it }) {
-            return ColorDrawable(topLeftPixel)
+            return topLeftPixel.toDrawable()
         }
 
         val cornerPixels = listOf(topLeftPixel, topRightPixel, botLeftPixel, botRightPixel)
@@ -504,8 +506,8 @@ object ImageUtil {
         val isLandscape = context.resources.configuration?.orientation == Configuration.ORIENTATION_LANDSCAPE
         if (isLandscape) {
             return when {
-                darkBG -> ColorDrawable(blackColor)
-                else -> ColorDrawable(whiteColor)
+                darkBG -> blackColor.toDrawable()
+                else -> whiteColor.toDrawable()
             }
         }
 
@@ -526,7 +528,7 @@ object ImageUtil {
                 intArrayOf(whiteColor, whiteColor, blackColor, blackColor)
             }
             darkBG -> {
-                return ColorDrawable(blackColor)
+                return blackColor.toDrawable()
             }
             topIsBlackStreak ||
                 (
@@ -545,7 +547,7 @@ object ImageUtil {
                 intArrayOf(whiteColor, whiteColor, blackColor, blackColor)
             }
             else -> {
-                return ColorDrawable(whiteColor)
+                return whiteColor.toDrawable()
             }
         }
 

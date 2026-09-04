@@ -4,8 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import cafe.adriel.voyager.core.model.StateScreenModel
-import cafe.adriel.voyager.core.model.rememberScreenModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import eu.kanade.domain.sync.SyncPreferences
@@ -14,6 +13,7 @@ import eu.kanade.presentation.util.Screen
 import eu.kanade.tachiyomi.data.sync.models.SyncTriggerOptions
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.update
+import mihon.core.viewmodel.StateViewModel
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.LabeledCheckbox
 import tachiyomi.presentation.core.components.LazyColumnWithAction
@@ -28,7 +28,7 @@ class SyncTriggerOptionsScreen : Screen() {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val model = rememberScreenModel { SyncOptionsScreenModel() }
+        val model = viewModel<SyncOptionsScreenModel>()
         val state by model.state.collectAsState()
 
         Scaffold(
@@ -78,7 +78,7 @@ class SyncTriggerOptionsScreen : Screen() {
 
 private class SyncOptionsScreenModel(
     val syncPreferences: SyncPreferences = Injekt.get(),
-) : StateScreenModel<SyncOptionsScreenModel.State>(
+) : StateViewModel<SyncOptionsScreenModel.State>(
     State(
         syncPreferences.getSyncTriggerOptions(),
     ),

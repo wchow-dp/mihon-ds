@@ -14,10 +14,10 @@ import eu.kanade.tachiyomi.util.lang.chop
 import eu.kanade.tachiyomi.util.system.cancelNotification
 import eu.kanade.tachiyomi.util.system.notificationBuilder
 import eu.kanade.tachiyomi.util.system.notify
+import java.util.regex.Pattern
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.i18n.MR
 import uy.kohesive.injekt.injectLazy
-import java.util.regex.Pattern
 
 /**
  * DownloadNotifier is used to show notifications when downloading one or multiple chapters.
@@ -96,7 +96,7 @@ internal class DownloadNotifier(private val context: Context) {
                 download.pages!!.size,
             )
 
-            if (preferences.hideNotificationContent().get()) {
+            if (preferences.hideNotificationContent.get()) {
                 setContentTitle(downloadingProgressText)
                 setContentText(null)
             } else {

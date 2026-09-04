@@ -22,14 +22,14 @@ import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.ui.base.delegate.ThemingDelegate
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.lang.truncateCenter
+import java.io.File
 import logcat.LogPriority
-import rikka.sui.Sui
+import rikka.shizuku.ShizukuProvider
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.i18n.MR
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
-import java.io.File
 
 /**
  * Copies a string to clipboard
@@ -105,8 +105,8 @@ fun Context.createFileInCacheDir(name: String): File {
 fun Context.createReaderThemeContext(): Context {
     val preferences = Injekt.get<UiPreferences>()
     val readerPreferences = Injekt.get<ReaderPreferences>()
-    val themeMode = preferences.themeMode().get()
-    val isDarkBackground = when (readerPreferences.readerTheme().get()) {
+    val themeMode = preferences.themeMode.get()
+    val isDarkBackground = when (readerPreferences.readerTheme.get()) {
         1, 2 -> true // Black, Gray
         3 -> when (themeMode) { // Automatic bg uses activity background by default
             ThemeMode.SYSTEM -> applicationContext.isNightMode()
@@ -122,7 +122,7 @@ fun Context.createReaderThemeContext(): Context {
 
         val wrappedContext = ContextThemeWrapper(this, R.style.Theme_Tachiyomi)
         wrappedContext.applyOverrideConfiguration(overrideConf)
-        ThemingDelegate.getThemeResIds(preferences.appTheme().get(), preferences.themeDarkAmoled().get())
+        ThemingDelegate.getThemeResIds(preferences.appTheme.get(), preferences.themeDarkAmoled.get())
             .forEach { wrappedContext.theme.applyStyle(it, true) }
         return wrappedContext
     }
@@ -152,7 +152,13 @@ fun Context.isPackageInstalled(packageName: String): Boolean {
 
 val Context.hasMiuiPackageInstaller get() = isPackageInstalled("com.miui.packageinstaller")
 
-val Context.isShizukuInstalled get() = isPackageInstalled("moe.shizuku.privileged.api") || Sui.isSui()
+val Context.isShizukuInstalled: Boolean
+    get() = try {
+        packageManager.getPermissionInfo(ShizukuProvider.PERMISSION, 0)
+        true
+    } catch (e: PackageManager.NameNotFoundException) {
+        false
+    }
 
 fun Context.launchRequestPackageInstallsPermission() {
     Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {

@@ -1,47 +1,35 @@
 package tachiyomi.data
 
-import androidx.paging.PagingSource
-import app.cash.sqldelight.ExecutableQuery
 import app.cash.sqldelight.Query
-import kotlinx.coroutines.flow.Flow
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
 
-interface DatabaseHandler {
+/**
+ * Compatibility shim for Mihon DS's SyncYomi integration.
+ *
+ * Upstream removed DatabaseHandler in v0.20.0 and injects [Database] directly. Mihon DS's
+ * SyncManager is built around the old call shapes, so this keeps the subset it uses rather
+ * than rewriting every sync query.
+ */
+class DatabaseHandler(
+    private val database: Database,
+) {
 
-    suspend fun <T> await(inTransaction: Boolean = false, block: suspend Database.() -> T): T
+    suspend fun <T> await(inTransaction: Boolean = false, block: suspend Database.() -> T): T {
+        return if (inTransaction) {
+            database.transactionWithResult { database.block() }
+        } else {
+            database.block()
+        }
+    }
 
     suspend fun <T : Any> awaitList(
         inTransaction: Boolean = false,
         block: suspend Database.() -> Query<T>,
-    ): List<T>
+    ): List<T> = await(inTransaction) { block().awaitAsList() }
 
     suspend fun <T : Any> awaitOne(
         inTransaction: Boolean = false,
         block: suspend Database.() -> Query<T>,
-    ): T
-
-    suspend fun <T : Any> awaitOneExecutable(
-        inTransaction: Boolean = false,
-        block: suspend Database.() -> ExecutableQuery<T>,
-    ): T
-
-    suspend fun <T : Any> awaitOneOrNull(
-        inTransaction: Boolean = false,
-        block: suspend Database.() -> Query<T>,
-    ): T?
-
-    suspend fun <T : Any> awaitOneOrNullExecutable(
-        inTransaction: Boolean = false,
-        block: suspend Database.() -> ExecutableQuery<T>,
-    ): T?
-
-    fun <T : Any> subscribeToList(block: Database.() -> Query<T>): Flow<List<T>>
-
-    fun <T : Any> subscribeToOne(block: Database.() -> Query<T>): Flow<T>
-
-    fun <T : Any> subscribeToOneOrNull(block: Database.() -> Query<T>): Flow<T?>
-
-    fun <T : Any> subscribeToPagingSource(
-        countQuery: Database.() -> Query<Long>,
-        queryProvider: Database.(Long, Long) -> Query<T>,
-    ): PagingSource<Long, T>
+    ): T = await(inTransaction) { block().awaitAsOne() }
 }

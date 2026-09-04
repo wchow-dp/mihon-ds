@@ -1,5 +1,7 @@
 package eu.kanade.tachiyomi.ui.more
 
+import android.content.Context
+import android.view.Display
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
@@ -9,11 +11,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import android.content.Context
-import android.view.Display
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import mihon.core.dualscreen.DualScreenState
+import mihon.feature.support.SupportUsScreen
 import tachiyomi.core.common.util.lang.launchIO
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
@@ -68,11 +69,10 @@ data object MoreTab : Tab {
 
     @Composable
     override fun Content() {
-        val context = LocalContext.current
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel = rememberScreenModel { MoreScreenModel() }
-        val downloadQueueState by screenModel.downloadQueueState.collectAsState()
-        val detectedDisplays by screenModel.detectedDisplays.collectAsState()
+        val viewModel = viewModel<MoreViewModel>()
+        val downloadQueueState by viewModel.downloadQueueState.collectAsState()
+        val detectedDisplays by viewModel.detectedDisplays.collectAsState()
         val hasSecondaryDisplay = remember(detectedDisplays) { detectedDisplays.isNotEmpty() }
 
         val openScreen = { screen: cafe.adriel.voyager.core.screen.Screen ->
@@ -86,33 +86,34 @@ data object MoreTab : Tab {
 
         MoreScreen(
             downloadQueueStateProvider = { downloadQueueState },
-            downloadedOnly = screenModel.downloadedOnly,
-            onDownloadedOnlyChange = { screenModel.downloadedOnly = it },
-            incognitoMode = screenModel.incognitoMode,
-            onIncognitoModeChange = { screenModel.incognitoMode = it },
-            dualScreenMode = screenModel.dualScreenMode,
-            onDualScreenModeChange = { screenModel.dualScreenMode = it },
+            downloadedOnly = viewModel.downloadedOnly,
+            onDownloadedOnlyChange = { viewModel.downloadedOnly = it },
+            incognitoMode = viewModel.incognitoMode,
+            onIncognitoModeChange = { viewModel.incognitoMode = it },
+            dualScreenMode = viewModel.dualScreenMode,
+            onDualScreenModeChange = { viewModel.dualScreenMode = it },
             hasSecondaryDisplay = hasSecondaryDisplay,
             onClickDownloadQueue = { openScreen(DownloadQueueScreen) },
             onClickCategories = { openScreen(CategoryScreen()) },
             onClickStats = { openScreen(StatsScreen()) },
             onClickDataAndStorage = { openScreen(SettingsScreen(SettingsScreen.Destination.DataAndStorage)) },
             onClickSettings = { openScreen(SettingsScreen()) },
+            onClickSupport = { openScreen(SupportUsScreen()) },
             onClickAbout = { openScreen(SettingsScreen(SettingsScreen.Destination.About)) },
         )
     }
 }
 
-private class MoreScreenModel(
+class MoreViewModel(
     private val downloadManager: DownloadManager = Injekt.get(),
     preferences: BasePreferences = Injekt.get(),
-) : ScreenModel {
+) : ViewModel() {
 
-    var downloadedOnly by preferences.downloadedOnly().asState(screenModelScope)
-    var incognitoMode by preferences.incognitoMode().asState(screenModelScope)
-    var dualScreenMode by preferences.enableDualScreenMode().asState(screenModelScope)
-    var secondaryDisplayId by preferences.secondaryDisplayId().asState(screenModelScope)
-    var swapPresentationRotation by preferences.swapPresentationRotation().asState(screenModelScope)
+    var downloadedOnly by preferences.downloadedOnly.asState(viewModelScope)
+    var incognitoMode by preferences.incognitoMode.asState(viewModelScope)
+    var dualScreenMode by preferences.enableDualScreenMode().asState(viewModelScope)
+    var secondaryDisplayId by preferences.secondaryDisplayId().asState(viewModelScope)
+    var swapPresentationRotation by preferences.swapPresentationRotation().asState(viewModelScope)
 
     private val _detectedDisplays = MutableStateFlow<List<Int>>(emptyList())
     val detectedDisplays: StateFlow<List<Int>> = _detectedDisplays.asStateFlow()
@@ -127,7 +128,7 @@ private class MoreScreenModel(
             .map { it.displayId }
 
         // Handle running/paused status change and queue progress updating
-        screenModelScope.launchIO {
+        viewModelScope.launchIO {
             combine(
                 downloadManager.isDownloaderRunning,
                 downloadManager.queueState,

@@ -7,12 +7,12 @@ import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.core.security.SecurityPreferences
 import eu.kanade.tachiyomi.data.notification.NotificationReceiver
 import eu.kanade.tachiyomi.data.notification.Notifications
+import eu.kanade.tachiyomi.ui.main.ProcessBannerState
 import eu.kanade.tachiyomi.util.system.cancelNotification
 import eu.kanade.tachiyomi.util.system.notificationBuilder
 import eu.kanade.tachiyomi.util.system.notify
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.i18n.MR
-import eu.kanade.tachiyomi.ui.main.ProcessBannerState
 import uy.kohesive.injekt.injectLazy
 
 class SyncNotifier(private val context: Context) {
@@ -46,14 +46,14 @@ class SyncNotifier(private val context: Context) {
         ProcessBannerState.show(
             id = ProcessBannerState.SYNC_ID,
             title = title,
-            subtitle = content.takeIf { !preferences.hideNotificationContent().get() },
+            subtitle = content.takeIf { !preferences.hideNotificationContent.get() },
             progress = progress.toFloat() / maxAmount.coerceAtLeast(1),
         )
 
         val builder = with(progressNotificationBuilder) {
             setContentTitle(title)
 
-            if (!preferences.hideNotificationContent().get()) {
+            if (!preferences.hideNotificationContent.get()) {
                 setContentText(content)
             }
 

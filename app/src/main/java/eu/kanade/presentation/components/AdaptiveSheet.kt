@@ -1,13 +1,11 @@
 package eu.kanade.presentation.components
 
-import android.app.Presentation
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.SecureFlagPolicy
@@ -31,7 +29,7 @@ fun NavigatorAdaptiveSheet(
         content = { sheetNavigator ->
             AdaptiveSheet(
                 onDismissRequest = onDismissRequest,
-                enableSwipeDismiss = enableSwipeDismiss(sheetNavigator),
+                enableImplicitDismiss = enableSwipeDismiss(sheetNavigator),
             ) {
                 ScreenTransition(
                     navigator = sheetNavigator,
@@ -66,7 +64,7 @@ fun NavigatorAdaptiveSheet(
 fun AdaptiveSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    enableSwipeDismiss: Boolean = true,
+    enableImplicitDismiss: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val isTabletUi = isTabletUi()
@@ -77,7 +75,7 @@ fun AdaptiveSheet(
     ) {
         AdaptiveSheetImpl(
             isTabletUi = isTabletUi,
-            enableSwipeDismiss = enableSwipeDismiss,
+            enableImplicitDismiss = enableImplicitDismiss,
             onDismissRequest = onDismissRequest,
             modifier = modifier,
         ) {
@@ -91,16 +89,16 @@ fun AdaptiveSheet(
  * In dual-screen mode, the context may be a Presentation (window type 2037),
  * which requires specific dialog properties to avoid "Window type mismatch" crashes.
  */
+@Suppress("USELESS_IS_CHECK")
 @Composable
 private fun rememberDialogProperties(): DialogProperties {
-    val context = LocalContext.current
-    val isPresentationContext = context is Presentation
-
     return DialogProperties(
         usePlatformDefaultWidth = false,
         decorFitsSystemWindows = true,
         // Allow the dialog to work in Presentation contexts by not enforcing secure flags
         // that could conflict with the overlay window type
-        securePolicy = if (isPresentationContext) SecureFlagPolicy.SecureOn else SecureFlagPolicy.Inherit,
+        // NOTE: this previously read `context is Presentation`, which is always false
+        // (Presentation is a Dialog, not a Context) so it has always resolved to Inherit.
+        securePolicy = SecureFlagPolicy.Inherit,
     )
 }
