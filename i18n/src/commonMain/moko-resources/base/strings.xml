@@ -49,6 +49,8 @@
     <string name="pref_dual_screen_no_secondary_display">No secondary display detected</string>
     <string name="pref_always_show_dashboard">Always show Companion Dashboard</string>
     <string name="pref_always_show_dashboard_summary">Show the dashboard on the secondary screen during normal app navigation</string>
+    <string name="pref_close_companion_on_leave">Close companion when leaving the app</string>
+    <string name="pref_close_companion_on_leave_summary">Hide the secondary screen when you switch to another app or go to the home screen</string>
     <string name="side_by_side_view">Side-by-Side View</string>
     <string name="pref_hinge_gap">Hinge gap</string>
     <string name="pref_auto_enable_book_mode">Auto-enable Side-by-Side View when spanning</string>
