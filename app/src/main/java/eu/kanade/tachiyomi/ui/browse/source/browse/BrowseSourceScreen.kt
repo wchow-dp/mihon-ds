@@ -210,14 +210,17 @@ data class BrowseSourceScreen(
                                 onClick = {
                                     val preferences = Injekt.get<BasePreferences>()
                                     if (preferences.enableDualScreenMode().get()) {
-                                        DualScreenState.openScreen(
-                                            FilterCompanionScreen.Source(
+                                        DualScreenState.setSourceFilterContext(
+                                            DualScreenState.SourceFilterContext(
                                                 sourceId = sourceId,
                                                 filters = state.filters,
                                                 onReset = viewModel::resetFilters,
                                                 onFilter = { viewModel.search(filters = state.filters) },
                                                 onUpdate = viewModel::setFilters,
                                             )
+                                        )
+                                        DualScreenState.openScreen(
+                                            FilterCompanionScreen.Source(sourceId = sourceId)
                                         )
                                     } else {
                                         viewModel.openFilterSheet()

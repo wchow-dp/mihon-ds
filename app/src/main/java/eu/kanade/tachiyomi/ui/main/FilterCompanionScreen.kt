@@ -22,6 +22,10 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -117,16 +121,48 @@ sealed class FilterCompanionScreen : Screen {
         }
     }
 
+    /**
+     * Carries only the source id. The FilterList and callbacks live in DualScreenState:
+     * Voyager Screens are Serializable and get written into the instance-state Bundle, so
+     * holding them here crashed with NotSerializableException whenever the app was
+     * backgrounded with filters open on the companion display.
+     */
     data class Source(
         val sourceId: Long,
-        val filters: FilterList,
-        val onReset: () -> Unit,
-        val onFilter: () -> Unit,
-        val onUpdate: (FilterList) -> Unit,
     ) : FilterCompanionScreen() {
         @Composable
         override fun Content() {
-            val updateFilters = { onUpdate(filters) }
+            val context by DualScreenState.sourceFilterContext.collectAsState()
+
+            // Null after process death, when the screen is restored but the payload is not.
+            // Nothing useful can be shown, so hand the display back to the dashboard.
+            val filterContext = context?.takeIf { it.sourceId == sourceId }
+            if (filterContext == null) {
+                LaunchedEffect(Unit) { DualScreenState.close() }
+                return
+            }
+
+            val filters = filterContext.filters
+            val onReset = filterContext.onReset
+            val onFilter = filterContext.onFilter
+
+            // Source filters are mutated in place and are not Compose state, so changing
+            // one does not invalidate anything here. The main-screen dialog gets redrawn by
+            // its host; this screen does not, which made every selection look like a no-op.
+            // Bump a revision on each change and key the rows on it to force a redraw.
+            var revision by remember { mutableIntStateOf(0) }
+
+            // Keyed on revision so the callback gets a fresh identity after every change.
+            // Filter.Group renders through CollapsibleBox, which is skippable: with a stable
+            // callback its content lambda compares equal and Compose skips it, so nested
+            // checkboxes kept showing stale state until the group was collapsed and
+            // reopened. A new identity invalidates that content instead.
+            val updateFilters: () -> Unit = remember(revision, filterContext) {
+                {
+                    filterContext.onUpdate(filters)
+                    revision++
+                }
+            }
 
             Scaffold(
                 topBar = { scrollBehavior ->
@@ -170,6 +206,11 @@ sealed class FilterCompanionScreen : Screen {
                     }
 
                     items(filters) {
+                        // Reading `revision` subscribes this row to the in-place filter
+                        // mutations, so it redraws when one changes. Keying on it instead
+                        // would remount the row, and Filter.Group renders as a
+                        // CollapsibleBox whose expanded state lives in an internal
+                        // remember — remounting collapsed the group after every checkbox.
                         FilterItem(it, updateFilters)
                     }
                 }

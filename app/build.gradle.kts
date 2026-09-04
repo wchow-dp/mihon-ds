@@ -38,8 +38,8 @@ android {
     defaultConfig {
         applicationId = "app.mihon.ds"
 
-        versionCode = 21
-        versionName = "0.2.0"
+        versionCode = 22
+        versionName = "0.2.1"
 
         buildConfigField("String", "COMMIT_COUNT", "\"${getLatestCommitCount()}\"")
         buildConfigField("String", "COMMIT_SHA", "\"${getLatestCommitSha()}\"")
@@ -108,7 +108,9 @@ android {
         create("preview") {
             initWith(release)
 
-            applicationIdSuffix = ".debug"
+            // Not ".debug": these are the builds published from main, and a package id
+            // reading "debug" misleads anyone who installs one without context.
+            applicationIdSuffix = ".dualscreen"
 
             versionNameSuffix = debug.versionNameSuffix
 
