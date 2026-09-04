@@ -1,7 +1,7 @@
 # Mihon DS 0.2.1
 
 > **Credits.** Mihon DS is not my work. The dual-screen fork was created by
-> [mis0suppe](https://github.com/mis0suppe/mihon-ds) and substantially extended by
+> [mis0suppe](https://github.com/mis0suppe/mihon-ds) and extended by
 > [frazse](https://github.com/frazse/mihon-ds) — Layout Memory / manual panel training,
 > instant SyncYomi, flicker-free reader transitions and stabilised dual-screen sync are all
 > frazse's. Mihon itself is by the [Mihon team](https://github.com/mihonapp/mihon) and its
