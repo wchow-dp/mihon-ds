@@ -1,4 +1,4 @@
-# Mihon DS 0.2.0
+# Mihon DS 0.2.1
 
 > **Credits.** Mihon DS is not my work. The dual-screen fork was created by
 > [mis0suppe](https://github.com/mis0suppe/mihon-ds) and substantially extended by
@@ -28,6 +28,22 @@ The work in this release is integration, not new features:
   This predates the rebase and affects 0.1.6 too.
 - **Fixed a stale-navigator leak** in the download queue, introduced while porting it off Voyager.
 
+Since 0.2.0, three companion-display bugs found once sources finally worked:
+
+- **Source filters can be used on the second display.** Selections applied but the screen
+  never redrew, so every tap looked like it did nothing. Mihon's filter objects are mutated
+  in place and are not Compose state; the main-screen dialog is redrawn by its host, the
+  companion screen was not.
+- **Checkbox groups stay open.** Ticking a box closed the group, and the ticks only appeared
+  after reopening it.
+- **No longer crashes when backgrounded with filters open.** The companion filter screen
+  carried a FilterList and callbacks, which Android cannot write into the instance-state
+  Bundle.
+
+- **Published builds are now `app.mihon.ds.dualscreen` with a purple icon**, so they are not
+  mistaken for an official Mihon DS install. Note this is a different package id from 0.2.0,
+  so it installs alongside rather than upgrading.
+
 ## Upstream
 
 Everything in Mihon v0.19.5 through v0.20.4. Highlights: MangaBaka and Hikka tracker
@@ -52,18 +68,6 @@ to build.
 
 ## Known issues
 
-All of these predate this release. The first two only became reachable now: browsing a
-source requires a modern extension, which requires Mihon v0.20+, so Mihon DS could never
-open these screens before.
-
-- **Source filter dropdowns cannot be used on the secondary display.** Tapping an option
-  in a Select filter (Sort, Sort Order, and so on) dismisses the menu without selecting
-  anything. The same filter works normally in single-screen mode. `ExposedDropdownMenu`
-  renders through a `Popup`, and on the companion display a tap inside the popup is
-  treated as an outside-dismiss. Workaround: set filters in single-screen mode.
-- **Opening a source's filters on the companion display can crash on save-instance-state.**
-  `FilterCompanionScreen.Source` carries lambdas and a `FilterList`, which Android cannot
-  serialise into the instance-state `Bundle`.
 - `AdaptiveSheet` has a long-standing bug where `context is Presentation` can never be
   true, so secure-flag handling for sheets on the secondary display has never actually
   engaged. Behaviour is unchanged here; the dead branch was removed so the bug is visible.
@@ -71,6 +75,8 @@ open these screens before.
   It self-corrects within a frame or two.
 - The reader's companion-page ("book mode") toggle has no effect in webtoon mode — it only
   applies to the paged viewer. Same behaviour in mis0suppe's original.
+- Releases are still signed with the auto-generated debug keystore, so they are not
+  reliably upgradeable between builds. A real keystore in repo secrets would fix it.
 
 ## Testing
 
@@ -83,6 +89,10 @@ Verified on an AYN Thor (Android 13, secondary display id 4):
 - Guided reading and panel detection, the reader controls mapper with hardware bindings,
   the download queue opening on the secondary display, and webtoon reading from a real
   source across both panels.
+
+For 0.2.1, on the same device: selecting single-choice filters and ticking several
+checkboxes in a group on the companion display, both updating immediately, and the screen
+surviving being backgrounded with filters open.
 
 Not exercised: tapping through from the download queue to a manga, and recording a new
 control binding.
