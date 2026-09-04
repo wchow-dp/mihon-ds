@@ -7,6 +7,9 @@
 # Gradle wrapper
 *.jar binary
 *.tflite binary
+*.dex binary
+*.apk binary
+*.zst binary
 
 # Images
 *.webp binary
