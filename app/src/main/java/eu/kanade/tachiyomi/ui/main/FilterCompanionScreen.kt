@@ -22,6 +22,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -121,22 +122,38 @@ sealed class FilterCompanionScreen : Screen {
         }
     }
 
+    /**
+     * Carries only the source id. The FilterList and callbacks live in DualScreenState:
+     * Voyager Screens are Serializable and get written into the instance-state Bundle, so
+     * holding them here crashed with NotSerializableException whenever the app was
+     * backgrounded with filters open on the companion display.
+     */
     data class Source(
         val sourceId: Long,
-        val filters: FilterList,
-        val onReset: () -> Unit,
-        val onFilter: () -> Unit,
-        val onUpdate: (FilterList) -> Unit,
     ) : FilterCompanionScreen() {
         @Composable
         override fun Content() {
+            val context by DualScreenState.sourceFilterContext.collectAsState()
+
+            // Null after process death, when the screen is restored but the payload is not.
+            // Nothing useful can be shown, so hand the display back to the dashboard.
+            val filterContext = context?.takeIf { it.sourceId == sourceId }
+            if (filterContext == null) {
+                LaunchedEffect(Unit) { DualScreenState.close() }
+                return
+            }
+
+            val filters = filterContext.filters
+            val onReset = filterContext.onReset
+            val onFilter = filterContext.onFilter
+
             // Source filters are mutated in place and are not Compose state, so changing
             // one does not invalidate anything here. The main-screen dialog gets redrawn by
             // its host; this screen does not, which made every selection look like a no-op.
             // Bump a revision on each change and key the rows on it to force a redraw.
             var revision by remember { mutableIntStateOf(0) }
             val updateFilters: () -> Unit = {
-                onUpdate(filters)
+                filterContext.onUpdate(filters)
                 revision++
             }
 
