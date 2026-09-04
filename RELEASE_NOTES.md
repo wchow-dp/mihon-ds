@@ -1,8 +1,32 @@
 # Mihon DS 0.2.0
 
+> **Credits.** Mihon DS is not my work. The dual-screen fork was created by
+> [mis0suppe](https://github.com/mis0suppe/mihon-ds) and substantially extended by
+> [frazse](https://github.com/frazse/mihon-ds) — Layout Memory / manual panel training,
+> instant SyncYomi, flicker-free reader transitions and stabilised dual-screen sync are all
+> frazse's. Mihon itself is by the [Mihon team](https://github.com/mihonapp/mihon) and its
+> contributors. This build only rebases their work onto a newer upstream Mihon.
+
 Rebases Mihon DS onto **upstream Mihon v0.20.4**. The fork had been sitting on v0.19.4,
 so this brings in 300 upstream commits' worth of fixes and features while keeping every
 dual-screen capability intact.
+
+## What this build changes
+
+The work in this release is integration, not new features:
+
+- **Rebased Mihon DS onto upstream Mihon v0.20.4** (it had been on v0.19.4). Upstream replaced
+  Voyager's `ScreenModel` with androidx `ViewModel` and deleted the `voyager-screenmodel`
+  dependency, moved preference classes from function accessors to properties, removed
+  `DatabaseHandler` in favour of injecting `Database`, and renamed extension repos to extension
+  stores. The fork's dual-screen code was ported across all four changes.
+- **Fixed extension repos being wiped on upgrade.** Mihon DS shipped its own database migration
+  11, so DS databases never ran upstream's — leaving them without the `extension_store` table.
+  Upgrading would either crash or silently discard every configured repo. The migration now
+  creates the table and copies the rows across.
+- **Fixed the companion-display crash** when reopening a settings screen on the second display.
+  This predates the rebase and affects 0.1.6 too.
+- **Fixed a stale-navigator leak** in the download queue, introduced while porting it off Voyager.
 
 ## Upstream
 
@@ -17,20 +41,6 @@ All retained: dual-screen mode and the companion dashboard, guided reading and p
 detection, the reader controls mapper, secondary-display scroll sensitivity, webtoon
 spanning, tracker progress sync, SyncYomi support, recommendations, and telemetry off
 by default.
-
-## Fixes
-
-- **Extension repos survive the upgrade.** Mihon DS databases sit at schema 12 because
-  the fork shipped its own migration 11, so they never ran upstream's — meaning no
-  `extension_store` table. Upgrading would either crash or silently discard every
-  configured extension repo. The migration now creates the table and copies the rows
-  across.
-- **Companion display no longer crashes** when reopening a settings screen on the second
-  display (`Key <screen>:transition was used multiple times`). This bug predates the
-  rebase and affects 0.1.6 as well. Screens now swap instantly on the secondary display
-  rather than sliding — that animation was the cause.
-- **Download-queue navigation** no longer holds a stale navigator after its screen is
-  disposed.
 
 ## Under the hood
 

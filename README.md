@@ -7,6 +7,12 @@
 ### Dual-Screen Fork of Mihon
 A specialized fork of [Mihon](https://mihon.app) optimized for devices with secondary physical displays (like the AYN Thor, AYANEO Flip DS, and external monitors). This fork is capable of running side-by-side with the official app.
 
+**This repository is a personal build, not original work.** The dual-screen fork was created by
+[mis0suppe](https://github.com/mis0suppe/mihon-ds) and substantially extended by
+[frazse](https://github.com/frazse/mihon-ds); Mihon itself is by the
+[Mihon team](https://github.com/mihonapp/mihon) and contributors. Everything below is their work.
+This fork exists only to keep that work current with upstream Mihon.
+
 [![License: Apache-2.0](https://img.shields.io/github/license/mihonapp/mihon?labelColor=27303D&color=0877d2)](/LICENSE)
 
 </div>
@@ -27,13 +33,27 @@ A specialized fork of [Mihon](https://mihon.app) optimized for devices with seco
 
 ---
 
-### Custom Enhancements (v1.0+)
-These features are unique to this build and separate it from the upstream [mis0suppe/mihon-ds](https://github.com/mis0suppe/mihon-ds):
+### Enhancements by [frazse](https://github.com/frazse/mihon-ds)
+Built by [frazse](https://github.com/frazse) on top of [mis0suppe/mihon-ds](https://github.com/mis0suppe/mihon-ds).
+They are credited here, not claimed:
 
 *   **Layout Memory (Manual Panel Training):** A "Human-in-the-Loop" solution for panel detection errors. Enter **Correction Mode** in the reader to drag-and-drop panel numbers and fix the reading order. The app calculates a fuzzy "Geometric DNA" for the page and remembers your fix globally across all manga titles.
 *   **Instant Synchronization:** Removed the hardcoded 30-second delay for SyncYomi. Synchronization now triggers **instantly** upon app launch, resume, or manual command.
 *   **Flicker-Free Reader Transitions:** Eliminated the 1-frame "flash" of the panel overlay during transitions. Visual effects are now hard-blocked and the view hierarchy is cleaned up when Focus Effects are disabled.
 *   **Stabilized Dual-Screen Sync:** Unified the rendering logic across both primary and secondary displays to prevent stale layout artifacts on multi-screen devices.
+
+---
+
+### Changes in this build
+Integration work only, keeping the above current with upstream:
+
+*   Rebased onto **upstream Mihon v0.20.4** (from v0.19.4), porting the dual-screen code across
+    upstream's move from Voyager `ScreenModel` to androidx `ViewModel`, its preference API
+    change, the removal of `DatabaseHandler`, and the extension repo → extension store rename.
+*   Fixed configured **extension repos being silently discarded** when upgrading a Mihon DS
+    database, which sits at a schema version that never ran upstream's migration.
+*   Fixed a **crash on the companion display** when reopening a settings screen there
+    (pre-existing; affects 0.1.6 as well).
 
 ---
 
