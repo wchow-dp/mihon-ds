@@ -26,7 +26,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.key
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -152,9 +151,17 @@ sealed class FilterCompanionScreen : Screen {
             // its host; this screen does not, which made every selection look like a no-op.
             // Bump a revision on each change and key the rows on it to force a redraw.
             var revision by remember { mutableIntStateOf(0) }
-            val updateFilters: () -> Unit = {
-                filterContext.onUpdate(filters)
-                revision++
+
+            // Keyed on revision so the callback gets a fresh identity after every change.
+            // Filter.Group renders through CollapsibleBox, which is skippable: with a stable
+            // callback its content lambda compares equal and Compose skips it, so nested
+            // checkboxes kept showing stale state until the group was collapsed and
+            // reopened. A new identity invalidates that content instead.
+            val updateFilters: () -> Unit = remember(revision, filterContext) {
+                {
+                    filterContext.onUpdate(filters)
+                    revision++
+                }
             }
 
             Scaffold(
@@ -199,9 +206,12 @@ sealed class FilterCompanionScreen : Screen {
                     }
 
                     items(filters) {
-                        key(it, revision) {
-                            FilterItem(it, updateFilters)
-                        }
+                        // Reading `revision` subscribes this row to the in-place filter
+                        // mutations, so it redraws when one changes. Keying on it instead
+                        // would remount the row, and Filter.Group renders as a
+                        // CollapsibleBox whose expanded state lives in an internal
+                        // remember — remounting collapsed the group after every checkbox.
+                        FilterItem(it, updateFilters)
                     }
                 }
             }
