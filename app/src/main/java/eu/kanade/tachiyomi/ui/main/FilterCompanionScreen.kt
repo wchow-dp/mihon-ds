@@ -22,6 +22,10 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.key
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -126,7 +130,15 @@ sealed class FilterCompanionScreen : Screen {
     ) : FilterCompanionScreen() {
         @Composable
         override fun Content() {
-            val updateFilters = { onUpdate(filters) }
+            // Source filters are mutated in place and are not Compose state, so changing
+            // one does not invalidate anything here. The main-screen dialog gets redrawn by
+            // its host; this screen does not, which made every selection look like a no-op.
+            // Bump a revision on each change and key the rows on it to force a redraw.
+            var revision by remember { mutableIntStateOf(0) }
+            val updateFilters: () -> Unit = {
+                onUpdate(filters)
+                revision++
+            }
 
             Scaffold(
                 topBar = { scrollBehavior ->
@@ -170,7 +182,9 @@ sealed class FilterCompanionScreen : Screen {
                     }
 
                     items(filters) {
-                        FilterItem(it, updateFilters)
+                        key(it, revision) {
+                            FilterItem(it, updateFilters)
+                        }
                     }
                 }
             }
