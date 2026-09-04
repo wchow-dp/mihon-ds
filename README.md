@@ -8,7 +8,7 @@
 A specialized fork of [Mihon](https://mihon.app) optimized for devices with secondary physical displays (like the AYN Thor, AYANEO Flip DS, and external monitors). This fork is capable of running side-by-side with the official app.
 
 **This repository is a personal build, not original work.** The dual-screen fork was created by
-[mis0suppe](https://github.com/mis0suppe/mihon-ds) and substantially extended by
+[mis0suppe](https://github.com/mis0suppe/mihon-ds) and extended by
 [frazse](https://github.com/frazse/mihon-ds); Mihon itself is by the
 [Mihon team](https://github.com/mihonapp/mihon) and contributors. Everything below is their work.
 This fork exists only to keep that work current with upstream Mihon.
