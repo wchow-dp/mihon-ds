@@ -52,15 +52,37 @@ to build.
 
 ## Known issues
 
+All of these predate this release. The first two only became reachable now: browsing a
+source requires a modern extension, which requires Mihon v0.20+, so Mihon DS could never
+open these screens before.
+
+- **Source filter dropdowns cannot be used on the secondary display.** Tapping an option
+  in a Select filter (Sort, Sort Order, and so on) dismisses the menu without selecting
+  anything. The same filter works normally in single-screen mode. `ExposedDropdownMenu`
+  renders through a `Popup`, and on the companion display a tap inside the popup is
+  treated as an outside-dismiss. Workaround: set filters in single-screen mode.
+- **Opening a source's filters on the companion display can crash on save-instance-state.**
+  `FilterCompanionScreen.Source` carries lambdas and a `FilterList`, which Android cannot
+  serialise into the instance-state `Bundle`.
 - `AdaptiveSheet` has a long-standing bug where `context is Presentation` can never be
   true, so secure-flag handling for sheets on the secondary display has never actually
   engaged. Behaviour is unchanged here; the dead branch was removed so the bug is visible.
 - `InputDispatcher` occasionally logs that the companion window is on the wrong display.
-  It self-corrects within a frame or two. Pre-existing.
+  It self-corrects within a frame or two.
+- The reader's companion-page ("book mode") toggle has no effect in webtoon mode — it only
+  applies to the paged viewer. Same behaviour in mis0suppe's original.
 
 ## Testing
 
-Verified on an AYN Thor: in-place upgrade, database migration with extension repos
-preserved, guided reading, the download queue opening on the secondary display, and the
-reader controls mapper with hardware bindings. Webtoon spanning and download-queue
-tap-through have not been exercised against a real library.
+Verified on an AYN Thor (Android 13, secondary display id 4):
+
+- Upgrading a Mihon DS database in place: schema 12 → 15 with a configured extension repo
+  preserved in `extension_store`, `manga_merger` and its indices intact, no errors.
+- The companion-display crash fixed here still reproduces on a build of the pre-merge code
+  and no longer reproduces on this one.
+- Guided reading and panel detection, the reader controls mapper with hardware bindings,
+  the download queue opening on the secondary display, and webtoon reading from a real
+  source across both panels.
+
+Not exercised: tapping through from the download queue to a manga, and recording a new
+control binding.
