@@ -19,6 +19,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -78,7 +79,9 @@ object DownloadQueueScreen : Screen() {
         }
         val scope = rememberCoroutineScope()
         val viewModel = viewModel<DownloadQueueViewModel>()
-        LaunchedEffect(viewModel, navigator) {
+        // Cleared on dispose: the ViewModel outlives this composition, so holding the
+        // callback (and the navigator it captures) past that would push onto a dead navigator.
+        DisposableEffect(viewModel, navigator) {
             viewModel.onOpenManga = { mangaId ->
                 if (Injekt.get<BasePreferences>().enableDualScreenMode().get()) {
                     DualScreenState.openScreen(MangaScreen(mangaId))
@@ -86,6 +89,7 @@ object DownloadQueueScreen : Screen() {
                     navigator.push(MangaScreen(mangaId))
                 }
             }
+            onDispose { viewModel.onOpenManga = null }
         }
         val downloadList by viewModel.state.collectAsState()
         val downloadCount by remember {
