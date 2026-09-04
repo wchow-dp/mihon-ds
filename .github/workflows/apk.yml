@@ -19,13 +19,22 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Build APK
         run: ./gradlew assemblePreview
-      - name: Read version
+      - name: Read version and release number
         id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
           VERSION=$(grep -m1 'versionName = ' app/build.gradle.kts | sed 's/.*"\(.*\)".*/\1/')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Version: $VERSION"
+
+          # Release counter, independent of github.run_number (which counts every CI run on
+          # every branch). Take the highest existing rN tag and add one, so deleting old
+          # releases cannot make the counter go backwards onto a tag that still exists.
+          LAST=$(gh api "repos/${{ github.repository }}/tags?per_page=100" --jq \
+            '[.[].name | capture("-r(?<n>[0-9]+)$") | .n | tonumber] | max // 0' 2>/dev/null || echo 0)
+          echo "release=$((LAST + 1))" >> "$GITHUB_OUTPUT"
+          echo "Version: $VERSION, release: $((LAST + 1))"
 
       - name: Collect APK
         run: |
@@ -43,7 +52,7 @@ jobs:
       - uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v${{ steps.version.outputs.version }}-${{ github.run_number }}
-          name: Mihon DS ${{ steps.version.outputs.version }} (build ${{ github.run_number }})
+          tag_name: v${{ steps.version.outputs.version }}-r${{ steps.version.outputs.release }}
+          name: Mihon DS ${{ steps.version.outputs.version }} (release ${{ steps.version.outputs.release }})
           body_path: RELEASE_NOTES.md
           files: out/*.apk
