@@ -50,6 +50,8 @@ What these builds change for you, newest first. Internal fixes and the full hist
 
 **0.2.2**
 
+*   **Clear Layout Memory** from Settings → Spanning → Guided reading, which also shows how
+    many panel layouts are stored. Previously saved corrections could only accumulate.
 *   **Optionally close the companion display when you leave the app.** Off by default; turn it
     on in Settings → Spanning. Previously the second screen kept showing Mihon after you
     pressed home or switched apps.

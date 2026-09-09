@@ -34,6 +34,10 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ### Added
 
+- **A way to clear Layout Memory.** Corrections are saved implicitly from the reader's
+  correction mode and applied silently, so there was no way to see how many were stored or to
+  discard them. Settings → Spanning → Guided reading now shows the count and clears them. This
+  is also how you remove the entries this release stopped honouring.
 - **Option to close the companion display when you leave the app.** The companion runs as its
   own task on the second screen, so pressing home or switching apps left Mihon showing there
   over whatever was now in front. Off by default; enable it in Settings → Spanning. Returning

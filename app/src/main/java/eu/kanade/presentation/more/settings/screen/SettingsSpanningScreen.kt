@@ -6,10 +6,14 @@ import android.view.Display
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import eu.kanade.domain.base.BasePreferences
 import eu.kanade.presentation.more.settings.Preference
+import eu.kanade.tachiyomi.ui.reader.panel.PanelCorrectionStore
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
+import eu.kanade.tachiyomi.util.system.toast
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
@@ -38,6 +42,7 @@ object SettingsSpanningScreen : SearchableSettings {
             add(getReaderGroup(readerPref))
             add(getHingeGroup(readerPref))
             add(getDualScreenModeGroup(basePref, readerPref, context, dualScreenEnabled))
+            add(getGuidedReadingGroup(context))
         }
     }
 
@@ -195,6 +200,38 @@ object SettingsSpanningScreen : SearchableSettings {
         return Preference.PreferenceGroup(
             title = stringResource(MR.strings.pref_category_secondary_display),
             preferenceItems = items.toImmutableList(),
+        )
+    }
+
+    /**
+     * Layout Memory has no other UI: corrections are saved implicitly from the reader's
+     * correction mode and applied silently, so this is the only way to see how many are stored
+     * or to discard them. Entries written before the FUZZY_V3 key change are ignored rather
+     * than deleted, and this is what clears them out.
+     */
+    @Composable
+    private fun getGuidedReadingGroup(context: Context): Preference.PreferenceGroup {
+        val store = remember { PanelCorrectionStore(context) }
+        var savedLayouts by remember { mutableIntStateOf(store.size()) }
+
+        return Preference.PreferenceGroup(
+            title = stringResource(MR.strings.pref_guided_reading),
+            preferenceItems = persistentListOf(
+                Preference.PreferenceItem.TextPreference(
+                    title = stringResource(MR.strings.pref_clear_layout_memory),
+                    subtitle = if (savedLayouts > 0) {
+                        stringResource(MR.strings.pref_clear_layout_memory_summary, savedLayouts)
+                    } else {
+                        stringResource(MR.strings.pref_clear_layout_memory_empty)
+                    },
+                    enabled = savedLayouts > 0,
+                    onClick = {
+                        store.clearAll()
+                        savedLayouts = 0
+                        context.toast(MR.strings.layout_memory_cleared)
+                    },
+                ),
+            ),
         )
     }
 }

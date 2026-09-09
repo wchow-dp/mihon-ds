@@ -12,6 +12,10 @@ option. No upstream Mihon changes — still based on Mihon v0.20.4.
 
 ## Added
 
+- **Clear Layout Memory.** Panel corrections are saved implicitly and applied silently, so
+  there was no way to see how many were stored or to get rid of them. **Settings → Spanning →
+  Guided reading** now shows the count and clears them — which is also how you discard the
+  entries this release stopped honouring.
 - **Option to close the companion display when you leave the app.** The companion runs as its
   own task on the second screen, so pressing home or switching apps left Mihon showing there
   over whatever was now in front. Off by default; enable it in **Settings → Spanning**.
