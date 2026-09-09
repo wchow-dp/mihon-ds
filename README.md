@@ -22,7 +22,7 @@ This fork exists only to keep that work current with upstream Mihon.
 <div align="left">
 
 *   **Dual Screen Support:** Optimized reading experience that spans across two physical displays.
-*   **Side-by-Side Installation:** Uses a unique package name (`app.mihon.ds`) so it can be installed alongside the official Mihon app.
+*   **Side-by-Side Installation:** Uses its own package name, so it installs alongside the official Mihon app. Builds published here use `app.mihon.ds.dualscreen`; upstream Mihon DS uses `app.mihon.ds`.
 *   **Webtoon Spanning:** Automatically synchronizes scrolling across both screens for a continuous webtoon reading experience.
 *   **Guided Reading:** Detects panels in paged manga and comics for panel-by-panel navigation with dual-screen context.
 *   **Reader Controls Mapper:** Map hardware buttons and controller inputs to reader actions, with global defaults and per-reading-mode overrides.
@@ -44,8 +44,30 @@ They are credited here, not claimed:
 
 ---
 
-### Changes in this build
-Integration work only, keeping the above current with upstream:
+### Changes in this fork
+What these builds change for you, newest first. Internal fixes and the full history live in
+[CHANGELOG-DS.md](CHANGELOG-DS.md).
+
+**Unreleased**
+
+*   **Layout Memory corrections behave on pages other than the one you trained.** A saved fix
+    was recorded against the panel detector's own output order, which is not stable from page
+    to page, so a layout match on a different page applied an order that meant nothing there —
+    replacing a usually-correct sort with a scrambled one. Fixes are now recorded against the
+    page's geometry instead. Layouts trained before this build need retraining.
+
+**0.2.1**
+
+*   **Source filters work on the companion display.** Selections applied, but the screen never
+    redrew, so every tap looked like it did nothing.
+*   **Checkbox groups stay open** while ticking, instead of closing and only showing the ticks
+    once reopened.
+*   **No crash when backgrounded** with the companion filter screen open.
+*   Published builds moved to the `app.mihon.ds.dualscreen` package id with a purple icon, so
+    they are not mistaken for an official Mihon DS install. This installs alongside 0.2.0
+    rather than upgrading it.
+
+**0.2.0**
 
 *   Rebased onto **upstream Mihon v0.20.4** (from v0.19.4), porting the dual-screen code across
     upstream's move from Voyager `ScreenModel` to androidx `ViewModel`, its preference API
