@@ -48,8 +48,11 @@ They are credited here, not claimed:
 What these builds change for you, newest first. Internal fixes and the full history live in
 [CHANGELOG-DS.md](CHANGELOG-DS.md).
 
-**Unreleased**
+**0.2.2**
 
+*   **Optionally close the companion display when you leave the app.** Off by default; turn it
+    on in Settings → Spanning. Previously the second screen kept showing Mihon after you
+    pressed home or switched apps.
 *   **Layout Memory corrections behave on pages other than the one you trained.** A saved fix
     was recorded against the panel detector's own output order, which is not stable from page
     to page, so a layout match on a different page applied an order that meant nothing there —

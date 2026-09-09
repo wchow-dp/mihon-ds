@@ -9,7 +9,7 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ## How this file is kept
 
-- Every change lands with an entry under `## [Unreleased]`, in the same commit as the change.
+- Every change lands with an entry under `## [0.2.2] - 2026-09-09`, in the same commit as the change.
 - When a release is cut, rename that heading to the version and date, and rewrite
   `RELEASE_NOTES.md` — CI publishes that file verbatim as the release body, so it describes a
   single release, while this file keeps the history.
@@ -31,6 +31,14 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   entries that are not a complete permutation of the page's panels are discarded, and the key
   prefix moved to `FUZZY_V3` so existing entries are ignored rather than misapplied.
   Layouts trained before this build need retraining.
+
+### Added
+
+- **Option to close the companion display when you leave the app.** The companion runs as its
+  own task on the second screen, so pressing home or switching apps left Mihon showing there
+  over whatever was now in front. Off by default; enable it in Settings → Spanning. Returning
+  to the app brings the companion back. Closing lags the main screen slightly, because Android
+  defers the signal until the leave animation finishes.
 
 ### Other
 
