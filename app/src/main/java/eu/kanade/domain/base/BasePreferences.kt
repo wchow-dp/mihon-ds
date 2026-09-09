@@ -27,6 +27,8 @@ class BasePreferences(
 
     fun alwaysShowDashboard() = preferenceStore.getBoolean(Preference.appStateKey("always_show_dashboard"), true)
 
+    fun closeCompanionOnLeave() = preferenceStore.getBoolean(Preference.appStateKey("close_companion_on_leave"), false)
+
     val extensionInstaller: ExtensionInstallerPreference = ExtensionInstallerPreference(context, preferenceStore)
 
     val shownOnboardingFlow: Preference<Boolean> = preferenceStore.getBoolean(
