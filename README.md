@@ -23,7 +23,7 @@ This fork exists only to keep that work current with upstream Mihon.
 
 *   **Dual Screen Support:** Optimized reading experience that spans across two physical displays.
 *   **Side-by-Side Installation:** Uses its own package name, so it installs alongside the official Mihon app. Builds published here use `app.mihon.ds.dualscreen`; upstream Mihon DS uses `app.mihon.ds`.
-*   **Webtoon Spanning:** Automatically synchronizes scrolling across both screens for a continuous webtoon reading experience.
+*   **Webtoon Spanning:** Automatically synchronizes scrolling across both screens for a continuous webtoon reading experience. Requires the **Long strip** reading mode — Mihon's name for webtoon. "Long strip with gaps" sits next to it in the list and looks the same, but will not span.
 *   **Guided Reading:** Detects panels in paged manga and comics for panel-by-panel navigation with dual-screen context.
 *   **Reader Controls Mapper:** Map hardware buttons and controller inputs to reader actions, with global defaults and per-reading-mode overrides.
 *   **Secondary Display Scroll Sensitivity:** Adjustable bottom-screen touchpad scroll speed, from 50% to 500% (100% stays one-to-one with finger movement).

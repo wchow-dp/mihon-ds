@@ -9,7 +9,15 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ## How this file is kept
 
-- Every change lands with an entry under `## [0.2.3] - 2026-09-09
+- Every change lands with an entry under `## [Unreleased]
+
+### Other
+
+- README now says Webtoon Spanning needs the **Long strip** reading mode. The feature is gated on
+  `ViewerType.Webtoon`, which the UI labels "Long strip", so the docs named something that does not
+  appear anywhere in the app — and "Long strip with gaps" is a different mode that does not span.
+
+## [0.2.3] - 2026-09-09
 
 ### Fixed
 
