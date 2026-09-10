@@ -1,4 +1,4 @@
-# Mihon DS 0.2.2
+# Mihon DS 0.2.3
 
 > **Credits.** Mihon DS is not my work. The dual-screen fork was created by
 > [mis0suppe](https://github.com/mis0suppe/mihon-ds) and extended by
@@ -7,36 +7,24 @@
 > frazse's. Mihon itself is by the [Mihon team](https://github.com/mihonapp/mihon) and its
 > contributors. This build only keeps their work current with upstream Mihon.
 
-A small release on top of 0.2.1: one Layout Memory correctness fix and one new dual-screen
-option. No upstream Mihon changes — still based on Mihon v0.20.4.
-
-## Added
-
-- **Clear Layout Memory.** Panel corrections are saved implicitly and applied silently, so
-  there was no way to see how many were stored or to get rid of them. **Settings → Spanning →
-  Guided reading** now shows the count and clears them — which is also how you discard the
-  entries this release stopped honouring.
-- **Option to close the companion display when you leave the app.** The companion runs as its
-  own task on the second screen, so pressing home or switching apps left Mihon showing there
-  over whatever was now in front. Off by default; enable it in **Settings → Spanning**.
-  Returning to the app brings the companion back.
+A follow-up to 0.2.2, fixing the settings entry that release introduced. Still based on
+Mihon v0.20.4.
 
 ## Fixed
 
-- **Layout Memory no longer scrambles panel order on pages other than the one you trained.**
-  A correction was saved as indices into the panel detector's own output order, which is not
-  stable from page to page, while the layout signature is built from a geometry-sorted view of
-  the same panels. So whenever a signature matched a *different* page — the cross-title case
-  the feature exists for — the stored order described an arrangement that did not apply there,
-  replacing a usually-correct sort with a meaningless one. Corrections are now recorded against
-  the page's geometry, and entries that are not a complete permutation are discarded.
+- **"Clear layout memory" no longer disappears once you use it.** The row was hidden whenever
+  no layouts were stored, so clearing them made it vanish — leaving an empty "Guided reading"
+  heading and hiding the "No saved panel layouts" text meant to replace the count. Preference
+  items in this app hide when disabled rather than greying out, which is what the row was
+  doing. It now stays visible and simply does nothing when there is nothing to clear.
 
-  **Layouts trained on earlier builds need retraining.** Old entries are ignored rather than
-  misapplied.
+## Other
+
+- Repo logo recoloured to match the purple launcher icon that published builds use.
 
 ## Known issues
 
-Unchanged from 0.2.1, all pre-existing:
+Unchanged, all pre-existing:
 
 - `AdaptiveSheet` has a long-standing bug where `context is Presentation` can never be true, so
   secure-flag handling for sheets on the secondary display has never actually engaged.
@@ -46,11 +34,14 @@ Unchanged from 0.2.1, all pre-existing:
   the paged viewer only. Same behaviour in mis0suppe's original.
 - Releases are signed with the auto-generated debug keystore, so they are not reliably
   upgradeable between builds. A real keystore in repo secrets would fix it.
-- Closing the companion lags the main screen slightly. Android defers the signal until the
-  leave animation finishes, so most of the delay is not ours to remove.
+- Closing the companion lags the main screen. Android defers the signal until the leave
+  animation finishes, so most of the delay is not ours to remove.
 
 ## Testing
 
-The Layout Memory fix is reasoned from the code and has not been exercised against a trained
-layout on device. The companion-close option was tested on an AYN Thor: it closes on leaving
-the app and restores on return.
+Verified on an AYN Thor: with three layouts stored (including one from the old key format),
+the setting showed the correct count, clearing emptied the store, and the row stayed visible
+afterwards reading "No saved panel layouts".
+
+The Layout Memory ordering fix from 0.2.2 still has not been exercised against a layout trained
+on one page and matched on another — the case it exists for.

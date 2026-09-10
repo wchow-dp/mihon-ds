@@ -48,6 +48,11 @@ They are credited here, not claimed:
 What these builds change for you, newest first. Internal fixes and the full history live in
 [CHANGELOG-DS.md](CHANGELOG-DS.md).
 
+**0.2.3**
+
+*   **"Clear layout memory" stays visible after you use it**, instead of vanishing and leaving
+    an empty heading behind.
+
 **0.2.2**
 
 *   **Clear Layout Memory** from Settings → Spanning → Guided reading, which also shows how

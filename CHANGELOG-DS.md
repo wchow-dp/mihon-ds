@@ -9,7 +9,20 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ## How this file is kept
 
-- Every change lands with an entry under `## [0.2.2] - 2026-09-09`, in the same commit as the change.
+- Every change lands with an entry under `## [0.2.3] - 2026-09-09
+
+### Fixed
+
+- **"Clear layout memory" no longer disappears once you use it.** The row was hidden when no
+  layouts were stored, which left an empty "Guided reading" heading behind and hid the
+  "No saved panel layouts" text. Preference items in this codebase hide when disabled rather
+  than greying out; the row is now always shown and simply does nothing when empty.
+
+### Other
+
+- Repo logo recoloured to match the purple launcher icon published builds use.
+
+## [0.2.2] - 2026-09-09`, in the same commit as the change.
 - When a release is cut, rename that heading to the version and date, and rewrite
   `RELEASE_NOTES.md` — CI publishes that file verbatim as the release body, so it describes a
   single release, while this file keeps the history.

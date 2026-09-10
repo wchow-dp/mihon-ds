@@ -217,6 +217,9 @@ object SettingsSpanningScreen : SearchableSettings {
         return Preference.PreferenceGroup(
             title = stringResource(MR.strings.pref_guided_reading),
             preferenceItems = persistentListOf(
+                // Deliberately not using `enabled`: PreferenceItem hides disabled items rather
+                // than greying them out, so gating on the count made the row vanish after
+                // clearing and left an empty "Guided reading" heading behind.
                 Preference.PreferenceItem.TextPreference(
                     title = stringResource(MR.strings.pref_clear_layout_memory),
                     subtitle = if (savedLayouts > 0) {
@@ -224,11 +227,12 @@ object SettingsSpanningScreen : SearchableSettings {
                     } else {
                         stringResource(MR.strings.pref_clear_layout_memory_empty)
                     },
-                    enabled = savedLayouts > 0,
                     onClick = {
-                        store.clearAll()
-                        savedLayouts = 0
-                        context.toast(MR.strings.layout_memory_cleared)
+                        if (savedLayouts > 0) {
+                            store.clearAll()
+                            savedLayouts = 0
+                            context.toast(MR.strings.layout_memory_cleared)
+                        }
                     },
                 ),
             ),
