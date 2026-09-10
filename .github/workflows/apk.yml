@@ -17,7 +17,26 @@ jobs:
           java-version-file: .github/.java-version
           distribution: temurin
       - uses: gradle/actions/setup-gradle@v4
+      # Signed with a real keystore when the secrets are present, so releases update over
+      # each other. Without them the build falls back to a per-run generated debug key, which
+      # is why every earlier release had to be uninstalled before the next could install.
+      - name: Check for signing secrets
+        id: signing
+        run: |
+          if [ -n "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::No signing keystore configured; this build cannot update an installed release."
+          fi
+
       - name: Build APK
+        env:
+          MIHON_GITHUB_RELEASE: ${{ steps.signing.outputs.available }}
+          storeFileBase64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+          storePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          keyAlias: ${{ secrets.SIGNING_KEY_ALIAS }}
+          keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: ./gradlew assemblePreview
       - name: Read version and release number
         id: version
