@@ -276,6 +276,18 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
         recreatePresentation()
     }
 
+    /**
+     * Hides the secondary-display windows without forgetting them.
+     *
+     * The references are deliberately kept: onResume recreates any presentation that is
+     * non-null but no longer showing, so leaving and returning to the app restores the
+     * companion exactly as it was.
+     */
+    private fun dismissCompanionPresentations() {
+        controlsPresentation?.dismiss()
+        readerPresentation?.dismiss()
+    }
+
     private fun recreatePresentation() {
         controlsPresentation?.dismiss()
         controlsPresentation = null
@@ -366,6 +378,14 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
 
         companionPageEnabled = readerPreferences.companionPageEnabled().get()
         recreatePresentation()
+
+        // Collected on lifecycleScope rather than repeatOnLifecycle: the request arrives
+        // after this activity has already been stopped, which is the whole point of it.
+        lifecycleScope.launch {
+            DualScreenState.companionCloseRequests.collect {
+                dismissCompanionPresentations()
+            }
+        }
 
         if (!viewModel.hasValidArgs) {
             finish()

@@ -9,7 +9,29 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ## How this file is kept
 
-- Every change lands with an entry under `## [Unreleased]
+- Every change lands with an entry under `## [Unreleased]`, in the same commit as the change.
+- When a release is cut, rename that heading to the version and date, and rewrite
+  `RELEASE_NOTES.md` — CI publishes that file verbatim as the release body, so it describes a
+  single release, while this file keeps the history.
+- Anything that changes what the app *does* for a user also gets a line in the README's
+  "Changes in this fork" section. Internal fixes stay here only.
+- Entries say what changed and why it mattered, not which files moved.
+
+## [Unreleased]
+
+### Fixed
+
+- **"Close companion when leaving the app" now works from anywhere, not just the dashboard.**
+  Leaving with a manga open on the companion reset it to the dashboard instead of closing it,
+  and leaving from the reader did nothing at all. Two separate causes. Finishing the companion
+  clears the active screen, and the main screen treated that clear as a reason to reopen the
+  companion — even though the app was on its way out — so it came straight back at the
+  dashboard. It only behaved from the dashboard because the active screen was already empty
+  there, so nothing changed and nothing reopened. Separately, the reader does not use the
+  companion activity at all: it closes it and puts its own window on the second screen, so a
+  request aimed at that activity had nothing to act on and the reader stayed up. The companion
+  is now asked to close in a way both owners can hear, and the main screen only opens it while
+  the app is actually on screen. Returning to the app restores the companion as it was.
 
 ### Other
 
@@ -30,15 +52,7 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 - Repo logo recoloured to match the purple launcher icon published builds use.
 
-## [0.2.2] - 2026-09-09`, in the same commit as the change.
-- When a release is cut, rename that heading to the version and date, and rewrite
-  `RELEASE_NOTES.md` — CI publishes that file verbatim as the release body, so it describes a
-  single release, while this file keeps the history.
-- Anything that changes what the app *does* for a user also gets a line in the README's
-  "Changes in this fork" section. Internal fixes stay here only.
-- Entries say what changed and why it mattered, not which files moved.
-
-## [Unreleased]
+## [0.2.2] - 2026-09-09
 
 ### Fixed
 

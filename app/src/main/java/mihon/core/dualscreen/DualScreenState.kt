@@ -83,6 +83,26 @@ object DualScreenState {
         _sourceFilterContext.value = null
     }
 
+    /**
+     * Asks whoever currently owns the secondary display to take it down.
+     *
+     * DualScreenActivity is not always that owner: while reading, ReaderActivity finishes it
+     * and puts its own Presentation there instead. So "close the companion" cannot be
+     * expressed as an intent to DualScreenActivity alone -- sent from the reader it just
+     * creates a fresh activity in order to immediately finish it, leaving the reader's
+     * Presentation on screen.
+     */
+    private val _companionCloseRequests = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val companionCloseRequests = _companionCloseRequests.asSharedFlow()
+
+    fun requestCompanionClose() {
+        _companionCloseRequests.tryEmit(Unit)
+    }
+
     sealed interface MainScreenEvent {
         data class OpenScreen(val screen: Screen) : MainScreenEvent
     }

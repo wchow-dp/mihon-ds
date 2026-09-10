@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import eu.kanade.domain.base.BasePreferences
+import mihon.core.dualscreen.DualScreenState
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.util.Collections
@@ -40,6 +41,11 @@ class DualScreenForegroundWatcher(
         val preferences = Injekt.get<BasePreferences>()
         if (!preferences.enableDualScreenMode().get()) return@Runnable
         if (!preferences.closeCompanionOnLeave().get()) return@Runnable
+
+        // Takes down the reader's Presentation, which owns the companion display while
+        // reading. The intent below only reaches DualScreenActivity, which does not exist
+        // in that case.
+        DualScreenState.requestCompanionClose()
 
         val intent = Intent(context, DualScreenActivity::class.java).apply {
             action = DualScreenActivity.ACTION_FINISH

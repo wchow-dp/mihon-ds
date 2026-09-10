@@ -66,6 +66,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Consumer
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -369,6 +370,19 @@ class MainActivity : BaseActivity() {
     }
 
     private fun checkAndStartDualScreenActivity() {
+        // Only open the companion while this activity is actually on screen.
+        //
+        // DualScreenForegroundWatcher closes the companion when the app leaves the
+        // foreground, which finishes DualScreenActivity, whose onDestroy calls
+        // DualScreenState.close(). That flips activeScreen to null, and the collector that
+        // watches activeScreen reopened the companion at the dashboard -- so leaving the app
+        // with a screen open reset the companion instead of closing it. activeScreen never
+        // emits when it is already null, which is why leaving from the dashboard closed
+        // correctly and leaving from anything else did not.
+        //
+        // onResume calls this unconditionally, so returning to the app still reopens it.
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
+
         val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         val targetId = preferences.secondaryDisplayId().get()
         
