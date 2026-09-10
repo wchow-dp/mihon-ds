@@ -51,6 +51,7 @@ import androidx.core.transition.doOnEnd
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.window.layout.WindowLayoutInfo
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
@@ -381,9 +382,18 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
 
         // Collected on lifecycleScope rather than repeatOnLifecycle: the request arrives
         // after this activity has already been stopped, which is the whole point of it.
+        //
+        // Hence the explicit state check instead. The watcher decides the app has left the
+        // foreground by counting started activities, and that count dips to zero for a
+        // moment whenever the reader is relaunched -- long enough to fire if the next
+        // chapter is slow to start. Acting on that while the reader is still on screen
+        // blanks the companion mid-read, so the reader ignores a request that arrives
+        // while it is visible.
         lifecycleScope.launch {
             DualScreenState.companionCloseRequests.collect {
-                dismissCompanionPresentations()
+                if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    dismissCompanionPresentations()
+                }
             }
         }
 
