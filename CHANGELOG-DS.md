@@ -74,6 +74,13 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ### Other
 
+- **Releases can now be signed with a real keystore.** CI previously fell back to a debug key
+  generated fresh on each runner, so every release was signed differently and Android refused to
+  update one over another — each new version meant uninstalling, losing the library, and restoring
+  a backup. The build already supported signing via `MIHON_GITHUB_RELEASE`; the workflow just never
+  passed the secrets. Needs `SIGNING_KEYSTORE_BASE64`, `SIGNING_STORE_PASSWORD`, `SIGNING_KEY_ALIAS`
+  and `SIGNING_KEY_PASSWORD` in repo secrets; without them the build still works and warns.
+  The first signed release still requires one last uninstall, since it changes the signature.
 - README now says Webtoon Spanning needs the **Long strip** reading mode. The feature is gated on
   `ViewerType.Webtoon`, which the UI labels "Long strip", so the docs named something that does not
   appear anywhere in the app — and "Long strip with gaps" is a different mode that does not span.
