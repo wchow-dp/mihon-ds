@@ -53,6 +53,14 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   an older `ChapterUpdate` shape and one to a scroll-sensitivity floor that has since moved; those
   now assert the behaviour rather than the payload. 179 tests pass; two are marked `@Disabled`
   against real, still-unfixed panel sorting bugs rather than quietly deleted.
+- **Advanced Recursive no longer reads a tall panel after the shorter ones beside it.** When
+  panels overlap enough that no clean cut exists -- a full-height figure with panels bleeding over
+  it, which is ordinary manga -- the algorithm falls back to a simple sort, and that sort ranked
+  panels by their vertical centre. A panel spanning two rows has its centre *between* them, so it
+  was read second, and the taller the panel the further down the order it sank. The fallback now
+  ranks by the edge a reader meets first and groups panels whose tops are close into one row,
+  ordered across the page in reading direction. Only affects layouts that reach the fallback;
+  cleanly separable pages are unchanged.
 - **The panel sorting setting no longer labels the wrong option as the default.** "Row-based" was
   marked "(default)" while the preference actually defaults to XY-cut.
 

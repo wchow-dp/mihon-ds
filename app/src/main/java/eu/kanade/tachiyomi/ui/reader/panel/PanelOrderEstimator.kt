@@ -15,6 +15,9 @@ object PanelOrderEstimator {
     private const val DEFAULT_THRESHOLD = 0.25f
     private const val MAX_DEPTH = 32
 
+    /** Share of the median panel height within which two panels count as the same row. */
+    private const val ROW_TOLERANCE_RATIO = 0.35f
+
     fun estimateOrder(
         panels: List<ReaderPanel>,
         rtl: Boolean = true,
@@ -153,6 +156,37 @@ object PanelOrderEstimator {
         }
     }
 
-    private fun stableFallbackSort(panels: List<ReaderPanel>, rtl: Boolean) =
-        panels.sortedWith(compareBy({ it.centerY }, { if (rtl) -it.centerX else it.centerX }))
+    /**
+     * Orders panels the splitter could not separate cleanly.
+     *
+     * Ranks by the edge a reader reaches first, not by the panel's midpoint. Sorting on
+     * centerY sank a tall panel below shorter neighbours that begin at the same height --
+     * a panel spanning two rows has its midpoint between them, so it was read second, and
+     * the taller it was the further it sank. Panels whose tops are within a tolerance of
+     * each other count as one row and are ordered across the page in reading direction.
+     *
+     * The tolerance is taken from the median panel height so that one very tall panel does
+     * not widen it; using the mean let the outlier that caused the problem mask it.
+     */
+    private fun stableFallbackSort(panels: List<ReaderPanel>, rtl: Boolean): List<ReaderPanel> {
+        if (panels.size <= 1) return panels
+
+        val heights = panels.map { it.height }.sorted()
+        val medianHeight = heights[heights.size / 2]
+        val tolerance = medianHeight * ROW_TOLERANCE_RATIO
+
+        val rows = mutableListOf<MutableList<ReaderPanel>>()
+        panels.sortedBy { it.bounds.top }.forEach { panel ->
+            val row = rows.lastOrNull()
+            if (row != null && panel.bounds.top - row.first().bounds.top <= tolerance) {
+                row += panel
+            } else {
+                rows += mutableListOf(panel)
+            }
+        }
+
+        return rows.flatMap { row ->
+            row.sortedBy { if (rtl) -it.centerX else it.centerX }
+        }
+    }
 }

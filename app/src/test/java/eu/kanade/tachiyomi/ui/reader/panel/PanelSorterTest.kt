@@ -210,6 +210,56 @@ class PanelSorterTest {
         assertEquals(listOf("1", "2"), result.map { it.id })
     }
 
+    // When panels overlap enough that no clean cut exists, ADVANCED_RECURSIVE drops to its
+    // fallback sort. That used to rank by centerY, which sank a tall panel below shorter
+    // neighbours starting at the same height: a panel spanning two rows has its midpoint
+    // between them. Observed in normal reading, not a synthetic case.
+    @Test
+    fun `fallback orders a tall panel ahead of the shorter panels it overlaps`() {
+        val tall = panel(id = "tall", left = 0f, top = 0f, width = 400f, height = 400f)
+        val topRight = panel(id = "topRight", left = 200f, top = 0f, width = 400f, height = 210f)
+        val botRight = panel(id = "botRight", left = 200f, top = 190f, width = 400f, height = 210f)
+
+        val result = PanelSorter.sort(
+            listOf(topRight, botRight, tall),
+            PanelReadingDirection.LEFT_TO_RIGHT,
+            PanelSortingAlgorithm.ADVANCED_RECURSIVE,
+        )
+
+        assertEquals(listOf("tall", "topRight", "botRight"), result.map { it.id })
+    }
+
+    @Test
+    fun `fallback row tolerance absorbs jitter in detected top edges`() {
+        val tall = panel(id = "tall", left = 0f, top = 4f, width = 400f, height = 400f)
+        val topRight = panel(id = "topRight", left = 200f, top = 0f, width = 400f, height = 210f)
+        val botRight = panel(id = "botRight", left = 200f, top = 193f, width = 400f, height = 210f)
+
+        val result = PanelSorter.sort(
+            listOf(topRight, botRight, tall),
+            PanelReadingDirection.LEFT_TO_RIGHT,
+            PanelSortingAlgorithm.ADVANCED_RECURSIVE,
+        )
+
+        // A 4px difference in top edge must not split these into separate rows.
+        assertEquals(listOf("tall", "topRight", "botRight"), result.map { it.id })
+    }
+
+    @Test
+    fun `fallback reads right to left within a row`() {
+        val tall = panel(id = "tall", left = 200f, top = 0f, width = 400f, height = 400f)
+        val topLeft = panel(id = "topLeft", left = 0f, top = 0f, width = 400f, height = 210f)
+        val botLeft = panel(id = "botLeft", left = 0f, top = 190f, width = 400f, height = 210f)
+
+        val result = PanelSorter.sort(
+            listOf(topLeft, botLeft, tall),
+            PanelReadingDirection.RIGHT_TO_LEFT,
+            PanelSortingAlgorithm.ADVANCED_RECURSIVE,
+        )
+
+        assertEquals(listOf("tall", "topLeft", "botLeft"), result.map { it.id })
+    }
+
     private fun panel(
         id: String,
         left: Float,
