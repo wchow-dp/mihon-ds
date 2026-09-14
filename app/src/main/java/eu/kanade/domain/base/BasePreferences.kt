@@ -19,7 +19,9 @@ class BasePreferences(
 
     val incognitoMode: Preference<Boolean> = preferenceStore.getBoolean(Preference.appStateKey("incognito_mode"), false)
 
-    fun enableDualScreenMode() = preferenceStore.getBoolean(Preference.appStateKey("enable_dual_screen_mode"), false)
+    // On by default: this is a dual-screen build, and MainActivity turns it back off at startup
+    // if no secondary display is present, so a single-screen device is not left in a broken state.
+    fun enableDualScreenMode() = preferenceStore.getBoolean(Preference.appStateKey("enable_dual_screen_mode"), true)
 
     fun secondaryDisplayId() = preferenceStore.getInt(Preference.appStateKey("secondary_display_id"), -1)
 
@@ -27,7 +29,9 @@ class BasePreferences(
 
     fun alwaysShowDashboard() = preferenceStore.getBoolean(Preference.appStateKey("always_show_dashboard"), true)
 
-    fun closeCompanionOnLeave() = preferenceStore.getBoolean(Preference.appStateKey("close_companion_on_leave"), false)
+    // On by default: the companion runs as its own task, so without this it keeps showing Mihon
+    // on the second screen over whatever the user switched to.
+    fun closeCompanionOnLeave() = preferenceStore.getBoolean(Preference.appStateKey("close_companion_on_leave"), true)
 
     val extensionInstaller: ExtensionInstallerPreference = ExtensionInstallerPreference(context, preferenceStore)
 

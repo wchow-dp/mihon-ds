@@ -19,6 +19,12 @@ another. That is fixed from here on — but this one cannot install over an exis
 from Settings → Data and storage if you would rather not lose it. Every release after this
 one will update in place.
 
+## Changed
+
+- **Dual-screen mode and "Close companion when leaving the app" now default to on.** This only
+  affects fresh installs — if you have already set them, your choice stands. A single-screen
+  device still turns dual-screen mode off automatically at startup.
+
 ## Fixed
 
 - **"Close companion when leaving the app" now works from anywhere**, not just from the

@@ -50,6 +50,8 @@ What these builds change for you, newest first. Internal fixes and the full hist
 
 **0.2.4**
 
+*   **Dual-screen mode and "close companion when leaving the app" are on by default** on a fresh
+    install. Your existing settings are untouched.
 *   **Signed releases.** Builds update over each other from now on. This one needs the old app
     uninstalled first — every release after it will not.
 *   **"Close companion when leaving the app" works from anywhere**, not just the dashboard.

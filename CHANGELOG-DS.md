@@ -19,6 +19,14 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ## [0.2.4] - 2026-09-14
 
+### Changed
+
+- **Dual-screen mode and "Close companion when leaving the app" are on by default.** Only affects
+  fresh installs, since an existing choice is never overwritten. Dual-screen mode being off out of
+  the box meant a new install of a dual-screen build behaved like stock Mihon until you found the
+  setting; MainActivity still turns it back off at startup when no secondary display is present,
+  so a single-screen device is not left in a broken state.
+
 ### Fixed
 
 - **"Close companion when leaving the app" now works from anywhere, not just the dashboard.**
