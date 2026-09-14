@@ -42,7 +42,7 @@ object SettingsSpanningScreen : SearchableSettings {
             add(getReaderGroup(readerPref))
             add(getHingeGroup(readerPref))
             add(getDualScreenModeGroup(basePref, readerPref, context, dualScreenEnabled))
-            add(getGuidedReadingGroup(context))
+            add(getGuidedReadingGroup(context, readerPref))
         }
     }
 
@@ -210,13 +210,21 @@ object SettingsSpanningScreen : SearchableSettings {
      * than deleted, and this is what clears them out.
      */
     @Composable
-    private fun getGuidedReadingGroup(context: Context): Preference.PreferenceGroup {
+    private fun getGuidedReadingGroup(
+        context: Context,
+        readerPref: ReaderPreferences,
+    ): Preference.PreferenceGroup {
         val store = remember { PanelCorrectionStore(context) }
         var savedLayouts by remember { mutableIntStateOf(store.size()) }
 
         return Preference.PreferenceGroup(
             title = stringResource(MR.strings.pref_guided_reading),
             preferenceItems = persistentListOf(
+                Preference.PreferenceItem.SwitchPreference(
+                    preference = readerPref.panelReadingKeepPageFramed(),
+                    title = stringResource(MR.strings.pref_keep_page_framed),
+                    subtitle = stringResource(MR.strings.pref_keep_page_framed_summary),
+                ),
                 // Deliberately not using `enabled`: PreferenceItem hides disabled items rather
                 // than greying them out, so gating on the count made the row vanish after
                 // clearing and left an empty "Guided reading" heading behind.

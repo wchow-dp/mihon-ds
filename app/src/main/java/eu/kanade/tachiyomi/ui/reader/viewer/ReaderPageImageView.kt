@@ -284,6 +284,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
             minScale = view.minScale,
             maxScale = view.maxScale,
             allowOverpan = true,
+            keepPageFramed = config?.panelKeepPageFramed == true,
         )
         val targetCenter = PointF(focus.centerX, focus.centerY)
         val duration = config
@@ -317,6 +318,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
         panelFocusEffect: PanelFocusEffect,
         panelFocusStrength: Int,
         panelPrimaryOverlay: Boolean = true,
+        panelKeepPageFramed: Boolean = false,
     ) {
         val currentConfig = config ?: return
         val newConfig = currentConfig.copy(
@@ -324,6 +326,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
             panelFocusEffect = panelFocusEffect,
             panelFocusStrength = PanelReadingSettings.normalizeFocusStrength(panelFocusStrength),
             panelPrimaryOverlay = panelPrimaryOverlay,
+            panelKeepPageFramed = panelKeepPageFramed,
         )
         if (config == newConfig) return
         config = newConfig
@@ -678,6 +681,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
         val panelFocusEffect: PanelFocusEffect = PanelFocusEffect.DARKEN,
         val panelFocusStrength: Int = PanelReadingSettings.PANEL_FOCUS_STRENGTH_DEFAULT,
         val panelPrimaryOverlay: Boolean = true,
+        val panelKeepPageFramed: Boolean = false,
         val minimumScaleType: Int = SCALE_TYPE_CENTER_INSIDE,
         val cropBorders: Boolean = false,
         val zoomStartPosition: ZoomStartPosition = ZoomStartPosition.CENTER,

@@ -222,6 +222,7 @@ class PagerPageHolder(
                         panelFocusEffect = viewer.config.panelReadingFocusEffect,
                         panelFocusStrength = viewer.config.panelReadingFocusStrength,
                         panelPrimaryOverlay = viewer.config.panelReadingPrimaryOverlay,
+                        panelKeepPageFramed = viewer.config.panelReadingKeepPageFramed,
                         minimumScaleType = viewer.config.imageScaleType,
                         cropBorders = viewer.config.imageCropBorders,
                         zoomStartPosition = viewer.config.imageZoomType,

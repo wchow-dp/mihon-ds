@@ -114,6 +114,8 @@ class ReaderPreferences(
 
     fun panelReadingPrimaryOverlay() = preferenceStore.getBoolean("pref_panel_reading_primary_overlay", true)
 
+    fun panelReadingKeepPageFramed() = preferenceStore.getBoolean("pref_panel_reading_keep_page_framed", false)
+
     fun panelReadingSecondaryOverlay() = preferenceStore.getBoolean("pref_panel_reading_secondary_overlay", true)
 
     fun panelReadingFocusEffectSecondary() = preferenceStore.getEnum(

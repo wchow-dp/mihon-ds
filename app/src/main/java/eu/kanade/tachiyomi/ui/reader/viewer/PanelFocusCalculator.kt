@@ -19,6 +19,7 @@ object PanelFocusCalculator {
         horizontalBias: PanelFocusHorizontalBias = PanelFocusHorizontalBias.CENTER,
         padding: Float = PANEL_FOCUS_PADDING,
         allowOverpan: Boolean = false,
+        keepPageFramed: Boolean = false,
     ): PanelFocusTarget {
         val panelWidth = panelRight - panelLeft
         val panelHeight = panelBottom - panelTop
@@ -47,8 +48,8 @@ object PanelFocusCalculator {
 
         return PanelFocusTarget(
             scale = scale,
-            centerX = centerX.clampCenter(visibleWidth, imageWidth, allowOverpan),
-            centerY = centerY.clampCenter(visibleHeight, imageHeight, allowOverpan),
+            centerX = centerX.clampCenter(visibleWidth, imageWidth, allowOverpan, keepPageFramed),
+            centerY = centerY.clampCenter(visibleHeight, imageHeight, allowOverpan, keepPageFramed),
         )
     }
 
@@ -83,10 +84,22 @@ object PanelFocusCalculator {
         return oldWidth != newWidth || oldHeight != newHeight
     }
 
-    private fun Float.clampCenter(visibleSize: Float, imageSize: Int, allowOverpan: Boolean): Float {
+    private fun Float.clampCenter(
+        visibleSize: Float,
+        imageSize: Int,
+        allowOverpan: Boolean,
+        keepPageFramed: Boolean = false,
+    ): Float {
         if (imageSize <= 0) return this
 
         val imageSizeFloat = imageSize.toFloat()
+
+        // Whole page already visible on this axis. Panning here reveals nothing -- every panel
+        // is on screen either way -- so overpanning only slides the page inside its letterbox,
+        // and far enough to push part of it off the edge while empty space opens opposite.
+        // Centring the page instead trades a centred panel for a page that is never clipped.
+        if (keepPageFramed && visibleSize >= imageSizeFloat) return imageSizeFloat / 2f
+
         if (allowOverpan) return coerceIn(0f, imageSizeFloat)
 
         if (visibleSize >= imageSizeFloat) return imageSizeFloat / 2f
