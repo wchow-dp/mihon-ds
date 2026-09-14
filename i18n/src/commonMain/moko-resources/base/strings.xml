@@ -1199,7 +1199,6 @@
     <string name="reader_input_add_binding">Add mapping</string>
 
     <string name="pref_keep_page_framed">Keep the page on screen</string>
-    <string name="pref_keep_page_framed_summary">When a whole page already fits, centre the page instead of the panel. Stops pages being pushed off the edge, but the highlighted panel will not sit in the middle of the screen.</string>
     <string name="pref_clear_layout_memory">Clear layout memory</string>
     <string name="pref_clear_layout_memory_summary">%1$d saved panel layout(s). Guided reading will fall back to automatic ordering.</string>
     <string name="pref_clear_layout_memory_empty">No saved panel layouts</string>

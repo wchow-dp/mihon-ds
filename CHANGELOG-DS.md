@@ -35,8 +35,9 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ### Added
 
-- **Option to keep the page on screen during guided reading.** Settings -> Dual-screen & Tablet ->
-  Guided reading. Focusing a panel always centred the panel exactly, which on an axis where the
+- **Option to keep the page on screen during guided reading.** In the reader's own settings,
+  Reading mode -> Guided reading, beside the other panel display options, so it can be flipped
+  mid-chapter and judged on the page in front of you. Focusing a panel always centred the panel exactly, which on an axis where the
   whole page already fits meant sliding the page inside its letterbox -- far enough, on real pages,
   to push part of it off the screen edge while empty space opened opposite. Turning this on centres
   the page instead on any axis it already fits; axes where the page is genuinely larger than the

@@ -174,6 +174,11 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
         )
 
         CheckboxItem(
+            label = stringResource(MR.strings.pref_keep_page_framed),
+            pref = viewModel.preferences.panelReadingKeepPageFramed(),
+        )
+
+        CheckboxItem(
             label = stringResource(MR.strings.pref_panel_primary_overlay),
             pref = viewModel.preferences.panelReadingPrimaryOverlay(),
         )
