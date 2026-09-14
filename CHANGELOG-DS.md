@@ -74,6 +74,10 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ### Other
 
+- **The signing keystore secret tolerates surrounding whitespace.** `base64 ... | pbcopy` copies
+  the trailing newline with it, and Kotlin's Base64 rejects any character after the padding, so
+  the build failed with "Symbol '\n' is prohibited after the pad character" and no mention of
+  signing at all. The value is trimmed before decoding.
 - **Releases can now be signed with a real keystore.** CI previously fell back to a debug key
   generated fresh on each runner, so every release was signed differently and Android refused to
   update one over another — each new version meant uninstalling, losing the library, and restoring
