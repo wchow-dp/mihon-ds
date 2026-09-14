@@ -48,6 +48,20 @@ They are credited here, not claimed:
 What these builds change for you, newest first. Internal fixes and the full history live in
 [CHANGELOG-DS.md](CHANGELOG-DS.md).
 
+**0.2.4**
+
+*   **Signed releases.** Builds update over each other from now on. This one needs the old app
+    uninstalled first — every release after it will not.
+*   **"Close companion when leaving the app" works from anywhere**, not just the dashboard.
+    Leaving from the reader, or with a manga open, previously did nothing or bounced the
+    companion back to the dashboard.
+*   **The companion no longer goes black while reading.**
+*   **Guided reading frames the correct part of the page when "Crop borders" is on.** The
+    focused panel used to sit well above where it belonged. Cropping is now turned off while
+    guided reading is active, and the setting greys out to say so.
+*   **Tall panels are read before the shorter ones beside them** under Advanced Recursive
+    sorting, instead of being ordered by their middle and landing between them.
+
 **0.2.3**
 
 *   **"Clear layout memory" stays visible after you use it**, instead of vanishing and leaving

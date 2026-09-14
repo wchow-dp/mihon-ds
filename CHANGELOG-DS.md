@@ -17,7 +17,7 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   "Changes in this fork" section. Internal fixes stay here only.
 - Entries say what changed and why it mattered, not which files moved.
 
-## [Unreleased]
+## [0.2.4] - 2026-09-14
 
 ### Fixed
 
@@ -40,7 +40,7 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   v0.20.4 merge added a second break when upstream's `Tracker` grew `getDisplayUsername`. Nothing
   in CI ran the tests, so neither was ever reported. Five tracking assertions were also pinned to
   an older `ChapterUpdate` shape and one to a scroll-sensitivity floor that has since moved; those
-  now assert the behaviour rather than the payload. 181 tests pass; two are marked `@Disabled`
+  now assert the behaviour rather than the payload. 182 tests pass; two are marked `@Disabled`
   against real, still-unfixed panel sorting bugs rather than quietly deleted.
 - **The companion no longer goes black mid-read.** Rebuilding the reader's second-screen window
   first tells the companion activity to close, so it is not squatting on that display. It is
