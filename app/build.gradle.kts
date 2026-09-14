@@ -53,11 +53,15 @@ android {
     if (System.getenv("MIHON_GITHUB_RELEASE").toBoolean()) {
         val tempStoreFile = file(System.getenv("RUNNER_TEMP")).resolve("antsy.keystore")
 
-        // trim(): a value pasted from `base64 ... | pbcopy` carries the trailing newline, and
-        // Kotlin's Base64 rejects anything after the padding -- "Symbol '\n' is prohibited after
-        // the pad character", which fails the build with no mention of signing. Costs nothing
-        // when the value is already clean.
-        val storeFileBytes = System.getenv("storeFileBase64").trim().let(Base64::decode)
+        // Kotlin's Base64 rejects every character outside the alphabet, so any whitespace that
+        // survived the trip into the secret fails the build -- a trailing newline from
+        // `base64 ... | pbcopy` gives "Symbol '\n' is prohibited after the pad character", and a
+        // value that got soft-wrapped somewhere gives "Invalid symbol ' ' at index N". Neither
+        // message mentions signing, so they read like a corrupt keystore. Whitespace carries no
+        // meaning in base64; drop all of it rather than only the ends.
+        val storeFileBytes = System.getenv("storeFileBase64")
+            .filterNot(Char::isWhitespace)
+            .let(Base64::decode)
         tempStoreFile.outputStream().use { it.write(storeFileBytes) }
 
         signingConfigs {
