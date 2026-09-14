@@ -42,6 +42,15 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   an older `ChapterUpdate` shape and one to a scroll-sensitivity floor that has since moved; those
   now assert the behaviour rather than the payload. 181 tests pass; two are marked `@Disabled`
   against real, still-unfixed panel sorting bugs rather than quietly deleted.
+- **The companion no longer goes black mid-read.** Rebuilding the reader's second-screen window
+  first tells the companion activity to close, so it is not squatting on that display. It is
+  singleInstance, so when it exists the request reaches it and it finishes; when it does not --
+  the normal case while reading -- Android creates one purely to run that finish. That throwaway
+  activity carried no launch display, so it appeared on the *primary* screen on top of the reader
+  and stopped it. On resume the reader saw a second-screen window that was no longer showing and
+  rebuilt it, which sent the request again: a loop that ran about once a second and left the
+  companion black, because its window was destroyed and recreated before it could draw. The
+  request now goes to the secondary display, where it finishes without disturbing the reader.
 - **Guided reading frames the right part of the page when border cropping is on.** Panels are
   detected against the original image file, but the paged viewer was displaying that page with its
   borders cropped -- a different, smaller picture -- and nothing translated the panel positions

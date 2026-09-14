@@ -295,16 +295,6 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
         readerPresentation?.dismiss()
         readerPresentation = null
 
-        if (preferences.enableDualScreenMode().get()) {
-            try {
-                val intent = Intent(this, eu.kanade.tachiyomi.ui.main.DualScreenActivity::class.java)
-                intent.action = eu.kanade.tachiyomi.ui.main.DualScreenActivity.ACTION_FINISH
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                startActivity(intent)
-            } catch (_: Exception) {
-            }
-        }
-
         val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         val secondaryId = preferences.secondaryDisplayId().get()
 
@@ -320,6 +310,27 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
         }
 
         val dualScreenEnabled = preferences.enableDualScreenMode().get()
+
+        // Take down the companion activity, which owns the second screen when we are not
+        // reading. It is singleInstance, so when it exists this reaches onNewIntent and
+        // finishes it; when it does not, Android creates one just to run that finish.
+        //
+        // The launch display matters. Without it that throwaway activity appears on the
+        // primary display, on top of the reader, which stops the reader; onResume then sees a
+        // presentation that is no longer showing and calls back into here, which starts the
+        // same activity again. That loop ran about once a second and left the companion black,
+        // because its Presentation was torn down and rebuilt before it could draw.
+        if (dualScreenEnabled) {
+            try {
+                val intent = Intent(this, eu.kanade.tachiyomi.ui.main.DualScreenActivity::class.java)
+                intent.action = eu.kanade.tachiyomi.ui.main.DualScreenActivity.ACTION_FINISH
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                val options = android.app.ActivityOptions.makeBasic()
+                presentationDisplay?.displayId?.let { options.setLaunchDisplayId(it) }
+                startActivity(intent, options.toBundle())
+            } catch (_: Exception) {
+            }
+        }
 
         if (presentationDisplay != null && dualScreenEnabled) {
             try {
