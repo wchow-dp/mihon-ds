@@ -324,7 +324,6 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
                 panelFocusEffect = config.panelReadingFocusEffect,
                 panelFocusStrength = config.panelReadingFocusStrength,
                 panelPrimaryOverlay = config.panelReadingPrimaryOverlay,
-                panelKeepPageFramed = config.panelReadingKeepPageFramed,
             )
         }
     }

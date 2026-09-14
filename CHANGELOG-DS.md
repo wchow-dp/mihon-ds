@@ -33,18 +33,6 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   is now asked to close in a way both owners can hear, and the main screen only opens it while
   the app is actually on screen. Returning to the app restores the companion as it was.
 
-### Added
-
-- **Option to keep the page on screen during guided reading.** In the reader's own settings,
-  Reading mode -> Guided reading, beside the other panel display options, so it can be flipped
-  mid-chapter and judged on the page in front of you. Focusing a panel always centred the panel exactly, which on an axis where the
-  whole page already fits meant sliding the page inside its letterbox -- far enough, on real pages,
-  to push part of it off the screen edge while empty space opened opposite. Turning this on centres
-  the page instead on any axis it already fits; axes where the page is genuinely larger than the
-  viewport still pan to the panel as before. Off by default. Measured against 83 recorded focus
-  events from a real reading session: 25 of them pushed the page off screen, and none do with this
-  enabled.
-
 ### Fixed
 
 - **The unit test suite compiles and runs again, and CI runs it.** It had been broken since July:
@@ -52,7 +40,7 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   v0.20.4 merge added a second break when upstream's `Tracker` grew `getDisplayUsername`. Nothing
   in CI ran the tests, so neither was ever reported. Five tracking assertions were also pinned to
   an older `ChapterUpdate` shape and one to a scroll-sensitivity floor that has since moved; those
-  now assert the behaviour rather than the payload. 179 tests pass; two are marked `@Disabled`
+  now assert the behaviour rather than the payload. 181 tests pass; two are marked `@Disabled`
   against real, still-unfixed panel sorting bugs rather than quietly deleted.
 - **Guided reading frames the right part of the page when border cropping is on.** Panels are
   detected against the original image file, but the paged viewer was displaying that page with its

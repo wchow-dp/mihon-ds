@@ -222,7 +222,6 @@ class PagerPageHolder(
                         panelFocusEffect = viewer.config.panelReadingFocusEffect,
                         panelFocusStrength = viewer.config.panelReadingFocusStrength,
                         panelPrimaryOverlay = viewer.config.panelReadingPrimaryOverlay,
-                        panelKeepPageFramed = viewer.config.panelReadingKeepPageFramed,
                         minimumScaleType = viewer.config.imageScaleType,
                         // Panel bounds are detected against the original file, and the companion
                         // deliberately renders uncropped for the same reason (see

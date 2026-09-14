@@ -198,7 +198,6 @@ class ReaderPresentation(
         val panelFocusEffectSecondary by activity.readerPreferences.panelReadingFocusEffectSecondary().collectAsState()
         val panelSecondaryOverlay by activity.readerPreferences.panelReadingSecondaryOverlay().collectAsState()
         val panelFocusStrength by activity.readerPreferences.panelReadingFocusStrength().collectAsState()
-        val panelKeepPageFramed by activity.readerPreferences.panelReadingKeepPageFramed().collectAsState()
         val panelReadingState by activity.panelReadingController.state.collectAsState()
         val panelCorrectionMode by activity.isPanelCorrectionMode.collectAsState()
         val panelReadingEnabled = ReaderPanelReadingMode.isActive(
@@ -311,7 +310,6 @@ class ReaderPresentation(
                                     panelFocusEffect = panelFocusEffectSecondary,
                                     panelFocusStrength = panelFocusStrength,
                                     panelPrimaryOverlay = panelSecondaryOverlay,
-                                    panelKeepPageFramed = panelKeepPageFramed,
                                 )
                                 val panelKey = panelReadingState.key
                                 if (panelMapEnabled && activePanel != null && panelKey != null) {

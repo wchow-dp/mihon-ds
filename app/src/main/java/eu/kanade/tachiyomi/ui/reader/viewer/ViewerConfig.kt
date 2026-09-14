@@ -28,7 +28,6 @@ abstract class ViewerConfig(readerPreferences: ReaderPreferences, private val sc
     var panelReadingFocusEffect = PanelFocusEffect.DARKEN
     var panelReadingFocusStrength = PanelReadingSettings.PANEL_FOCUS_STRENGTH_DEFAULT
     var panelReadingPrimaryOverlay = true
-    var panelReadingKeepPageFramed = false
     var volumeKeysEnabled = false
     var volumeKeysInverted = false
     var alwaysShowChapterTransition = true
@@ -85,12 +84,6 @@ abstract class ViewerConfig(readerPreferences: ReaderPreferences, private val sc
         readerPreferences.panelReadingPrimaryOverlay()
             .register(
                 { panelReadingPrimaryOverlay = it },
-                { panelReadingDisplayChangedListener?.invoke() },
-            )
-
-        readerPreferences.panelReadingKeepPageFramed()
-            .register(
-                { panelReadingKeepPageFramed = it },
                 { panelReadingDisplayChangedListener?.invoke() },
             )
 

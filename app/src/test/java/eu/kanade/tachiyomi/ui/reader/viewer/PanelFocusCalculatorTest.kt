@@ -151,52 +151,6 @@ class PanelFocusCalculatorTest {
         assertEquals(120f, focus.centerX, 0.001f)
     }
 
-    // Modelled on a real capture from an AYN Thor: a 933x1397 page on a 1920x1080 viewport,
-    // focused at scale ~1.92. The page fits across the viewport with room to spare, so
-    // overpanning slid it sideways far enough to push part of it off the screen edge while
-    // black opened up opposite. It is still taller than the viewport, so the vertical axis
-    // must keep overpanning.
-    @Test
-    fun `keepPageFramed centers only the axis the page already fits`() {
-        val focus = PanelFocusCalculator.calculateFocus(
-            viewWidth = 1920,
-            viewHeight = 1080,
-            imageWidth = 933,
-            imageHeight = 1397,
-            panelLeft = 300f,
-            panelTop = 700f,
-            panelRight = 900f,
-            panelBottom = 1202f,
-            minScale = 0.5f,
-            maxScale = 4f,
-            allowOverpan = true,
-            keepPageFramed = true,
-        )
-
-        assertEquals(933f / 2f, focus.centerX, 0.001f)
-        assertEquals(951f, focus.centerY, 0.001f)
-    }
-
-    @Test
-    fun `page is left where it falls when keepPageFramed is off`() {
-        val focus = PanelFocusCalculator.calculateFocus(
-            viewWidth = 1920,
-            viewHeight = 1080,
-            imageWidth = 933,
-            imageHeight = 1397,
-            panelLeft = 300f,
-            panelTop = 700f,
-            panelRight = 900f,
-            panelBottom = 1202f,
-            minScale = 0.5f,
-            maxScale = 4f,
-            allowOverpan = true,
-        )
-
-        assertEquals(600f, focus.centerX, 0.001f)
-        assertEquals(951f, focus.centerY, 0.001f)
-    }
-
     @Test
     fun `top edge panel focus can target panel center when overpan is allowed`() {
         val focus = PanelFocusCalculator.calculateFocus(
