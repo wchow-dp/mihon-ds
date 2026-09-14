@@ -55,9 +55,9 @@ class RefreshTracksTest {
         tracker.refreshCalls shouldBe 0
         tracker.remoteUpdates.shouldBeEmpty()
         trackRepository.inserted.map { it.lastChapterRead } shouldContainExactly listOf(2.0)
-        chapterRepository.updates shouldContainExactly listOf(
-            ChapterUpdate(id = 1, read = true),
-            ChapterUpdate(id = 2, read = true),
+        chapterRepository.updates.map { it.id to it.read } shouldContainExactly listOf(
+            1L to true,
+            2L to true,
         )
     }
 

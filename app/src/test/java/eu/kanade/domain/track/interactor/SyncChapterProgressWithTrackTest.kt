@@ -55,9 +55,9 @@ class SyncChapterProgressWithTrackTest {
             tracker = TestTracker(notStartedStatuses = setOf(TestTracker.PLAN_TO_READ)),
         )
 
-        chapterRepository.updates shouldContainExactly listOf(
-            ChapterUpdate(id = 1, read = true),
-            ChapterUpdate(id = 2, read = true),
+        chapterRepository.updates.map { it.id to it.read } shouldContainExactly listOf(
+            1L to true,
+            2L to true,
         )
     }
 
@@ -77,9 +77,9 @@ class SyncChapterProgressWithTrackTest {
             tracker = TestTracker(notStartedStatuses = emptySet()),
         )
 
-        chapterRepository.updates shouldContainExactly listOf(
-            ChapterUpdate(id = 1, read = true),
-            ChapterUpdate(id = 2, read = true),
+        chapterRepository.updates.map { it.id to it.read } shouldContainExactly listOf(
+            1L to true,
+            2L to true,
         )
     }
 
@@ -101,9 +101,9 @@ class SyncChapterProgressWithTrackTest {
             tracker = TestTracker(notStartedStatuses = emptySet()),
         )
 
-        chapterRepository.updates shouldContainExactly listOf(
-            ChapterUpdate(id = 1, read = true),
-            ChapterUpdate(id = 2, read = true),
+        chapterRepository.updates.map { it.id to it.read } shouldContainExactly listOf(
+            1L to true,
+            2L to true,
         )
     }
 
@@ -161,9 +161,9 @@ class SyncChapterProgressWithTrackTest {
             tracker = EnhancedTestTracker(notStartedStatuses = emptySet()),
         )
 
-        chapterRepository.updates shouldContainExactly listOf(
-            ChapterUpdate(id = 1, read = true),
-            ChapterUpdate(id = 2, read = true),
+        chapterRepository.updates.map { it.id to it.read } shouldContainExactly listOf(
+            1L to true,
+            2L to true,
         )
     }
 
@@ -354,6 +354,9 @@ class SyncChapterProgressWithTrackTest {
         override suspend fun login(username: String, password: String) = Unit
         override fun logout() = Unit
         override fun getUsername(): String = "username"
+        // Added upstream in v0.20.4; EnhancedTestTracker inherits these from here.
+        override fun getDisplayUsername(): String = "username"
+        override fun saveDisplayUsername(displayName: String) = Unit
         override fun getPassword(): String = "password"
         override fun saveCredentials(username: String, password: String) = Unit
         override suspend fun register(item: DbTrack, mangaId: Long) = Unit

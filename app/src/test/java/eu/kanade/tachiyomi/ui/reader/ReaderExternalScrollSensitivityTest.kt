@@ -27,10 +27,16 @@ class ReaderExternalScrollSensitivityTest {
 
     @Test
     fun `sensitivity is clamped to supported slider range`() {
+        // The slider floor is SECONDARY_DISPLAY_SCROLL_SENSITIVITY_MIN, which was widened from
+        // 50 to 10; anything at or above it passes through unscaled by the clamp.
+        ReaderExternalScrollSensitivity.scaleDistance(
+            distance = 100f,
+            sensitivityPercent = 5,
+        ) shouldBeExactly 10f
         ReaderExternalScrollSensitivity.scaleDistance(
             distance = 100f,
             sensitivityPercent = 25,
-        ) shouldBeExactly 50f
+        ) shouldBeExactly 25f
         ReaderExternalScrollSensitivity.scaleDistance(
             distance = 100f,
             sensitivityPercent = 600,

@@ -33,6 +33,29 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   is now asked to close in a way both owners can hear, and the main screen only opens it while
   the app is actually on screen. Returning to the app restores the companion as it was.
 
+### Added
+
+- **Option to keep the page on screen during guided reading.** Settings -> Dual-screen & Tablet ->
+  Guided reading. Focusing a panel always centred the panel exactly, which on an axis where the
+  whole page already fits meant sliding the page inside its letterbox -- far enough, on real pages,
+  to push part of it off the screen edge while empty space opened opposite. Turning this on centres
+  the page instead on any axis it already fits; axes where the page is genuinely larger than the
+  viewport still pan to the panel as before. Off by default. Measured against 83 recorded focus
+  events from a real reading session: 25 of them pushed the page off screen, and none do with this
+  enabled.
+
+### Fixed
+
+- **The unit test suite compiles and runs again, and CI runs it.** It had been broken since July:
+  `PanelReadingController` gained a `context` parameter its test was never updated for, and the
+  v0.20.4 merge added a second break when upstream's `Tracker` grew `getDisplayUsername`. Nothing
+  in CI ran the tests, so neither was ever reported. Five tracking assertions were also pinned to
+  an older `ChapterUpdate` shape and one to a scroll-sensitivity floor that has since moved; those
+  now assert the behaviour rather than the payload. 179 tests pass; two are marked `@Disabled`
+  against real, still-unfixed panel sorting bugs rather than quietly deleted.
+- **The panel sorting setting no longer labels the wrong option as the default.** "Row-based" was
+  marked "(default)" while the preference actually defaults to XY-cut.
+
 ### Other
 
 - README now says Webtoon Spanning needs the **Long strip** reading mode. The feature is gated on

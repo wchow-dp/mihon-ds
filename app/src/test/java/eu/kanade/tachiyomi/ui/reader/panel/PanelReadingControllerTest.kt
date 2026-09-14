@@ -1,6 +1,12 @@
 package eu.kanade.tachiyomi.ui.reader.panel
 
+import android.content.Context
 import android.graphics.RectF
+import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.flow.emptyFlow
+import tachiyomi.core.common.preference.Preference
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
@@ -17,6 +23,42 @@ import org.junit.jupiter.api.Test
 
 class PanelReadingControllerTest {
 
+    /**
+     * PanelReadingController reaches for a Context (toasts on a saved correction) and pulls
+     * ReaderPreferences and PanelCorrectionStore from Injekt by default. Injekt is not wired up
+     * in a plain JVM test, and those defaults are evaluated at construction, so every dependency
+     * is passed explicitly here rather than left to resolve.
+     */
+    private fun testController(
+        scope: kotlinx.coroutines.CoroutineScope,
+        detector: PanelDetector,
+        dispatcher: kotlinx.coroutines.CoroutineDispatcher,
+        isEnabled: () -> Boolean = { true },
+        readingDirection: () -> PanelReadingDirection = { PanelReadingDirection.LEFT_TO_RIGHT },
+    ): PanelReadingController {
+        val context = mockk<Context>(relaxed = true)
+        // A relaxed mock would hand back a mock enum for the sorting algorithm and a mock
+        // correction for every page, so both are stubbed with the real defaults: sort with
+        // XY_CUT, and no stored correction.
+        val sortingPreference = mockk<Preference<PanelSortingAlgorithm>>(relaxed = true)
+        every { sortingPreference.get() } returns PanelSortingAlgorithm.XY_CUT
+        every { sortingPreference.changes() } returns emptyFlow()
+        val preferences = mockk<ReaderPreferences>(relaxed = true)
+        every { preferences.panelSortingAlgorithm() } returns sortingPreference
+        val corrections = mockk<PanelCorrectionStore>(relaxed = true)
+        every { corrections.getCorrection(any()) } returns null
+        return PanelReadingController(
+            scope = scope,
+            detector = detector,
+            isEnabled = isEnabled,
+            readingDirection = readingDirection,
+            dispatcher = dispatcher,
+            context = context,
+            readerPreferences = preferences,
+            correctionStore = corrections,
+        )
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `detects one page at a time`() = runTest {
@@ -25,11 +67,9 @@ class PanelReadingControllerTest {
         val detector = TrackingDelayedPanelDetector(
             panels = listOf(panel(id = "a", left = 0f)),
         )
-        val controller = PanelReadingController(
+        val controller = testController(
             scope = this,
             detector = detector,
-            isEnabled = { true },
-            readingDirection = { PanelReadingDirection.LEFT_TO_RIGHT },
             dispatcher = StandardTestDispatcher(testScheduler),
         ).apply {
             setEnabledState(true)
@@ -59,11 +99,9 @@ class PanelReadingControllerTest {
     fun `oversized visible page is marked unavailable instead of queued for detection`() = runTest {
         val key = pageKey(pageIndex = 3)
         val detector = CountingPanelDetector(panels = listOf(panel(id = "a", left = 0f)))
-        val controller = PanelReadingController(
+        val controller = testController(
             scope = this,
             detector = detector,
-            isEnabled = { true },
-            readingDirection = { PanelReadingDirection.LEFT_TO_RIGHT },
             dispatcher = StandardTestDispatcher(testScheduler),
         ).apply {
             setEnabledState(true)
@@ -102,11 +140,9 @@ class PanelReadingControllerTest {
     fun `cached panel pages are capped and evict oldest offscreen pages`() = runTest {
         val keys = (0..32).map { pageKey(pageIndex = it) }
         val detector = CountingPanelDetector(panels = listOf(panel(id = "a", left = 0f)))
-        val controller = PanelReadingController(
+        val controller = testController(
             scope = this,
             detector = detector,
-            isEnabled = { true },
-            readingDirection = { PanelReadingDirection.LEFT_TO_RIGHT },
             dispatcher = StandardTestDispatcher(testScheduler),
         ).apply {
             setEnabledState(true)
@@ -133,11 +169,9 @@ class PanelReadingControllerTest {
         val visibleKey = pageKey(pageIndex = 3)
         val offscreenKey = pageKey(pageIndex = 4)
         val detector = CountingPanelDetector(panels = listOf(panel(id = "a", left = 0f)))
-        val controller = PanelReadingController(
+        val controller = testController(
             scope = this,
             detector = detector,
-            isEnabled = { true },
-            readingDirection = { PanelReadingDirection.LEFT_TO_RIGHT },
             dispatcher = StandardTestDispatcher(testScheduler),
         ).apply {
             setEnabledState(true)
@@ -187,12 +221,11 @@ class PanelReadingControllerTest {
                 panel(id = "right", left = 120f),
             ),
         )
-        val controller = PanelReadingController(
+        val controller = testController(
             scope = this,
             detector = detector,
-            isEnabled = { true },
-            readingDirection = { direction },
             dispatcher = StandardTestDispatcher(testScheduler),
+            readingDirection = { direction },
         ).apply {
             setEnabledState(true)
         }
@@ -354,11 +387,9 @@ class PanelReadingControllerTest {
     @Test
     fun `disabling while detection is pending keeps panels inactive`() = runTest {
         val key = pageKey()
-        val controller = PanelReadingController(
+        val controller = testController(
             scope = this,
             detector = DelayedPanelDetector(listOf(panel(id = "a", left = 0f))),
-            isEnabled = { true },
-            readingDirection = { PanelReadingDirection.LEFT_TO_RIGHT },
             dispatcher = StandardTestDispatcher(testScheduler),
         ).apply {
             setEnabledState(true)
@@ -380,11 +411,9 @@ class PanelReadingControllerTest {
     @Test
     fun `panel movement returns pending while detection is pending for page`() = runTest {
         val key = pageKey()
-        val controller = PanelReadingController(
+        val controller = testController(
             scope = this,
             detector = DelayedPanelDetector(listOf(panel(id = "a", left = 0f))),
-            isEnabled = { true },
-            readingDirection = { PanelReadingDirection.LEFT_TO_RIGHT },
             dispatcher = StandardTestDispatcher(testScheduler),
         ).apply {
             setEnabledState(true)
@@ -401,11 +430,9 @@ class PanelReadingControllerTest {
     @Test
     fun `stale detector failure after disabling does not publish failed state`() = runTest {
         val key = pageKey()
-        val controller = PanelReadingController(
+        val controller = testController(
             scope = this,
             detector = NonCancellableFailingPanelDetector(),
-            isEnabled = { true },
-            readingDirection = { PanelReadingDirection.LEFT_TO_RIGHT },
             dispatcher = StandardTestDispatcher(testScheduler),
         ).apply {
             setEnabledState(true)
@@ -429,12 +456,11 @@ class PanelReadingControllerTest {
     fun `detector failure after enabled source turns off does not publish failed state`() = runTest {
         var enabled = true
         val key = pageKey()
-        val controller = PanelReadingController(
+        val controller = testController(
             scope = this,
             detector = DelayedFailingPanelDetector(),
-            isEnabled = { enabled },
-            readingDirection = { PanelReadingDirection.LEFT_TO_RIGHT },
             dispatcher = StandardTestDispatcher(testScheduler),
+            isEnabled = { enabled },
         ).apply {
             setEnabledState(true)
         }
@@ -456,12 +482,11 @@ class PanelReadingControllerTest {
     fun `detector success after enabled source turns off clears pending state`() = runTest {
         var enabled = true
         val key = pageKey()
-        val controller = PanelReadingController(
+        val controller = testController(
             scope = this,
             detector = DelayedPanelDetector(listOf(panel("one", 0f))),
-            isEnabled = { enabled },
-            readingDirection = { PanelReadingDirection.LEFT_TO_RIGHT },
             dispatcher = StandardTestDispatcher(testScheduler),
+            isEnabled = { enabled },
         ).apply {
             setEnabledState(true)
         }
@@ -484,12 +509,11 @@ class PanelReadingControllerTest {
         panels: List<ReaderPanel>,
         enabled: Boolean = true,
     ): PanelReadingController {
-        return PanelReadingController(
+        return testController(
             scope = this,
             detector = StaticPanelDetector(panels),
-            isEnabled = { enabled },
-            readingDirection = { PanelReadingDirection.LEFT_TO_RIGHT },
             dispatcher = StandardTestDispatcher(testScheduler),
+            isEnabled = { enabled },
         ).apply {
             setEnabledState(enabled)
         }

@@ -582,8 +582,8 @@
     <string name="pref_show_recommendations">Show recommendations</string>
     <string name="pref_auto_update_manga_on_mark_read">Update progress when marked as read</string>
     <string name="pref_auto_sync_read_chapters">Auto sync read chapters from Trackers</string>
-    <string name="panel_sort_row_based">Row-based (default)</string>
-    <string name="panel_sort_xy_cut">XY-cut</string>
+    <string name="panel_sort_row_based">Row-based</string>
+    <string name="panel_sort_xy_cut">XY-cut (default)</string>
     <string name="panel_sort_advanced">Advanced Recursive (Layered)</string>
     <string name="pref_panel_sorting_algorithm">Panel sorting algorithm</string>
 
