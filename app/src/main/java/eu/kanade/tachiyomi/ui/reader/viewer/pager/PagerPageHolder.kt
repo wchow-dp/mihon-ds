@@ -224,7 +224,14 @@ class PagerPageHolder(
                         panelPrimaryOverlay = viewer.config.panelReadingPrimaryOverlay,
                         panelKeepPageFramed = viewer.config.panelReadingKeepPageFramed,
                         minimumScaleType = viewer.config.imageScaleType,
-                        cropBorders = viewer.config.imageCropBorders,
+                        // Panel bounds are detected against the original file, and the companion
+                        // deliberately renders uncropped for the same reason (see
+                        // ReaderPresentation). Cropping here would leave this view in a different
+                        // coordinate space to the bounds -- on a 1200x1752 page trimmed to
+                        // 1115x1532 that put the focused panel ~150px off centre, growing toward
+                        // the bottom of the page, while the companion's highlight stayed correct.
+                        cropBorders = viewer.config.imageCropBorders &&
+                            !viewer.activity.isPanelReadingActive(),
                         zoomStartPosition = viewer.config.imageZoomType,
                         landscapeZoom = viewer.config.landscapeZoom,
                     ),

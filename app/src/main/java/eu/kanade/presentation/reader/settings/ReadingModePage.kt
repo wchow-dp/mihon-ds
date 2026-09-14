@@ -121,9 +121,14 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
 
     val isSideBySideViewEnabled by viewModel.preferences.sideBySideMode().collectAsState()
 
+    // Guided reading needs this view in the same coordinate space as the detected panel
+    // bounds, which are computed against the uncropped file, so cropping is suppressed while
+    // it is on (see PagerPageHolder). Greyed out rather than silently ignored.
+    val panelReadingEnabled by viewModel.preferences.panelReadingPaged().collectAsState()
     CheckboxItem(
         label = stringResource(MR.strings.pref_crop_borders),
         pref = viewModel.preferences.cropBorders,
+        enabled = !panelReadingEnabled,
     )
 
     CheckboxItem(
@@ -138,7 +143,6 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
 
     HeadingItem(MR.strings.pref_guided_reading)
 
-    val panelReadingEnabled by viewModel.preferences.panelReadingPaged().collectAsState()
     CheckboxItem(
         label = stringResource(MR.strings.pref_panel_reading),
         pref = viewModel.preferences.panelReadingPaged(),

@@ -54,6 +54,16 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   an older `ChapterUpdate` shape and one to a scroll-sensitivity floor that has since moved; those
   now assert the behaviour rather than the payload. 179 tests pass; two are marked `@Disabled`
   against real, still-unfixed panel sorting bugs rather than quietly deleted.
+- **Guided reading frames the right part of the page when border cropping is on.** Panels are
+  detected against the original image file, but the paged viewer was displaying that page with its
+  borders cropped -- a different, smaller picture -- and nothing translated the panel positions
+  between the two. Every panel was framed against a page that no longer existed, drifting further
+  off the further down the page you read: on a 1200x1752 page trimmed to 1115x1532, the focused
+  panel sat about 150px above where it belonged. The companion display was unaffected because it
+  already renders uncropped, which is why its highlight looked correct while the main screen did
+  not. Cropping is now suppressed while guided reading is active, so both screens and the detected
+  panels share one coordinate space, and the Crop borders setting greys out to say so rather than
+  silently doing nothing. Turning guided reading off restores cropping immediately.
 - **Advanced Recursive no longer reads a tall panel after the shorter ones beside it.** When
   panels overlap enough that no clean cut exists -- a full-height figure with panels bleeding over
   it, which is ordinary manga -- the algorithm falls back to a simple sort, and that sort ranked

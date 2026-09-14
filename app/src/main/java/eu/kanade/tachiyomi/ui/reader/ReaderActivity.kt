@@ -420,9 +420,9 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
                 val enabled = isPanelReadingActive()
                 panelReadingController.setEnabledState(enabled)
                 recreatePresentation()
-                if (enabled) {
-                    (viewModel.state.value.viewer as? PagerViewer)?.refreshAdapter(forceFullReset = true)
-                }
+                // Unconditional: border cropping is suppressed while guided reading is on, so
+                // pages have to be re-decoded when it is turned off as well as on.
+                (viewModel.state.value.viewer as? PagerViewer)?.refreshAdapter(forceFullReset = true)
             }
             .launchIn(lifecycleScope)
 
