@@ -8,6 +8,31 @@ import org.junit.jupiter.api.Test
 
 class ReaderPresentationPageLoadGuardTest {
 
+    // The marker is stamped before the load starts, so it means "requested", not "done". A load
+    // that is cancelled must clear it, or this returns false forever and the companion stays
+    // blank until the page changes. Found in the wild: a cancelled load left the second screen
+    // black for eleven minutes while the reader carried on normally.
+    @Test
+    fun `retries the page once a failed load has cleared its request marker`() {
+        val expected = pageKey(pageIndex = 2)
+
+        // While the marker stands, nothing restarts the load.
+        assertFalse(
+            ReaderPresentationPageLoadGuard.shouldStartPageLoad(
+                expectedKey = expected,
+                requestedTag = expected,
+            ),
+        )
+
+        // Cleared on cancellation, the next update starts it again.
+        assertTrue(
+            ReaderPresentationPageLoadGuard.shouldStartPageLoad(
+                expectedKey = expected,
+                requestedTag = null,
+            ),
+        )
+    }
+
     @Test
     fun `allows image apply only when view is still attached to expected page`() {
         val expected = pageKey(pageIndex = 2)

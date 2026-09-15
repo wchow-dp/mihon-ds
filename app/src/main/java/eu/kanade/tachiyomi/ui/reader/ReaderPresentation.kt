@@ -71,11 +71,13 @@ import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonRecyclerView
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonAdapter
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.util.view.setComposeContent
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import logcat.LogPriority
 import okio.Buffer
 import mihon.core.dualscreen.DualScreenState
 import tachiyomi.core.common.util.lang.launchIO
@@ -570,11 +572,20 @@ class ReaderPresentation(
                     val isAnimated = ImageUtil.isAnimatedAndSupported(bufferedSource)
                     view.setImage(bufferedSource, isAnimated, config)
                     view.setTag(R.id.tag_panel_loaded_page_key, expectedKey)
+                } catch (e: CancellationException) {
+                    // The request marker is stamped before the load starts, and shouldLoad reads
+                    // it as "already handled". Leaving it in place after a cancelled load means
+                    // this page is never retried and the companion stays blank until the page
+                    // changes -- with nothing logged, because the catch below is DEBUG and
+                    // release builds filter below INFO. Clear it so the next update retries.
+                    view.clearPageLoadRequest(expectedKey)
+                    throw e
                 } catch (e: Exception) {
-                    logcat { "Error loading page image: ${e.message}" }
+                    logcat(LogPriority.WARN, e) { "Error loading companion page image" }
                     if (view.canApplyPageLoad(expectedKey)) {
                         view.recycle()
                     }
+                    view.clearPageLoadRequest(expectedKey)
                 }
             }
         } else if (status is Page.State.Error) {
@@ -603,6 +614,18 @@ class ReaderPresentation(
         setTag(R.id.tag_panel_loaded_page_key, null)
         recycle()
         highlightPanel(null)
+    }
+
+    /**
+     * Drops this page's load request so a later update can start it again.
+     *
+     * Only clears the marker if it is still ours: a newer request for a different page must not
+     * be wiped by a straggler failing late.
+     */
+    private fun ReaderPageImageView.clearPageLoadRequest(expectedKey: PanelPageKey) {
+        if (getTag(R.id.tag_panel_requested_page_key) == expectedKey) {
+            setTag(R.id.tag_panel_requested_page_key, null)
+        }
     }
 
     private fun ReaderPageImageView.canApplyPageLoad(expectedKey: PanelPageKey): Boolean {

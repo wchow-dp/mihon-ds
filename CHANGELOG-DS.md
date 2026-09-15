@@ -86,6 +86,16 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   change, and the neighbouring page -- still held in the pager with its rotated image -- is redrawn
   rather than left sideways.
 
+- **The companion no longer stays black after a page load is interrupted.** The companion stamps a
+  "load requested" marker on its view before fetching the page, and the check that decides whether
+  to start a load reads that marker as "already handled". A cancelled load left the marker in
+  place, so the page was never retried and the second screen stayed blank until the page changed --
+  while the reader carried on normally, which is why it looked like the display had died rather
+  than a load having failed. Nothing appeared in the log either: that failure path logged at DEBUG,
+  and release builds drop anything below INFO. The marker is now cleared when a load is cancelled
+  or fails, cancellation is rethrown instead of swallowed, and the failure logs at WARN. Observed
+  in the wild on 0.2.4, where a cancelled load left the companion black for eleven minutes.
+
 ## [0.2.4] - 2026-09-14
 
 ### Changed
