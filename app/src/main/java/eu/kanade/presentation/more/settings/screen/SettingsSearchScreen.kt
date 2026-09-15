@@ -64,6 +64,7 @@ class SettingsSearchScreen : Screen() {
         val navigator = LocalNavigator.currentOrThrow
         val softKeyboardController = LocalSoftwareKeyboardController.current
         val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
         val focusRequester = remember { FocusRequester() }
         val listState = rememberLazyListState()
 
@@ -110,7 +111,10 @@ class SettingsSearchScreen : Screen() {
                                     .copy(color = MaterialTheme.colorScheme.onSurface),
                                 lineLimits = TextFieldLineLimits.SingleLine,
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                                onKeyboardAction = { focusManager.clearFocus() },
+                                onKeyboardAction = {
+                                    focusManager.clearFocus()
+                                    keyboardController?.hide()
+                                },
                                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                                 decorator = {
                                     if (textFieldState.text.isEmpty()) {

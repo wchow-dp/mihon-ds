@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
+import mihon.core.dualscreen.DualScreenState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -290,6 +291,9 @@ fun SearchToolbar(
                 onSearch(searchQuery)
                 focusManager.clearFocus()
                 keyboardController?.hide()
+                // The companion display may be the one actually hosting the keyboard, in which
+                // case the hide above is addressed to the wrong window.
+                DualScreenState.requestHideKeyboard()
                 focusManager.moveFocus(FocusDirection.Next)
             }
 

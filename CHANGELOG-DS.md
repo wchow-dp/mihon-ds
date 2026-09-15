@@ -21,6 +21,13 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ### Added
 
+- **Searching now dismisses the keyboard, even when it is on the other screen.** Pressing search
+  or enter left the keyboard up. The app was asking it to close, but on a dual-screen device the
+  keyboard is hosted on the companion display while the field being typed into is on the main one,
+  so the request went to a window the keyboard was not attached to and did nothing. The companion
+  is now asked to dismiss it as well, through both the insets controller and the input method
+  manager. A no-op when the keyboard is not there. Settings search also hides the keyboard rather
+  than only dropping focus.
 - **Option to leave the app when you close the companion.** Pressing back or home on the companion
   display dismissed only the companion, leaving Mihon up on the main screen -- the physical buttons
   act on whichever display has focus, so the primary one never heard about it. Both screens now
