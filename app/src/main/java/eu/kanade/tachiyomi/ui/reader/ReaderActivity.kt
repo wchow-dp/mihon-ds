@@ -400,6 +400,17 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
         // chapter is slow to start. Acting on that while the reader is still on screen
         // blanks the companion mid-read, so the reader ignores a request that arrives
         // while it is visible.
+        // Companion dismissed by the user: step the primary display back too, so both screens
+        // leave together. moveTaskToBack rather than finish -- the app stays in recents and
+        // returning picks up where it left off.
+        lifecycleScope.launch {
+            DualScreenState.mainScreenLeaveRequests.collect {
+                if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    moveTaskToBack(true)
+                }
+            }
+        }
+
         lifecycleScope.launch {
             DualScreenState.companionCloseRequests.collect {
                 if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {

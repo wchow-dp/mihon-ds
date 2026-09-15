@@ -233,6 +233,17 @@ class MainActivity : BaseActivity() {
             .onEach { checkAndStartDualScreenActivity() }
             .launchIn(lifecycleScope)
 
+        // Companion dismissed by the user: step the primary display back too, so both screens
+        // leave together. moveTaskToBack rather than finish -- the app stays in recents and
+        // returning picks up where it left off.
+        lifecycleScope.launch {
+            DualScreenState.mainScreenLeaveRequests.collect {
+                if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    moveTaskToBack(true)
+                }
+            }
+        }
+
         DualScreenState.activeScreen
             .drop(1)
             .onEach { checkAndStartDualScreenActivity() }

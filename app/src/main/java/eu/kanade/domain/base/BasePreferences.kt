@@ -31,6 +31,11 @@ class BasePreferences(
 
     // On by default: the companion runs as its own task, so without this it keeps showing Mihon
     // on the second screen over whatever the user switched to.
+    fun leaveAppWithCompanion() = preferenceStore.getBoolean(
+        Preference.appStateKey("leave_app_with_companion"),
+        true,
+    )
+
     fun closeCompanionOnLeave() = preferenceStore.getBoolean(Preference.appStateKey("close_companion_on_leave"), true)
 
     val extensionInstaller: ExtensionInstallerPreference = ExtensionInstallerPreference(context, preferenceStore)

@@ -103,6 +103,24 @@ object DualScreenState {
         _companionCloseRequests.tryEmit(Unit)
     }
 
+    /**
+     * Asks the primary display to step back too, when the user dismissed the companion.
+     *
+     * The mirror of [companionCloseRequests]: that one carries main -> companion, this one
+     * companion -> main. Only emitted for a dismissal the user actually performed, never for a
+     * programmatic finish, so the two cannot drive each other in a circle.
+     */
+    private val _mainScreenLeaveRequests = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val mainScreenLeaveRequests = _mainScreenLeaveRequests.asSharedFlow()
+
+    fun requestMainScreenLeave() {
+        _mainScreenLeaveRequests.tryEmit(Unit)
+    }
+
     sealed interface MainScreenEvent {
         data class OpenScreen(val screen: Screen) : MainScreenEvent
     }

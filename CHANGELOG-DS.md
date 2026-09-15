@@ -17,6 +17,20 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   "Changes in this fork" section. Internal fixes stay here only.
 - Entries say what changed and why it mattered, not which files moved.
 
+## [Unreleased]
+
+### Added
+
+- **Option to leave the app when you close the companion.** Pressing back or home on the companion
+  display dismissed only the companion, leaving Mihon up on the main screen -- the physical buttons
+  act on whichever display has focus, so the primary one never heard about it. Both screens now
+  step back together: the main screen is sent to the background, so the app stays in recents and
+  returning picks up where it left off. The exact mirror of "close companion when leaving the app",
+  and on by default. Nothing about the buttons themselves changes: back still returns to the
+  companion's dashboard from inside a screen, and still dismisses the companion from the dashboard,
+  with Android's own handling and animation. The main screen simply reacts to the companion going
+  away.
+
 ## [0.2.4] - 2026-09-14
 
 ### Changed

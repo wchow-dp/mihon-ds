@@ -46,6 +46,7 @@ class DualScreenActivity : BaseActivity() {
         registerSecureActivity(this)
 
         if (intent?.action == ACTION_FINISH) {
+            finishedProgrammatically = true
             finish()
             return
         }
@@ -196,9 +197,29 @@ class DualScreenActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Called only when the user leaves deliberately -- home or recents -- and never for a
+     * programmatic finish or for being covered. onStop would fire for all of those, and acting on
+     * it is what caused two separate blank-companion bugs, so the narrower hook is used here.
+     */
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        requestMainScreenLeaveIfEnabled()
+    }
+
+    /** Set when we finish ourselves, to tell a user's dismissal apart from a programmatic one. */
+    private var finishedProgrammatically = false
+
+    private fun requestMainScreenLeaveIfEnabled() {
+        if (!preferences.enableDualScreenMode().get()) return
+        if (!preferences.leaveAppWithCompanion().get()) return
+        DualScreenState.requestMainScreenLeave()
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (intent.action == ACTION_FINISH) {
+            finishedProgrammatically = true
             finish()
         }
     }
@@ -219,6 +240,12 @@ class DualScreenActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        // A finish we did not ask for is the user dismissing the companion -- back, or swiping it
+        // away. Reacting to the finish rather than intercepting the gesture leaves back behaving
+        // exactly as it always has, including its animation.
+        if (isFinishing && !finishedProgrammatically) {
+            requestMainScreenLeaveIfEnabled()
+        }
         DualScreenState.close()
     }
 

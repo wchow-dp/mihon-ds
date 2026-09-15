@@ -169,6 +169,13 @@ object SettingsSpanningScreen : SearchableSettings {
                 )
             )
             items.add(
+                Preference.PreferenceItem.SwitchPreference(
+                    preference = basePref.leaveAppWithCompanion(),
+                    title = stringResource(MR.strings.pref_leave_app_with_companion),
+                    subtitle = stringResource(MR.strings.pref_leave_app_with_companion_summary),
+                )
+            )
+            items.add(
                 Preference.PreferenceItem.SliderPreference(
                     value = secondaryDisplayScrollSensitivity,
                     valueRange = ReaderPreferences.let {
