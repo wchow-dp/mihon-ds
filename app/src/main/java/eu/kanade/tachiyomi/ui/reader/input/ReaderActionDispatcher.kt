@@ -14,6 +14,13 @@ object ReaderActionDispatcher {
         ReaderAction.TOGGLE_COMPANION_PAGE,
         ReaderAction.TOGGLE_GUIDED_READING,
         ReaderAction.OPEN_READER_SETTINGS,
+        // Rotation is handled by the activity, which owns the viewer. Anything missing from this
+        // set is routed to handleViewerAction instead and silently returns false, so a new action
+        // has to be registered here as well as in the enum, its label, and actionsForLayer.
+        ReaderAction.ROTATE_PAGE,
+        ReaderAction.ROTATE_PAGE_90,
+        ReaderAction.ROTATE_PAGE_180,
+        ReaderAction.ROTATE_PAGE_270,
     )
 
     fun dispatch(action: ReaderAction, target: ReaderActionTarget): Boolean {
