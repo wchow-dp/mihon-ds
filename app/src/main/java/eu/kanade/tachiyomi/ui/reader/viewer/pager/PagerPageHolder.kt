@@ -103,6 +103,11 @@ class PagerPageHolder(
      */
     internal fun reloadForRotation() {
         loadJob?.cancel()
+        // Drop the focus held on the old layout first. It was calculated against the previous
+        // orientation, and leaving it in place applies that zoom and centre to the rotated image
+        // -- which is why a rotated page appeared small and pushed into a corner instead of
+        // fitting the screen. Detection re-runs on the new image and focuses a panel of its own.
+        clearPanelFocus()
         loadJob = scope.launch { loadPageAndProcessStatus() }
     }
 

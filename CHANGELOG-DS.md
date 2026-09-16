@@ -35,6 +35,11 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   panel detection to a single box, leaving guided reading with nothing to step through. Both are
   now skipped when the viewport is wider than it is tall. The settings keep their value and still
   apply on a portrait viewport.
+- **Rotating fits the whole page rather than jumping into a panel.** The zoom and centre held for
+  the previous orientation were being applied to the freshly rotated image, leaving the page small
+  and pushed into a corner, and detection then snapped straight to the first panel. Rotating now
+  drops that focus and lands on no active panel, so the rotated page is shown whole; stepping
+  forward enters the panels of the new layout.
 - **Rotate page, bindable to a key.** Some spreads are published sideways, and on a landscape
   handheld they are both unreadable and small. Four new reader actions: "Rotate page (cycle)" steps
   a quarter turn at a time, and 90°, 180° and 270° each go straight to that angle, since a series

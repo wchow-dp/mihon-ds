@@ -272,6 +272,16 @@ class PanelReadingController(
         context.toast("AI Training: Correction saved!")
     }
 
+    /**
+     * Keyed on page index rather than the full key, because rotating changes the render variant
+     * and therefore the key -- the page is the same one either way.
+     */
+    private var wholePageOnNextDetectionFor: Int? = null
+
+    fun showWholePageOnNextDetection(pageIndex: Int) {
+        wholePageOnNextDetectionFor = pageIndex
+    }
+
     fun activePanelFor(key: PanelPageKey): ReaderPanel? {
         val current = mutableState.value
         return current.activePanel.takeIf { current.key == key }
@@ -344,8 +354,15 @@ class PanelReadingController(
             PanelSorter.sort(rawPanels, direction, readerPreferences.panelSortingAlgorithm().get())
         }
 
+        val showWholePage = wholePageOnNextDetectionFor == key.pageIndex
+        if (showWholePage) wholePageOnNextDetectionFor = null
+
         val panelIndex = when {
             panels.isEmpty() -> -1
+            // -1 means no panel is active, so the reader shows the page fitted rather than
+            // zoomed. Used after a rotation: the page has just changed shape and the reader
+            // should show the whole of it, not jump straight back into a panel.
+            showWholePage -> -1
             preferredPanelIndex < 0 -> 0
             else -> preferredPanelIndex.coerceIn(panels.indices)
         }

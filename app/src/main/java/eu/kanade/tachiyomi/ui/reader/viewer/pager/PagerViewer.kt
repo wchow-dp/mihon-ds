@@ -306,6 +306,8 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
     private fun applyManualRotation(page: ReaderPage, degrees: Int) {
         rotatedDegrees = degrees
         rotatedPage = page.takeIf { degrees != 0 }
+        // Show the whole page once it has been re-detected, rather than snapping into panel one.
+        activity.panelReadingController.showWholePageOnNextDetection(page.index)
         // Re-read the page so process() applies the new rotation. That re-runs panel detection
         // against the rotated image, which is what keeps guided reading's order correct.
         getPageHolder(page)?.reloadForRotation()
