@@ -64,6 +64,22 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   with Android's own handling and animation. The main screen simply reacts to the companion going
   away.
 
+### Fixed
+
+- **Pages are framed centred instead of drifting into a corner.** Opening a chapter, or rotating a
+  page, could leave the whole page squashed into one corner of the screen with the rest black.
+  "Landscape zoom" parks a wide page against the edge you read from, half a second after the image
+  loads -- by which time guided reading has framed a panel, and framing a panel loosens the pan
+  limit so that edge target is no longer held inside the image. Landscape zoom now stands down
+  while a panel is focused. Separately, a panel large enough to show the whole page still centred
+  on the panel rather than the page, leaving it shoved to one side; once the page fits on screen it
+  is now centred on the page.
+- **A rotated page is forgotten once you move on.** Rotation was meant to be dropped when the
+  reader leaves the page, so it never leaks into normal reading. Nothing actually dropped it, so a
+  page rotated earlier was still sideways when you came back to it. It is now cleared on page
+  change, and the neighbouring page -- still held in the pager with its rotated image -- is redrawn
+  rather than left sideways.
+
 ## [0.2.4] - 2026-09-14
 
 ### Changed
