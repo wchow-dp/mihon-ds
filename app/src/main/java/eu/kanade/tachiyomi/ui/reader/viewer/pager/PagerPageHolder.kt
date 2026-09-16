@@ -259,6 +259,21 @@ class PagerPageHolder(
         }
     }
 
+    /**
+     * Both reshaping options below exist to rescue a wide page on a *tall* viewport: rotating or
+     * splitting it makes the content fill more of a portrait screen. On a landscape reader the
+     * page already fits, so they only shrink and mangle it -- a wide spread came out sideways,
+     * and splitting collapsed panel detection to a single box. Neither setting checked the shape
+     * of the screen it was correcting for.
+     *
+     * Read from display metrics rather than the pager's own size: process() runs off the main
+     * thread, and metrics are safe to read from anywhere.
+     */
+    private fun viewportIsPortrait(): Boolean {
+        val metrics = context.resources.displayMetrics
+        return metrics.heightPixels >= metrics.widthPixels
+    }
+
     private fun process(page: ReaderPage, imageSource: BufferedSource): ProcessedPageImage {
         // Manual rotation wins: it is a deliberate, per-page instruction, where everything below
         // is a standing preference. Applied here rather than at display time so that the detector
@@ -276,11 +291,13 @@ class PagerPageHolder(
             )
         }
 
-        if (viewer.config.dualPageRotateToFit) {
+        val reshapeForTallScreen = viewportIsPortrait()
+
+        if (reshapeForTallScreen && viewer.config.dualPageRotateToFit) {
             return rotateDualPage(imageSource)
         }
 
-        if (!viewer.config.dualPageSplit) {
+        if (!reshapeForTallScreen || !viewer.config.dualPageSplit) {
             return ProcessedPageImage(imageSource, PanelPageRenderVariant.FULL)
         }
 

@@ -28,6 +28,13 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   is now asked to dismiss it as well, through both the insets controller and the input method
   manager. A no-op when the keyboard is not there. Settings search also hides the keyboard rather
   than only dropping focus.
+- **Wide pages are no longer reshaped on a landscape screen.** "Rotate wide pages to fit" and
+  "Split wide pages" exist to rescue a wide spread on a *tall* phone, where rotating or splitting
+  it fills more of the screen. Neither checked the shape of the screen it was correcting for, so on
+  a landscape reader they turned spreads sideways and split them apart -- and splitting collapsed
+  panel detection to a single box, leaving guided reading with nothing to step through. Both are
+  now skipped when the viewport is wider than it is tall. The settings keep their value and still
+  apply on a portrait viewport.
 - **Rotate page, bindable to a key.** Some spreads are published sideways, and on a landscape
   handheld they are both unreadable and small. Four new reader actions: "Rotate page (cycle)" steps
   a quarter turn at a time, and 90°, 180° and 270° each go straight to that angle, since a series
