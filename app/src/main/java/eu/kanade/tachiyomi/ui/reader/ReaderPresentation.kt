@@ -562,6 +562,7 @@ class ReaderPresentation(
                             PanelPageRenderVariant.SPLIT_LEFT -> ImageUtil.splitInHalf(source, ImageUtil.Side.LEFT)
                             PanelPageRenderVariant.SPLIT_RIGHT -> ImageUtil.splitInHalf(source, ImageUtil.Side.RIGHT)
                             PanelPageRenderVariant.ROTATE_90 -> ImageUtil.rotateImage(source, 90f)
+                            PanelPageRenderVariant.ROTATE_180 -> ImageUtil.rotateImage(source, 180f)
                             PanelPageRenderVariant.ROTATE_NEGATIVE_90 -> ImageUtil.rotateImage(source, -90f)
                         }
                     }

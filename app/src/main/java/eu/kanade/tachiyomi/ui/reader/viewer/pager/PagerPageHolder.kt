@@ -265,13 +265,15 @@ class PagerPageHolder(
         // sees the rotated image and guided reading follows the rotated layout.
         val manualRotation = viewer.manualRotationFor(page)
         if (manualRotation != 0) {
-            val variant = if (manualRotation == 90) {
-                PanelPageRenderVariant.ROTATE_90
-            } else {
-                PanelPageRenderVariant.ROTATE_NEGATIVE_90
+            val variant = when (manualRotation) {
+                90 -> PanelPageRenderVariant.ROTATE_90
+                180 -> PanelPageRenderVariant.ROTATE_180
+                else -> PanelPageRenderVariant.ROTATE_NEGATIVE_90
             }
-            val degrees = if (manualRotation == 90) 90f else -90f
-            return ProcessedPageImage(ImageUtil.rotateImage(imageSource, degrees), variant)
+            return ProcessedPageImage(
+                ImageUtil.rotateImage(imageSource, manualRotation.toFloat()),
+                variant,
+            )
         }
 
         if (viewer.config.dualPageRotateToFit) {

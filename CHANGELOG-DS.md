@@ -29,8 +29,11 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   manager. A no-op when the keyboard is not there. Settings search also hides the keyboard rather
   than only dropping focus.
 - **Rotate page, bindable to a key.** Some spreads are published sideways, and on a landscape
-  handheld they are both unreadable and small. A new "Rotate page" reader action cycles the current
-  page none -> 90 -> 270 -> none, and the rotation is dropped as soon as you move to another page,
+  handheld they are both unreadable and small. Four new reader actions: "Rotate page (cycle)" steps
+  a quarter turn at a time, and 90°, 180° and 270° each go straight to that angle, since a series
+  published sideways stays that way and cycling past the others every time is wasted presses.
+  Pressing an angle it is already at puts the page back upright, so one key both applies and undoes.
+  The rotation is dropped as soon as you move to another page,
   so it never leaks into normal reading. Rotation is applied where the page is processed rather
   than at display time, which means the panel detector sees the rotated image: guided reading
   re-detects and re-sorts against the rotated layout instead of stepping through the upright page's

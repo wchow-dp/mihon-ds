@@ -1347,6 +1347,21 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
                 pager?.rotateCurrentPage()
                 pager != null
             }
+            ReaderAction.ROTATE_PAGE_90 -> {
+                val pager = viewModel.state.value.viewer as? PagerViewer
+                pager?.rotateCurrentPageTo(90)
+                pager != null
+            }
+            ReaderAction.ROTATE_PAGE_180 -> {
+                val pager = viewModel.state.value.viewer as? PagerViewer
+                pager?.rotateCurrentPageTo(180)
+                pager != null
+            }
+            ReaderAction.ROTATE_PAGE_270 -> {
+                val pager = viewModel.state.value.viewer as? PagerViewer
+                pager?.rotateCurrentPageTo(270)
+                pager != null
+            }
             else -> false
         }
     }

@@ -23,6 +23,7 @@ enum class PanelPageRenderVariant {
     SPLIT_LEFT,
     SPLIT_RIGHT,
     ROTATE_90,
+    ROTATE_180,
     ROTATE_NEGATIVE_90,
 }
 
