@@ -35,6 +35,9 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   panel detection to a single box, leaving guided reading with nothing to step through. Both are
   now skipped when the viewport is wider than it is tall. The settings keep their value and still
   apply on a portrait viewport.
+- **The companion follows the main screen's rotation.** It rendered the page unrotated whenever
+  the panel map was off, so rotating a page left the two screens showing opposite orientations. It
+  now uses the variant the page was actually rendered with.
 - **Rotating fits the whole page rather than jumping into a panel.** The zoom and centre held for
   the previous orientation were being applied to the freshly rotated image, leaving the page small
   and pushed into a corner, and detection then snapped straight to the first panel. Rotating now

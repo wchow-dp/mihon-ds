@@ -233,11 +233,11 @@ class ReaderPresentation(
         }
         val displayPage = currentChapterPages?.getOrNull(displayPageNum - 1)
         val activePanel = panelReadingState.activePanel.takeIf { panelMapEnabled }
-        val displayRenderVariant = if (panelMapEnabled) {
-            panelRenderVariant
-        } else {
-            PanelPageRenderVariant.FULL
-        }
+        // The variant the main screen actually rendered, whether or not the panel map is on.
+        // Hardcoding FULL here meant the companion could never show a rotation: rotating a page
+        // turned the main screen and left the companion upright, showing the two screens in
+        // different orientations.
+        val displayRenderVariant = panelRenderVariant
 
         val menuState = remember { mutableStateOf(false) }
         localMenuVisibleState = menuState
