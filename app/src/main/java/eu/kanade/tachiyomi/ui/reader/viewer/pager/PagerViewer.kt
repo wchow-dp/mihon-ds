@@ -277,16 +277,18 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
      * Deliberately not persisted: this exists for the occasional spread printed sideways, and a
      * rotation that outlived the page would turn every following page on its side.
      */
-    private var rotatedPage: ReaderPage? = null
+    private var rotatedPageIndex: Int? = null
     private var rotatedDegrees: Int = 0
 
+    // Keyed on page index rather than the instance: navigating away and back can hand out a
+    // different ReaderPage object for the same page, and identity would quietly lose the rotation.
     internal fun manualRotationFor(page: ReaderPage): Int =
-        if (page === rotatedPage) rotatedDegrees else 0
+        if (page.index == rotatedPageIndex) rotatedDegrees else 0
 
     /** Advances the current page a quarter turn: none -> 90 -> 180 -> 270 -> none. */
     internal fun rotateCurrentPage() {
         val page = currentPage as? ReaderPage ?: return
-        val current = if (page === rotatedPage) rotatedDegrees else 0
+        val current = manualRotationFor(page)
         applyManualRotation(page, (current + 90) % 360)
     }
 
@@ -299,26 +301,16 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
      */
     internal fun rotateCurrentPageTo(degrees: Int) {
         val page = currentPage as? ReaderPage ?: return
-        val target = if (page === rotatedPage && rotatedDegrees == degrees) 0 else degrees
+        val target = if (manualRotationFor(page) == degrees) 0 else degrees
         applyManualRotation(page, target)
     }
 
     private fun applyManualRotation(page: ReaderPage, degrees: Int) {
         rotatedDegrees = degrees
-        rotatedPage = page.takeIf { degrees != 0 }
-        // Show the whole page once it has been re-detected, rather than snapping into panel one.
-        activity.panelReadingController.showWholePageOnNextDetection(page.index)
+        rotatedPageIndex = page.index.takeIf { degrees != 0 }
         // Re-read the page so process() applies the new rotation. That re-runs panel detection
         // against the rotated image, which is what keeps guided reading's order correct.
         getPageHolder(page)?.reloadForRotation()
-    }
-
-    private fun clearManualRotation() {
-        if (rotatedPage == null) return
-        val previous = rotatedPage
-        rotatedPage = null
-        rotatedDegrees = 0
-        previous?.let { getPageHolder(it)?.reloadForRotation() }
     }
 
     private fun getPageHolder(page: ReaderPage): PagerPageHolder? {
@@ -522,7 +514,6 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
                 currentPage is ChapterTransition.Prev && page is ReaderItemPair -> false
                 else -> true
             }
-            if (page !== currentPage) clearManualRotation()
             currentPage = page
             activity.panelReadingController.onVisiblePagesChanged(
                 currentReaderPages().map { it.panelPageKey() },
