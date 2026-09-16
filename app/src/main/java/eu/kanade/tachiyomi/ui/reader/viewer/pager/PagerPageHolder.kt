@@ -285,11 +285,6 @@ class PagerPageHolder(
         // sees the rotated image and guided reading follows the rotated layout.
         val manualRotation = viewer.manualRotationFor(page)
         if (manualRotation != 0) {
-            // Asked for here rather than at the moment the key is pressed, so it also applies when
-            // a page that is already rotated comes back into view. Detection runs on the image
-            // produced just below, and this makes it land on no panel so the whole rotated page is
-            // shown fitted instead of snapping into panel one.
-            viewer.activity.panelReadingController.showWholePageOnNextDetection(page.index)
             val variant = when (manualRotation) {
                 90 -> PanelPageRenderVariant.ROTATE_90
                 180 -> PanelPageRenderVariant.ROTATE_180

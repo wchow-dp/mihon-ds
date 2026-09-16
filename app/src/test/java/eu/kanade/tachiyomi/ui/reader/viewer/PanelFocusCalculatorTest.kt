@@ -133,6 +133,28 @@ class PanelFocusCalculatorTest {
     }
 
     @Test
+    fun `a panel that fits the whole page on screen centres the page, not the panel`() {
+        // A full-page panel on a landscape viewport: the fit scale shows the whole spread, so
+        // honouring the panel's off-centre midpoint would leave the page shoved to one side.
+        val focus = PanelFocusCalculator.calculateFocus(
+            viewWidth = 1920,
+            viewHeight = 1080,
+            imageWidth = 2000,
+            imageHeight = 1400,
+            panelLeft = 1000f,
+            panelTop = 0f,
+            panelRight = 2000f,
+            panelBottom = 1400f,
+            minScale = 0.1f,
+            maxScale = 8f,
+            allowOverpan = true,
+        )
+
+        assertEquals(1000f, focus.centerX, 0.001f)
+        assertEquals(700f, focus.centerY, 0.001f)
+    }
+
+    @Test
     fun `edge panel focus can target panel center when overpan is allowed`() {
         val focus = PanelFocusCalculator.calculateFocus(
             viewWidth = 1000,

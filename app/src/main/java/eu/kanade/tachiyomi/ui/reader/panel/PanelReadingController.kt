@@ -273,13 +273,21 @@ class PanelReadingController(
     }
 
     /**
+     * The page the reader is currently holding at a manual rotation, or null when none is.
+     *
      * Keyed on page index rather than the full key, because rotating changes the render variant
-     * and therefore the key -- the page is the same one either way.
+     * and therefore the key -- the page is the same one either way. Held for as long as the
+     * rotation lasts rather than consumed by the first detection: detection results are cached,
+     * so a page that has been rotated once can activate again before its image has finished
+     * re-decoding, and a one-shot flag was routinely spent on the wrong activation. That left the
+     * page zoomed into panel one while the image behind it was still being replaced, which is how
+     * a rotated page ended up parked in a corner instead of fitted.
      */
-    private var wholePageOnNextDetectionFor: Int? = null
+    private var rotatedPageIndex: Int? = null
 
-    fun showWholePageOnNextDetection(pageIndex: Int) {
-        wholePageOnNextDetectionFor = pageIndex
+    /** Called from the reader when a manual rotation is applied or cleared. Main thread only. */
+    fun setRotatedPage(pageIndex: Int?) {
+        rotatedPageIndex = pageIndex
     }
 
     fun activePanelFor(key: PanelPageKey): ReaderPanel? {
@@ -354,8 +362,7 @@ class PanelReadingController(
             PanelSorter.sort(rawPanels, direction, readerPreferences.panelSortingAlgorithm().get())
         }
 
-        val showWholePage = wholePageOnNextDetectionFor == key.pageIndex
-        if (showWholePage) wholePageOnNextDetectionFor = null
+        val showWholePage = rotatedPageIndex == key.pageIndex
 
         val panelIndex = when {
             panels.isEmpty() -> -1

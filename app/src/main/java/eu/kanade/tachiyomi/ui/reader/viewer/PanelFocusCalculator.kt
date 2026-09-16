@@ -87,9 +87,14 @@ object PanelFocusCalculator {
         if (imageSize <= 0) return this
 
         val imageSizeFloat = imageSize.toFloat()
-        if (allowOverpan) return coerceIn(0f, imageSizeFloat)
 
+        // Once the whole image fits along this axis there is nothing left to pan to, so the panel's
+        // own centre stops being useful and only slides the page to one side behind a band of empty
+        // background. Checked ahead of the overpan escape hatch, which exists so a panel hard
+        // against an edge can still be centred -- that only makes sense while zoomed in.
         if (visibleSize >= imageSizeFloat) return imageSizeFloat / 2f
+
+        if (allowOverpan) return coerceIn(0f, imageSizeFloat)
 
         val halfVisibleSize = visibleSize / 2f
         return coerceIn(halfVisibleSize, imageSizeFloat - halfVisibleSize)

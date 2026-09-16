@@ -308,9 +308,46 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
     private fun applyManualRotation(page: ReaderPage, degrees: Int) {
         rotatedDegrees = degrees
         rotatedPageIndex = page.index.takeIf { degrees != 0 }
+        // Told here, on the main thread, rather than from the background decode: detection for a
+        // page that has been rotated before is already cached and can activate immediately, so
+        // the controller has to know the page is rotated before the reload is even started.
+        activity.panelReadingController.setRotatedPage(rotatedPageIndex)
         // Re-read the page so process() applies the new rotation. That re-runs panel detection
         // against the rotated image, which is what keeps guided reading's order correct.
         getPageHolder(page)?.reloadForRotation()
+    }
+
+    /**
+     * Puts the rotated page back upright once the reader has moved off it.
+     *
+     * Rotation is a fix for the occasional sideways spread, not a setting: leaving it in place
+     * means a page you turned two chapters ago is still on its side when you come back to it,
+     * which reads as the reader having a mind of its own. Re-reading the holder matters as much
+     * as dropping the state -- the page next door is still in the pager with its rotated bitmap,
+     * and nothing else would ever ask it to redraw.
+     */
+    private fun clearManualRotationIfMovedOn(currentIndices: List<Int>) {
+        val rotated = rotatedPageIndex ?: return
+        if (rotated in currentIndices) return
+
+        rotatedPageIndex = null
+        rotatedDegrees = 0
+        activity.panelReadingController.setRotatedPage(null)
+        getPageHolderByIndex(rotated)?.reloadForRotation()
+    }
+
+    private fun getPageHolderByIndex(pageIndex: Int): PagerPageHolder? {
+        pager.children.forEach { child ->
+            if (child is PagerPageHolder && child.page.index == pageIndex) {
+                return child
+            }
+            if (child is PagerPagePairHolder) {
+                child.children.filterIsInstance(PagerPageHolder::class.java).forEach {
+                    if (it.page.index == pageIndex) return it
+                }
+            }
+        }
+        return null
     }
 
     private fun getPageHolder(page: ReaderPage): PagerPageHolder? {
@@ -515,6 +552,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
                 else -> true
             }
             currentPage = page
+            clearManualRotationIfMovedOn(currentReaderPages().map { it.index })
             activity.panelReadingController.onVisiblePagesChanged(
                 currentReaderPages().map { it.panelPageKey() },
             )

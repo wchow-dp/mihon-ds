@@ -147,7 +147,22 @@ open class ReaderPageImageView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * True while a panel is focused, or while one is waiting for the image to become ready.
+     *
+     * Guided reading and landscape zoom both want to drive the viewport, and landscape zoom wins
+     * by accident because it fires half a second late.
+     */
+    private fun isPanelFocusActive(): Boolean = currentPanelFocus != null || pendingPanelFocus != null
+
     private fun SubsamplingScaleImageView.landscapeZoom(forward: Boolean) {
+        // Landscape zoom parks a wide page against the edge you read from. Under guided reading
+        // the panel focus has already framed the page, and worse, focusing a panel loosens the pan
+        // limit to PAN_LIMIT_CENTER -- so this animation's edge target is no longer clamped back
+        // inside the image and drags the whole page off into a corner. That is the "page is not
+        // centred" seen right after a page loads or is rotated.
+        if (isPanelFocusActive()) return
+
         if (
             config != null &&
             config!!.landscapeZoom &&
@@ -156,6 +171,10 @@ open class ReaderPageImageView @JvmOverloads constructor(
             scale == minScale
         ) {
             handler?.postDelayed(500) {
+                // Checked again on arrival: detection usually finishes inside this delay, so the
+                // panel focus that has to win may not have existed when the animation was queued.
+                if (isPanelFocusActive()) return@postDelayed
+
                 val point = when (config!!.zoomStartPosition) {
                     ZoomStartPosition.LEFT -> if (forward) PointF(0F, 0F) else PointF(sWidth.toFloat(), 0F)
                     ZoomStartPosition.RIGHT -> if (forward) PointF(sWidth.toFloat(), 0F) else PointF(0F, 0F)
@@ -525,6 +544,11 @@ open class ReaderPageImageView @JvmOverloads constructor(
         data: Any,
         config: Config,
     ) = (pageView as? SubsamplingScaleImageView)?.apply {
+        // A new image starts unconstrained. The looser PAN_LIMIT_CENTER is only ever wanted while
+        // a panel is focused, and the view is reused across loads, so a limit left behind by the
+        // previous image lets the zoom-start-position nudge in setupZoom push a freshly fitted
+        // page right out to a corner -- which is what a rotated page did instead of centring.
+        setPanelFocusPanLimit(enabled = false)
         setDoubleTapZoomDuration(config.zoomDuration.getSystemScaledDuration())
         setMinimumScaleType(config.minimumScaleType)
         setMinimumDpi(1) // Just so that very small image will be fit for initial load
