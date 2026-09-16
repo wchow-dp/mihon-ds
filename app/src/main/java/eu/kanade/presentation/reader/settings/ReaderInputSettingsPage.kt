@@ -265,6 +265,10 @@ private fun actionsForLayer(layer: ReaderInputLayer?): List<ReaderAction> {
             ReaderAction.TOGGLE_COMPANION_PAGE,
             ReaderAction.TOGGLE_GUIDED_READING,
             ReaderAction.OPEN_READER_SETTINGS,
+            ReaderAction.ROTATE_PAGE,
+            ReaderAction.ROTATE_PAGE_90,
+            ReaderAction.ROTATE_PAGE_180,
+            ReaderAction.ROTATE_PAGE_270,
         )
         ReaderInputLayer.PAGED -> listOf(
             ReaderAction.NEXT,
@@ -272,6 +276,10 @@ private fun actionsForLayer(layer: ReaderInputLayer?): List<ReaderAction> {
             ReaderAction.NEXT_PAGE,
             ReaderAction.PREVIOUS_PAGE,
             ReaderAction.TOGGLE_MENU,
+            ReaderAction.ROTATE_PAGE,
+            ReaderAction.ROTATE_PAGE_90,
+            ReaderAction.ROTATE_PAGE_180,
+            ReaderAction.ROTATE_PAGE_270,
         )
         ReaderInputLayer.WEBTOON -> listOf(
             ReaderAction.SCROLL_DOWN,
@@ -288,6 +296,10 @@ private fun actionsForLayer(layer: ReaderInputLayer?): List<ReaderAction> {
             ReaderAction.PREVIOUS_PANEL,
             ReaderAction.NEXT_PAGE,
             ReaderAction.PREVIOUS_PAGE,
+            ReaderAction.ROTATE_PAGE,
+            ReaderAction.ROTATE_PAGE_90,
+            ReaderAction.ROTATE_PAGE_180,
+            ReaderAction.ROTATE_PAGE_270,
         )
     }
 }
