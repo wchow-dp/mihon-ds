@@ -271,6 +271,40 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
     /**
      * Returns the PagerPageHolder for the provided page
      */
+    /**
+     * Manual rotation for one page, cleared as soon as the reader moves on.
+     *
+     * Deliberately not persisted: this exists for the occasional spread printed sideways, and a
+     * rotation that outlived the page would turn every following page on its side.
+     */
+    private var rotatedPage: ReaderPage? = null
+    private var rotatedDegrees: Int = 0
+
+    internal fun manualRotationFor(page: ReaderPage): Int =
+        if (page === rotatedPage) rotatedDegrees else 0
+
+    /** Advances the current page through none -> 90 -> 270 -> none and reloads it. */
+    internal fun rotateCurrentPage() {
+        val page = currentPage as? ReaderPage ?: return
+        rotatedDegrees = when {
+            page !== rotatedPage -> 90
+            rotatedDegrees == 90 -> 270
+            else -> 0
+        }
+        rotatedPage = page.takeIf { rotatedDegrees != 0 }
+        // Re-read the page so process() applies the new rotation. That re-runs panel detection
+        // against the rotated image, which is what keeps guided reading's order correct.
+        getPageHolder(page)?.reloadForRotation()
+    }
+
+    private fun clearManualRotation() {
+        if (rotatedPage == null) return
+        val previous = rotatedPage
+        rotatedPage = null
+        rotatedDegrees = 0
+        previous?.let { getPageHolder(it)?.reloadForRotation() }
+    }
+
     private fun getPageHolder(page: ReaderPage): PagerPageHolder? {
         pager.children.forEach { child ->
             if (child is PagerPageHolder && child.item == page) {
@@ -472,6 +506,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
                 currentPage is ChapterTransition.Prev && page is ReaderItemPair -> false
                 else -> true
             }
+            if (page !== currentPage) clearManualRotation()
             currentPage = page
             activity.panelReadingController.onVisiblePagesChanged(
                 currentReaderPages().map { it.panelPageKey() },

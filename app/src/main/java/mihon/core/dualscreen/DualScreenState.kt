@@ -121,23 +121,6 @@ object DualScreenState {
         _mainScreenLeaveRequests.tryEmit(Unit)
     }
 
-    /**
-     * Asks the companion to dismiss the soft keyboard.
-     *
-     * On the Thor the IME is hosted on the second display while the field being typed into is on
-     * the first, so the main screen's own hide() call is addressed to a window the keyboard is not
-     * attached to and does nothing. A no-op when the keyboard is not there.
-     */
-    private val _hideKeyboardRequests = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(
-        replay = 0,
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-    val hideKeyboardRequests = _hideKeyboardRequests.asSharedFlow()
-
-    fun requestHideKeyboard() {
-        _hideKeyboardRequests.tryEmit(Unit)
-    }
 
     sealed interface MainScreenEvent {
         data class OpenScreen(val screen: Screen) : MainScreenEvent

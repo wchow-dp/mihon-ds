@@ -1169,6 +1169,7 @@
     <string name="reader_action_toggle_companion_page">Toggle dashboard/companion page</string>
     <string name="reader_action_toggle_guided_reading">Toggle guided reading</string>
     <string name="reader_action_open_reader_settings">Open reader settings</string>
+    <string name="reader_action_rotate_page">Rotate page</string>
     <string name="reader_action_next_panel">Next panel</string>
     <string name="reader_action_previous_panel">Previous panel</string>
     <string name="reader_action_next_page">Next page</string>

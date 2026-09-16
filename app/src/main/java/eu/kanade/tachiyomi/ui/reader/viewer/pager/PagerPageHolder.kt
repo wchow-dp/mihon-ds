@@ -95,6 +95,17 @@ class PagerPageHolder(
         loadJob = null
     }
 
+    /**
+     * Re-reads the page so process() can apply a changed manual rotation.
+     *
+     * Detection is keyed on the render variant, so re-processing a rotated page re-runs it against
+     * the rotated image rather than reusing the upright page's panel order.
+     */
+    internal fun reloadForRotation() {
+        loadJob?.cancel()
+        loadJob = scope.launch { loadPageAndProcessStatus() }
+    }
+
     private fun initProgressIndicator() {
         if (progressIndicator == null) {
             progressIndicator = ReaderProgressIndicator(context)
@@ -249,6 +260,20 @@ class PagerPageHolder(
     }
 
     private fun process(page: ReaderPage, imageSource: BufferedSource): ProcessedPageImage {
+        // Manual rotation wins: it is a deliberate, per-page instruction, where everything below
+        // is a standing preference. Applied here rather than at display time so that the detector
+        // sees the rotated image and guided reading follows the rotated layout.
+        val manualRotation = viewer.manualRotationFor(page)
+        if (manualRotation != 0) {
+            val variant = if (manualRotation == 90) {
+                PanelPageRenderVariant.ROTATE_90
+            } else {
+                PanelPageRenderVariant.ROTATE_NEGATIVE_90
+            }
+            val degrees = if (manualRotation == 90) 90f else -90f
+            return ProcessedPageImage(ImageUtil.rotateImage(imageSource, degrees), variant)
+        }
+
         if (viewer.config.dualPageRotateToFit) {
             return rotateDualPage(imageSource)
         }

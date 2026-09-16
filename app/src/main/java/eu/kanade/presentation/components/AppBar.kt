@@ -6,7 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
-import mihon.core.dualscreen.DualScreenState
+import android.view.inputmethod.InputMethodManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -285,15 +286,21 @@ fun SearchToolbar(
 
             val keyboardController = LocalSoftwareKeyboardController.current
             val focusManager = LocalFocusManager.current
+            val view = LocalView.current
 
             val searchAndClearFocus: () -> Unit = f@{
                 if (searchQuery.isBlank()) return@f
                 onSearch(searchQuery)
                 focusManager.clearFocus()
                 keyboardController?.hide()
-                // The companion display may be the one actually hosting the keyboard, in which
-                // case the hide above is addressed to the wrong window.
-                DualScreenState.requestHideKeyboard()
+                // Go through the platform as well. LocalSoftwareKeyboardController can be null,
+                // in which case the call above is silently swallowed by the safe call -- and on
+                // the Thor the keyboard is rendered on the second display, which makes it easy to
+                // believe it is the app failing to ask rather than the ask not landing. The input
+                // connection belongs to this window whichever display draws the keyboard, so this
+                // is addressed correctly.
+                val imm = view.context.getSystemService(InputMethodManager::class.java)
+                imm?.hideSoftInputFromWindow(view.windowToken, 0)
                 focusManager.moveFocus(FocusDirection.Next)
             }
 

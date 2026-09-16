@@ -31,6 +31,7 @@ internal fun ReaderAction.readerInputLabel(): String {
         ReaderAction.TOGGLE_COMPANION_PAGE -> stringResource(MR.strings.reader_action_toggle_companion_page)
         ReaderAction.TOGGLE_GUIDED_READING -> stringResource(MR.strings.reader_action_toggle_guided_reading)
         ReaderAction.OPEN_READER_SETTINGS -> stringResource(MR.strings.reader_action_open_reader_settings)
+        ReaderAction.ROTATE_PAGE -> stringResource(MR.strings.reader_action_rotate_page)
         ReaderAction.NEXT_PANEL -> stringResource(MR.strings.reader_action_next_panel)
         ReaderAction.PREVIOUS_PANEL -> stringResource(MR.strings.reader_action_previous_panel)
         ReaderAction.NEXT_PAGE -> stringResource(MR.strings.reader_action_next_page)

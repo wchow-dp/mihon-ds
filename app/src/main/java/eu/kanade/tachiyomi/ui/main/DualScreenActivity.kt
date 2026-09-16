@@ -57,10 +57,6 @@ class DualScreenActivity : BaseActivity() {
 
         setupRotation()
 
-        lifecycleScope.launch {
-            DualScreenState.hideKeyboardRequests.collect { hideSoftKeyboard() }
-        }
-
         setComposeContent {
             val activeScreen by DualScreenState.activeScreen.collectAsState()
             val rotation = rotationState
@@ -163,15 +159,6 @@ class DualScreenActivity : BaseActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         setupRotation()
-    }
-
-    private fun hideSoftKeyboard() {
-        // Both routes: the insets controller covers the compose/window side, and the IMM call
-        // covers the case where the keyboard is attached to this window at the platform level.
-        val decor = window?.decorView ?: return
-        WindowCompat.getInsetsController(window, decor).hide(WindowInsetsCompat.Type.ime())
-        (getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
-            ?.hideSoftInputFromWindow(decor.windowToken, 0)
     }
 
     override fun onResume() {

@@ -1342,6 +1342,11 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
                 viewModel.openSettingsDialog()
                 true
             }
+            ReaderAction.ROTATE_PAGE -> {
+                val pager = viewModel.state.value.viewer as? PagerViewer
+                pager?.rotateCurrentPage()
+                pager != null
+            }
             else -> false
         }
     }

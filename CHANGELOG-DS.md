@@ -28,6 +28,14 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   is now asked to dismiss it as well, through both the insets controller and the input method
   manager. A no-op when the keyboard is not there. Settings search also hides the keyboard rather
   than only dropping focus.
+- **Rotate page, bindable to a key.** Some spreads are published sideways, and on a landscape
+  handheld they are both unreadable and small. A new "Rotate page" reader action cycles the current
+  page none -> 90 -> 270 -> none, and the rotation is dropped as soon as you move to another page,
+  so it never leaks into normal reading. Rotation is applied where the page is processed rather
+  than at display time, which means the panel detector sees the rotated image: guided reading
+  re-detects and re-sorts against the rotated layout instead of stepping through the upright page's
+  order. The companion follows, since it already renders whatever variant the page was processed
+  into.
 - **Option to leave the app when you close the companion.** Pressing back or home on the companion
   display dismissed only the companion, leaving Mihon up on the main screen -- the physical buttons
   act on whichever display has focus, so the primary one never heard about it. Both screens now
