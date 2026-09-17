@@ -289,6 +289,17 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
         readerPresentation?.dismiss()
     }
 
+    /**
+     * Rebuild the companion presentation after it has been torn down and reused.
+     *
+     * Posted rather than run inline: the caller is inside a view attach callback, and dismissing
+     * the window being attached from within that callback is a good way to get a worse bug than
+     * the one being fixed.
+     */
+    internal fun rebuildCompanionPresentation() {
+        window.decorView.post { recreatePresentation() }
+    }
+
     private fun recreatePresentation() {
         controlsPresentation?.dismiss()
         controlsPresentation = null

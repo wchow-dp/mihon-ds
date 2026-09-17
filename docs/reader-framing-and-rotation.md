@@ -123,6 +123,25 @@ error anywhere:
 The rotation actions shipped missing (2), then missing (3). Check all three before concluding a
 new action "doesn't work".
 
+## The companion presentation's lifecycle
+
+`ReaderPresentation` is its own `LifecycleOwner`, so `lifecycleScope` inside it is *its* scope,
+not the activity's. Two consequences worth holding on to:
+
+- **DESTROYED is final.** A `LifecycleRegistry` cannot be moved back up, and the scope is
+  cancelled with it. Anything launched from `lifecycleScope` afterwards silently does not run --
+  including the page loads and the code that would log their failure. The symptom is a companion
+  that is present, on top, unobscured and painting nothing but the dark reader background, with
+  an empty log. Teardown therefore belongs to `dismiss()`, not `onDetachedFromWindow()`: a
+  dialog's window can be detached and attached again without the dialog ending.
+- **Sleep and wake churn the presentation.** Waking the device produced four dismiss/recreate
+  cycles in about four seconds before settling. Each cycle cancels any page load in flight; the
+  cancellation path has to clear its request marker or the page is never retried.
+
+When the companion is blank, the log now distinguishes the cases: `Companion load start` means it
+asked, `Companion page not shown` means it believed the page was already requested and it never
+landed, and silence on both means the scope is dead.
+
 ## Testing on a dual-screen device over adb
 
 - **Reader key bindings only match gamepad-source events.** `adb shell input keyevent 96` does

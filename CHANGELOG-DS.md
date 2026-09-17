@@ -90,6 +90,16 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   change, and the neighbouring page -- still held in the pager with its rotated image -- is redrawn
   rather than left sideways.
 
+- **The companion survives its window being detached.** The presentation tore itself down
+  whenever its window was detached -- lifecycle to DESTROYED, compose view and container dropped,
+  view-model store cleared. A dialog's window can be detached without the dialog being dismissed,
+  and a lifecycle can never come back up from DESTROYED, so after one of those the presentation
+  was a window that could only ever paint the dark reader background: no page would load again
+  and nothing was logged, because the coroutines that would have logged had been cancelled with
+  the scope. Teardown now happens on dismissal only, and a presentation that is reattached after
+  being torn down asks the reader for a fresh one instead of sitting there black. The companion
+  also now logs when it starts a page and warns when a page it was asked for never appears, so a
+  blank second screen leaves a trace either way.
 - **The companion no longer stays black after a page load is interrupted.** The companion stamps a
   "load requested" marker on its view before fetching the page, and the check that decides whether
   to start a load reads that marker as "already handled". A cancelled load left the marker in

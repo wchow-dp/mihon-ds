@@ -294,6 +294,10 @@ class ReaderPresentation(
                     label = "PageTransition"
                 ) { page ->
                     if (page != null) {
+                        // Plain holder rather than state: written from the update lambda, and a
+                        // state write there would loop recomposition. Only used to keep the
+                        // stuck-page warning below to one line per page.
+                        val lastStuckLogged = remember { arrayOfNulls<Any>(1) }
                         AndroidView(
                             factory = { ctx ->
                                 ReaderPageImageView(ctx).apply {
@@ -302,10 +306,20 @@ class ReaderPresentation(
                             },
                             update = { view ->
                                 val requestedKey = view.getTag(R.id.tag_panel_requested_page_key)
+                                val loadedKey = view.getTag(R.id.tag_panel_loaded_page_key)
                                 val pageKey = page.panelPageKey(displayRenderVariant)
                                 if (ReaderPresentationPageLoadGuard.shouldStartPageLoad(pageKey, requestedKey)) {
+                                    logcat(LogPriority.INFO) { "Companion load start $pageKey" }
                                     view.prepareForPageLoad(pageKey)
                                     loadPageIntoView(view, page, displayRenderVariant)
+                                } else if (loadedKey != pageKey && lastStuckLogged[0] != pageKey) {
+                                    // Marked as requested, but this page never landed. That is the
+                                    // black-companion signature: the reader moves on and the second
+                                    // screen keeps whatever it had, or nothing at all.
+                                    lastStuckLogged[0] = pageKey
+                                    logcat(LogPriority.WARN) {
+                                        "Companion page not shown: want=$pageKey requested=$requestedKey loaded=$loadedKey"
+                                    }
                                 }
                                 view.applyPanelReadingDisplayConfig(
                                     panelTransitionDuration = panelTransitionMillis,
@@ -801,8 +815,45 @@ class ReaderPresentation(
         }
     }
 
+    /**
+     * Teardown belongs to dismissal, not to detachment.
+     *
+     * A dialog's window can be detached and attached again without the dialog ever being
+     * dismissed -- something else appearing on this display is enough. Tearing down here treated
+     * every detach as the end: the lifecycle went to DESTROYED, which a LifecycleRegistry can
+     * never come back up from, so [lifecycleScope] was cancelled for good and every later page
+     * load silently did nothing. The window was still there, still on top, painting the dark
+     * reader background and nothing else -- a black companion, with not one line in the log,
+     * because the coroutines that would have logged were never allowed to run.
+     */
+    private var dismissed = false
+
+    override fun dismiss() {
+        dismissed = true
+        super.dismiss()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        logcat(LogPriority.INFO) {
+            "Companion presentation attached (state=${lifecycleRegistry.currentState})"
+        }
+        if (lifecycleRegistry.currentState == Lifecycle.State.DESTROYED) {
+            // Already torn down and being reused: nothing here can be revived, so hand it back to
+            // the activity to build a fresh one rather than leave a window that can only be black.
+            logcat(LogPriority.WARN) { "Companion presentation reattached after teardown; rebuilding" }
+            activity.rebuildCompanionPresentation()
+        }
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        logcat(LogPriority.INFO) { "Companion presentation detached (dismissed=$dismissed)" }
+        if (!dismissed) {
+            // Transient: onStop has already dropped us to CREATED, which is resumable. Keep the
+            // views and the scope so the next attach can carry on.
+            return
+        }
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         composeView?.disposeComposition()
         composeView = null
