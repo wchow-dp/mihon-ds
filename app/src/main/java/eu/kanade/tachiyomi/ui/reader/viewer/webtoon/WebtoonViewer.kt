@@ -185,6 +185,10 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
             refreshAdapter()
         }
 
+        config.reshapeWidePagesChangedListener = {
+            refreshAdapter()
+        }
+
         config.themeChangedListener = {
             ActivityCompat.recreate(activity)
         }

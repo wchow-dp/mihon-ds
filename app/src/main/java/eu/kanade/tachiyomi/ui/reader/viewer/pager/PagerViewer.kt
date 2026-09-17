@@ -181,6 +181,10 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
             refreshAdapter()
         }
 
+        config.reshapeWidePagesChangedListener = {
+            refreshAdapter(forceFullReset = true)
+        }
+
         config.panelReadingDisplayChangedListener = {
             applyPanelReadingDisplayConfigToVisiblePages()
         }

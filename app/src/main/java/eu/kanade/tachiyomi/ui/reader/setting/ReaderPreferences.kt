@@ -194,6 +194,19 @@ class ReaderPreferences(
         false,
     )
 
+    /**
+     * Whether splitting and rotating only apply when the screen is taller than it is wide.
+     *
+     * Both reshaping options exist to rescue a wide spread on a tall phone. On a landscape reader
+     * the spread already fits, and reshaping only turns it on its side or cuts it in half. On by
+     * default so that is the behaviour out of the box; turn it off to reshape on any screen, which
+     * is how the options behaved before.
+     */
+    val reshapeWidePagesOnTallScreensOnly: Preference<Boolean> = preferenceStore.getBoolean(
+        "pref_reshape_wide_pages_tall_screens_only",
+        true,
+    )
+
     // endregion
 
     // region Side-by-Side View (dual-screen)

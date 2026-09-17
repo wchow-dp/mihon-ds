@@ -101,6 +101,14 @@ collapsed panel detection to a single box, leaving guided reading with nothing t
 Both are now gated on `viewportIsPortrait()`, read from display metrics because `process()`
 runs off the main thread and cannot touch the pager's size.
 
+The gate is itself a setting -- `reshapeWidePagesOnTallScreensOnly`, on by default -- because
+whether a spread *should* be reshaped is a preference, not a fact. Turning it off restores the
+old always-reshape behaviour. It deliberately does **not** use the shared
+`imagePropertyChangedListener`: that refreshes the adapter without rebuilding page views, so the
+page in front of the reader keeps its already-decoded image and the setting looks broken. It has
+its own listener that forces a full adapter reset, which re-runs the decode that decides a page's
+shape.
+
 ## Adding a reader action
 
 A new `ReaderAction` needs **three** registrations, and missing any one fails silently with no

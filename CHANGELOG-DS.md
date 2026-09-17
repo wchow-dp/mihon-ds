@@ -54,6 +54,12 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   re-detects and re-sorts against the rotated layout instead of stepping through the upright page's
   order. The companion follows, since it already renders whatever variant the page was processed
   into.
+- **"Only split or rotate on a tall screen", a setting.** Splitting and rotating wide pages exist to
+  rescue a spread on a tall phone; on a landscape reader they turn spreads on their side or cut them
+  in half. That is now skipped automatically, and this setting is the switch for it -- on by default,
+  so wide spreads are shown as drawn. Turning it off reshapes on any screen, which is how both
+  options behaved before. Shown under the two options it governs, and only while one of them is on.
+  Changing it redraws the page you are looking at rather than waiting for the next one.
 - **Option to leave the app when you close the companion.** Pressing back or home on the companion
   display dismissed only the companion, leaving Mihon up on the main screen -- the physical buttons
   act on whichever display has focus, so the primary one never heard about it. Both screens now

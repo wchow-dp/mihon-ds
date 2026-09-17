@@ -296,7 +296,10 @@ class PagerPageHolder(
             )
         }
 
-        val reshapeForTallScreen = viewportIsPortrait()
+        // Honouring the shape of the screen is itself a setting: a reader who prefers the old
+        // always-reshape behaviour can turn it off and get spreads rotated or split regardless.
+        val reshapeForTallScreen =
+            !viewer.config.reshapeWidePagesOnTallScreensOnly || viewportIsPortrait()
 
         if (reshapeForTallScreen && viewer.config.dualPageRotateToFit) {
             return rotateDualPage(imageSource)

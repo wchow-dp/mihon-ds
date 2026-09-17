@@ -50,6 +50,11 @@ abstract class ViewerConfig(readerPreferences: ReaderPreferences, private val sc
     var dualPageRotateToFitInvert = false
         protected set
 
+    var reshapeWidePagesOnTallScreensOnly = true
+        protected set
+
+    var reshapeWidePagesChangedListener: (() -> Unit)? = null
+
     abstract var navigator: ViewerNavigation
         protected set
 
@@ -95,6 +100,15 @@ abstract class ViewerConfig(readerPreferences: ReaderPreferences, private val sc
 
         readerPreferences.alwaysShowChapterTransition
             .register({ alwaysShowChapterTransition = it })
+
+        readerPreferences.reshapeWidePagesOnTallScreensOnly
+            .register(
+                { reshapeWidePagesOnTallScreensOnly = it },
+                // Not the shared image-property listener: that leaves already-built pages alone, so
+                // the page in front of you would not change and the setting would look broken. This
+                // one rebuilds the views, which re-runs the decode that decides the page's shape.
+                { reshapeWidePagesChangedListener?.invoke() },
+            )
 
         forceNavigationOverlay = readerPreferences.showNavigationOverlayNewUser.get()
         if (forceNavigationOverlay) {

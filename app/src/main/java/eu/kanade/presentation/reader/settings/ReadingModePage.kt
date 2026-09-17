@@ -275,6 +275,14 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
         )
     }
 
+    // Shown whenever either reshaping option is on, since it decides when both of them act.
+    if (dualPageSplitPaged || dualPageRotateToFit) {
+        CheckboxItem(
+            label = stringResource(MR.strings.pref_reshape_wide_pages_tall_only),
+            pref = viewModel.preferences.reshapeWidePagesOnTallScreensOnly,
+        )
+    }
+
     HeadingItem(MR.strings.label_spanning)
 
     CheckboxItem(
