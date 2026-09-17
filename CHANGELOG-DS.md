@@ -21,13 +21,17 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ### Added
 
-- **Searching now dismisses the keyboard, even when it is on the other screen.** Pressing search
-  or enter left the keyboard up. The app was asking it to close, but on a dual-screen device the
-  keyboard is hosted on the companion display while the field being typed into is on the main one,
-  so the request went to a window the keyboard was not attached to and did nothing. The companion
-  is now asked to dismiss it as well, through both the insets controller and the input method
-  manager. A no-op when the keyboard is not there. Settings search also hides the keyboard rather
-  than only dropping focus.
+- **Searching asks the keyboard to close more thoroughly.** Pressing search or enter could leave
+  the keyboard up. The request now goes through the input method manager as well as the Compose
+  keyboard controller, since the latter can be absent and the safe call then swallows the request
+  silently; settings search hides the keyboard rather than only dropping focus.
+
+  **This does not help when the device pins the keyboard to a second screen.** On the AYN Thor,
+  "IME Pin Mode" (the pin icon on the keyboard) set to "Pin on the bottom screen" holds the
+  keyboard on the companion display and no app can dismiss it: the framework accepts the hide --
+  `hideSoftInputFromWindow` returns true, twice, a frame apart -- and the keyboard stays regardless.
+  Switching that setting to "Auto display" moves the keyboard to the main screen, where hiding
+  works normally. That is a trade-off for the reader to make, not something the app can decide.
 - **Wide pages are no longer reshaped on a landscape screen.** "Rotate wide pages to fit" and
   "Split wide pages" exist to rescue a wide spread on a *tall* phone, where rotating or splitting
   it fills more of the screen. Neither checked the shape of the screen it was correcting for, so on

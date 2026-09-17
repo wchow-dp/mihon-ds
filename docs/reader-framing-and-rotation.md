@@ -133,5 +133,11 @@ new action "doesn't work".
   display in `dumpsys window windows`. With dual-screen mode off the second screen just shows
   the launcher, and the entire `ReaderPresentation` path goes unexercised.
 - `screencap` without `-d` defaults to the *companion* display. Pass the unique id explicitly.
+- **A pinned keyboard cannot be dismissed by the app.** The Thor's "IME Pin Mode" (pin icon on
+  the keyboard) set to "Pin on the bottom screen" holds the IME on the companion display, and
+  `hideSoftInputFromWindow` returns true while the keyboard stays up. `dumpsys input_method` tells
+  you which case you are in: `mCurTokenDisplayId` is the display hosting the IME, and `mInputShown`
+  is whether the framework thinks it is visible. Hide requests succeeding while `mInputShown` stays
+  true means something outside the app is holding it.
 - In guided reading the shoulder buttons and d-pad step **panels**, not pages. To change page,
   open the reader menu and use the page slider.
