@@ -20,6 +20,23 @@ object DualScreenState {
     val activeScreen = _activeScreen.asStateFlow()
 
     /**
+     * True while the reader is holding the secondary display with its own Presentation.
+     *
+     * The reader takes the second screen directly (it does not use the companion activity), so
+     * while it is up the main activity must not also try to put the dashboard there. Without this,
+     * "always show dashboard" made MainActivity restart the dashboard on the second display, the
+     * reader finished it to reclaim the display, that flipped [activeScreen] which made MainActivity
+     * restart it again -- a start/finish war a couple of times a second that reconfigured the
+     * display continuously and left the companion black.
+     */
+    private val _readerOwnsSecondary = MutableStateFlow(false)
+    val readerOwnsSecondary = _readerOwnsSecondary.asStateFlow()
+
+    fun setReaderOwnsSecondary(owns: Boolean) {
+        _readerOwnsSecondary.value = owns
+    }
+
+    /**
      * Events sent from the secondary screen back to the primary activity.
      * Used for navigation that must happen on the main screen context.
      */

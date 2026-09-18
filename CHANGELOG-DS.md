@@ -90,6 +90,15 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   change, and the neighbouring page -- still held in the pager with its rotated image -- is redrawn
   rather than left sideways.
 
+- **The companion no longer fights the reader for the second screen.** With "always show dashboard"
+  on (the default), the main activity tried to keep the companion dashboard on the second display
+  even while the reader was using that display for the page. The reader finished the dashboard to
+  reclaim the screen, which flipped the companion's active-screen state, which made the main activity
+  start the dashboard again -- a start/finish war a couple of times a second. Each round reconfigured
+  the display, and it was this, not the hardware, that made the second screen "flap" and go black
+  (it only ever happened in this app). The reader now claims the second display while it is open and
+  the main activity stands down, so the war cannot start. This is the cause; the two fixes below
+  handled the ways it showed up.
 - **The companion no longer stays black when the second display flaps mid-load.** Confirmed on the
   Thor with logging: the second screen's connection re-initialises repeatedly (the system logs a
   display reconfiguration every few seconds), which briefly detaches the companion's view. A page

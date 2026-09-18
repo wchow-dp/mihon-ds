@@ -138,7 +138,22 @@ not the activity's. Two consequences worth holding on to:
   cycles in about four seconds before settling. Each cycle cancels any page load in flight; the
   cancellation path has to clear its request marker or the page is never retried.
 
-**Confirmed cause (2026-09-18): a decode finishing while the view is transiently detached.**
+**Root cause (2026-09-18): the main activity and the reader fighting over the second display.**
+The reader takes the second screen directly with its own `Presentation`; it does not use the
+companion activity. But `MainActivity.checkAndStartDualScreenActivity` starts the companion
+dashboard whenever `alwaysShowDashboard` is set (its default is true) and a second display exists --
+with no regard for the reader already owning it. So: main activity starts the dashboard on the
+second display, the reader finishes it to reclaim the display (`ACTION_FINISH`), finishing flips
+`DualScreenState.activeScreen`, the collector on `activeScreen` calls `checkAndStartDualScreenActivity`
+again, and round it goes about twice a second. The log shows it plainly -- a steady stream of
+`START ... DualScreenActivity` and `Reconfiguring input devices, changes=DISPLAY_INFO`, with the
+main display's viewport toggling `isActive` false/true each cycle. Every cycle reconfigures the
+display, which is what "flapping" was; it is entirely app-caused, which is why no other app on the
+same device does it. `DualScreenState.readerOwnsSecondary` now records that the reader holds the
+display, set while a presentation is up and released in `onDestroy`, and the main activity stands
+down while it is set. The two entries below were the symptoms this produced.
+
+**Symptom (2026-09-18): a decode finishing while the view is transiently detached.**
 The apply-guard used to require the view to be attached at the moment the decode completed. The
 Thor's second display flaps -- the system reconfigures it every few seconds when the connection is
 unstable -- and each flap detaches the presentation's view for a beat. A decode that landed inside

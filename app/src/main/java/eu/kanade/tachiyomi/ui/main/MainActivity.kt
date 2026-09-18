@@ -394,6 +394,13 @@ class MainActivity : BaseActivity() {
         // onResume calls this unconditionally, so returning to the app still reopens it.
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
 
+        // The reader takes the second screen directly while it is open. Starting the dashboard
+        // there now would land on top of the reader's Presentation; the reader finishes it to
+        // reclaim the display, which flips activeScreen and brings us straight back here -- a
+        // start/finish war a couple of times a second that reconfigures the display and blacks
+        // out the companion. Stand down while the reader owns it.
+        if (DualScreenState.readerOwnsSecondary.value) return
+
         val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         val targetId = preferences.secondaryDisplayId().get()
         

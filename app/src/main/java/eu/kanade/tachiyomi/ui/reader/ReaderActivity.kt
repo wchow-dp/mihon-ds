@@ -321,6 +321,12 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
         }
 
         val dualScreenEnabled = preferences.enableDualScreenMode().get()
+        val usesSecondary = dualScreenEnabled && presentationDisplay != null
+        // Claim the display before finishing the companion below. The reader owns the second
+        // screen while it is open; telling the main activity now stops it refilling the display
+        // the instant the companion is finished, which was the start/finish war behind the black
+        // companion. Released in onDestroy, and cleared just below if the show actually fails.
+        DualScreenState.setReaderOwnsSecondary(usesSecondary)
 
         // Take down the companion activity, which owns the second screen when we are not
         // reading. It is singleInstance, so when it exists this reaches onNewIntent and
@@ -364,6 +370,7 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
                 logcat(LogPriority.WARN) { "Secondary display disconnected before show(): ${e.message}" }
                 readerPresentation = null
                 controlsPresentation = null
+                DualScreenState.setReaderOwnsSecondary(false)
             }
         }
     }
@@ -766,6 +773,7 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
     override fun onDestroy() {
         panelReadingController.cancel()
         panelDetector.close()
+        DualScreenState.setReaderOwnsSecondary(false)
         controlsPresentation?.dismiss()
         controlsPresentation = null
         readerPresentation?.dismiss()
