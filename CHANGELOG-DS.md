@@ -90,6 +90,15 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   change, and the neighbouring page -- still held in the pager with its rotated image -- is redrawn
   rather than left sideways.
 
+- **The companion no longer stays black when the second display flaps mid-load.** Confirmed on the
+  Thor with logging: the second screen's connection re-initialises repeatedly (the system logs a
+  display reconfiguration every few seconds), which briefly detaches the companion's view. A page
+  whose decode finished during one of those moments was thrown away because the view was detached
+  at that instant -- and since the load had already been marked as requested, nothing ever retried
+  it, so the page never appeared. A finished decode is now applied whenever the view still wants
+  that page, attached or not; a briefly-detached view simply draws it when it comes back. The
+  display flap itself is a hardware/driver issue this app cannot prevent, but it no longer strands
+  the companion black.
 - **The companion survives its window being detached.** The presentation tore itself down
   whenever its window was detached -- lifecycle to DESTROYED, compose view and container dropped,
   view-model store cleared. A dialog's window can be detached without the dialog being dismissed,

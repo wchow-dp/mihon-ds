@@ -34,14 +34,13 @@ class ReaderPresentationPageLoadGuardTest {
     }
 
     @Test
-    fun `allows image apply only when view is still attached to expected page`() {
+    fun `applies the decode while the view still wants this page`() {
         val expected = pageKey(pageIndex = 2)
 
         assertTrue(
             ReaderPresentationPageLoadGuard.canApplyPageLoad(
                 expectedKey = expected,
                 requestedTag = expected,
-                isAttached = true,
             ),
         )
     }
@@ -55,20 +54,22 @@ class ReaderPresentationPageLoadGuardTest {
             ReaderPresentationPageLoadGuard.canApplyPageLoad(
                 expectedKey = expected,
                 requestedTag = actual,
-                isAttached = true,
             ),
         )
     }
 
+    // Regression: the companion's display connection can flap and detach the view mid-decode.
+    // The finished decode must still be applied, or the request marker stays stamped, nothing
+    // retries, and the second screen is stuck black. Caught in the wild on the Thor: a load for
+    // a page started, the display reconfigured during the decode, and the page never appeared.
     @Test
-    fun `blocks image apply when view is detached`() {
+    fun `applies the decode even if the view detached during the load`() {
         val expected = pageKey(pageIndex = 2)
 
-        assertFalse(
+        assertTrue(
             ReaderPresentationPageLoadGuard.canApplyPageLoad(
                 expectedKey = expected,
                 requestedTag = expected,
-                isAttached = false,
             ),
         )
     }

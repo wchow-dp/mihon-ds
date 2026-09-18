@@ -138,6 +138,18 @@ not the activity's. Two consequences worth holding on to:
   cycles in about four seconds before settling. Each cycle cancels any page load in flight; the
   cancellation path has to clear its request marker or the page is never retried.
 
+**Confirmed cause (2026-09-18): a decode finishing while the view is transiently detached.**
+The apply-guard used to require the view to be attached at the moment the decode completed. The
+Thor's second display flaps -- the system reconfigures it every few seconds when the connection is
+unstable -- and each flap detaches the presentation's view for a beat. A decode that landed inside
+that beat was discarded, and because the request marker was already stamped, `shouldStartPageLoad`
+would not restart it: the page stayed `loaded=null` forever and the screen stayed black. The
+instrumented log showed exactly this -- `Companion load start pageIndex=7` followed a second later
+by `Companion page not shown ... loaded=null`, during a burst of `Reconfiguring input devices,
+changes=DISPLAY_INFO`. The fix drops the attachment requirement from `canApplyPageLoad`: a finished
+decode is applied as long as the view still wants that page, and a detached view draws it on
+reattach. The key comparison still blocks applying a stale page to a view that has moved on.
+
 When the companion is blank, the log now distinguishes the cases: `Companion load start` means it
 asked, `Companion page not shown` means it believed the page was already requested and it never
 landed, and silence on both means the scope is dead.

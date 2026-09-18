@@ -646,7 +646,6 @@ class ReaderPresentation(
         return ReaderPresentationPageLoadGuard.canApplyPageLoad(
             expectedKey = expectedKey,
             requestedTag = getTag(R.id.tag_panel_requested_page_key),
-            isAttached = isAttachedToWindow,
         )
     }
 
