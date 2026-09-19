@@ -76,6 +76,14 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ### Fixed
 
+- **Panel highlights and the backdrop are independent again.** Turning off the backdrop ("Backdrop
+  on secondary screen", or the main screen's focus effect) also stopped the panel highlights from
+  being drawn, on that screen -- so "Show highlights on main screen" did nothing while the main
+  backdrop was off, and highlights vanished on the companion when its backdrop was off. The overlay
+  had been drawing nothing at all whenever its backdrop was off. It now draws the outlines and
+  numbers whenever highlights are on, and the dim whenever the backdrop is on, each honoured on its
+  own. (The coupling came from upstream frazse's correction-mode work, so it predates this fork.)
+
 - **Pages are framed centred instead of drifting into a corner.** Opening a chapter, or rotating a
   page, could leave the whole page squashed into one corner of the screen with the rest black.
   "Landscape zoom" parks a wide page against the edge you read from, half a second after the image

@@ -100,11 +100,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
         val panel = pendingPanelFocus
         if (panel != null) {
             pendingPanelFocus = null
-            if (config?.panelFocusEffect != PanelFocusEffect.OFF || panelMapIsCorrectionMode) {
-                focusOnPanel(panel, animate = false)
-            } else {
-                clearPanelOverlay()
-            }
+            focusOnPanel(panel, animate = false)
         }
         refreshPanelOverlay()
     }
@@ -382,10 +378,6 @@ open class ReaderPageImageView @JvmOverloads constructor(
     }
 
     private fun showFocusedPanelOverlay(panel: ReaderPanel) {
-        if (config?.panelFocusEffect == PanelFocusEffect.OFF && !panelMapIsCorrectionMode) {
-            clearPanelOverlay()
-            return
-        }
         panelMapPanels = listOf(panel)
         panelMapActivePanelId = panel.id
         panelMapShowNumbers = false
@@ -405,14 +397,14 @@ open class ReaderPageImageView @JvmOverloads constructor(
     }
 
     private fun refreshPanelOverlay() {
-        val focusOff = config?.panelFocusEffect == PanelFocusEffect.OFF ||
-                      uy.kohesive.injekt.Injekt.get<eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences>().panelReadingFocusEffect().get() == PanelFocusEffect.OFF
+        // Highlights (outlines/numbers) and the backdrop (dim) are independent settings. The
+        // overlay is worth showing if either is wanted, or in correction mode; it is only removed
+        // when there is genuinely nothing to draw. Each element then self-gates inside the overlay.
+        val showHighlights = config?.panelPrimaryOverlay != false
+        val backdropOn = config?.panelFocusEffect != PanelFocusEffect.OFF
+        val nothingToDraw = !showHighlights && !backdropOn && !panelMapIsCorrectionMode
 
-        if (
-            panelMapPanels.isEmpty() ||
-            shouldHidePrimaryFocusOverlay() ||
-            (panelOverlayMode == PanelOverlayMode.FOCUS && focusOff && !panelMapIsCorrectionMode)
-        ) {
+        if (panelMapPanels.isEmpty() || nothingToDraw) {
             panelHighlightOverlay?.isVisible = false
             panelHighlightOverlay?.let { removeView(it) }
             panelHighlightOverlay = null
@@ -425,6 +417,7 @@ open class ReaderPageImageView @JvmOverloads constructor(
         }
         overlay.focusEffect = config?.panelFocusEffect ?: PanelFocusEffect.DARKEN
         overlay.focusStrength = config?.panelFocusStrength ?: PanelReadingSettings.PANEL_FOCUS_STRENGTH_DEFAULT
+        overlay.showHighlights = showHighlights
 
         val activePanelId = panelMapActivePanelId
         val regions = panelMapPanels.mapIndexedNotNull { index, panel ->
@@ -444,11 +437,6 @@ open class ReaderPageImageView @JvmOverloads constructor(
         if (overlay.isVisible) {
             overlay.bringToFront()
         }
-    }
-
-    private fun shouldHidePrimaryFocusOverlay(): Boolean {
-        return panelOverlayMode == PanelOverlayMode.FOCUS &&
-            (config?.panelPrimaryOverlay == false || config?.panelFocusEffect == PanelFocusEffect.OFF)
     }
 
     private fun refreshPanelOverlayAfterFocusMovement(duration: Long) {

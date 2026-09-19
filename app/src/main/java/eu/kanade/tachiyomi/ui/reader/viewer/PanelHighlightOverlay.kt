@@ -34,6 +34,15 @@ class PanelHighlightOverlay @JvmOverloads constructor(
         }
 
     var focusEffect: PanelFocusEffect = PanelFocusEffect.DARKEN
+
+    /**
+     * Whether to draw the panel outlines and numbers (the "highlights").
+     *
+     * Independent of [focusEffect]: the backdrop (dim) and the highlights are separate settings,
+     * so turning the backdrop off must not take the outlines with it, and vice versa. Correction
+     * mode always draws them regardless, since you cannot reorder panels you cannot see.
+     */
+    var showHighlights: Boolean = true
         set(value) {
             if (field == value) return
             field = value
@@ -117,13 +126,18 @@ class PanelHighlightOverlay @JvmOverloads constructor(
     private var dragY: Float = 0f
 
     override fun onDraw(canvas: Canvas) {
-        if (panelRegions.isEmpty() || (focusEffect == PanelFocusEffect.OFF && !isCorrectionMode)) return
+        if (panelRegions.isEmpty()) return
         super.onDraw(canvas)
 
+        // The backdrop and the outlines are drawn independently. drawFocusEffect already does
+        // nothing when the backdrop is off, and the outlines/numbers are gated on showHighlights,
+        // so each setting is honoured on its own instead of one switching off the other.
         val activeRegion = panelRegions.firstOrNull { it.active }
         if (!isCorrectionMode) {
             activeRegion?.let { drawFocusEffect(canvas, it) }
         }
+
+        if (!showHighlights && !isCorrectionMode) return
 
         panelRegions.forEach { region ->
             if (region.panelIndex != draggedPanelIndex) {
