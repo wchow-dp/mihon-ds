@@ -46,7 +46,26 @@ They are credited here, not claimed:
 
 ### Changes in this fork
 What these builds change for you, newest first. Internal fixes and the full history live in
-[CHANGELOG-DS.md](CHANGELOG-DS.md).
+[CHANGELOG-DS.md](CHANGELOG-DS.md). The changes in this fork are made with AI assistance (Claude
+Code) and verified on-device before each release.
+
+**0.2.4 (release 6)**
+
+*   **Wide spreads show whole on a landscape screen** instead of being rotated sideways or split
+    apart. New setting **"Only split or rotate on a tall screen"** (on by default) controls it.
+*   **Rotate a page from a bound key** — cycle, or jump to 90° / 180° / 270° — for spreads printed
+    sideways. Guided reading and the companion follow the rotation, which clears when you turn the page.
+*   **Leave the app from the companion.** Back or home on the companion now backgrounds the top
+    screen too, so both leave together.
+*   **The companion no longer goes black while reading** — several separate causes fixed.
+*   **Opening the app from the companion screen no longer spins**; it lands the reader on the main
+    screen and the dashboard on the companion.
+*   **Pages frame centred** instead of drifting into a corner.
+*   **Panel highlights and the backdrop are independent** — turning off the backdrop no longer hides
+    the highlights.
+*   **No more panel-number flash on the main screen** while navigating a corrected page.
+*   **The companion follows the main screen's rotation.**
+*   **Searching dismisses the keyboard more reliably.**
 
 **0.2.4**
 

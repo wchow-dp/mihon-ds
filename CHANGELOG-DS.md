@@ -17,7 +17,7 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   "Changes in this fork" section. Internal fixes stay here only.
 - Entries say what changed and why it mattered, not which files moved.
 
-## [Unreleased]
+## [0.2.4-r6] - 2026-10-03
 
 ### Added
 
