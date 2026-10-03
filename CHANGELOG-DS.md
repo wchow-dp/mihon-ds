@@ -80,10 +80,12 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   dual-screen logic assumes the main window is on the primary screen, so it kept restarting the
   companion dashboard on the display the main window was already occupying -- a start/finish loop
   several times a second, with the app stuck flickering. Two changes stop it: the dashboard will not
-  restart within a second of the last start, which breaks the feedback loop at its source; and the
-  main window moves itself to the primary display when launched on a secondary one, so opening the
-  app from the companion lands the reader UI on the primary and the dashboard on the companion.
-  (Only this fork has a companion activity, so only this fork had the loop.)
+  restart within a second of the last start, which breaks the feedback loop at its source; the main
+  window moves itself to the primary display when launched on a secondary one; and the dashboard is
+  not started at all while the main window is still on a secondary display, so it opens once cleanly
+  instead of flickering a few times first. Opening the app from the companion lands the reader UI on
+  the primary and the dashboard on the companion. (Only this fork has a companion activity, so only
+  this fork had the loop.)
 
 - **Panel highlights and the backdrop are independent again.** Turning off the backdrop ("Backdrop
   on secondary screen", or the main screen's focus effect) also stopped the panel highlights from

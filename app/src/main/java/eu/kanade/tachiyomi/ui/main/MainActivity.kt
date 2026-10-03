@@ -444,6 +444,14 @@ class MainActivity : BaseActivity() {
         // out the companion. Stand down while the reader owns it.
         if (DualScreenState.readerOwnsSecondary.value) return
 
+        // Do not manage the companion while this window is itself on a secondary display. That
+        // happens when the app is opened from the companion's launcher; onCreate bounces it to the
+        // primary display, but until that lands, starting the dashboard here puts it on the same
+        // display this window occupies and they fight over it. Waiting until the window is on the
+        // primary display means the dashboard is started once, cleanly, instead of flickering a few
+        // times first. onResume runs this again after the bounce settles.
+        if (currentDisplayId() != Display.DEFAULT_DISPLAY) return
+
         val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         val targetId = preferences.secondaryDisplayId().get()
         
