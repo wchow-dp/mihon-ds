@@ -137,6 +137,25 @@ When you first launch Mihon DS, you will be asked to select a storage folder.
 *   **Shared Content:** If you select the **same folder** as your main Mihon app, both apps will share the same **Downloads** and **Backups**. This allows you to read your existing library downloads in either app.
 *   **Isolated Databases:** Even if you share the storage folder, the **Library Database** (your list of manga, read progress, and categories) remains separate for each app. You can use the Backup/Restore feature to sync your library between them.
 
+## Bundled Model
+
+Guided Reading's panel detection runs a bundled, on-device machine-learning model. It is included
+in the app (`app/src/main/assets/panel/manga_panel_detector_int8.tflite`) and runs entirely locally
+— nothing about your pages is sent anywhere.
+
+- **Model:** Manga Panel and Text Detector (YOLO26-nano), INT8 TFLite (~2.7 MB)
+- **Author:** Leandro Narosky
+- **Source:** https://huggingface.co/leoxs22/manga-panel-detector-yolo26n
+- **License:** Apache-2.0
+- **Training data:** [Manga109-s](https://huggingface.co/datasets/hal-utokyo/Manga109-s)
+- **What it does:** detects panel and text-bubble regions (640×640 input) so the reader can step
+  through panels in reading order. It segments by panel borders, so borderless splash pages or
+  full-page spreads are seen as a single region — that is a limitation of panel detection, not a bug.
+
+This fork does not train or modify the model; it ships the author's published weights as-is. The same
+attribution is recorded for the in-app library list in
+`config/aboutlibraries/libraries/manga_panel_detector_yolo26n.json`.
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
