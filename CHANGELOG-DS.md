@@ -75,6 +75,13 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   away.
 
 ### Fixed
+- **The main screen no longer flashes panel numbers while navigating.** On a page with a saved
+  AI-training correction, stepping between panels briefly flashed the panel-number badges on the main
+  screen. The main screen drew the numbered panel map for a frame before the numberless focus view
+  replaced it; a saved correction makes panels resolve immediately, which exposed that frame (without
+  one, detection's slight delay let the focus view win first). Panel numbers are a correction-mode and
+  companion feature, so the main screen now only shows them in correction mode -- the focus highlight
+  during normal reading never carried numbers anyway.
 - **Opening the app from the companion screen no longer makes it spin.** The companion display has
   its own launcher, and tapping the app icon there launched the main window on the companion. The
   dual-screen logic assumes the main window is on the primary screen, so it kept restarting the

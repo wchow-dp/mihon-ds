@@ -240,7 +240,12 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
                 getPageHolder(page)?.showPanelMap(
                     panels = state.panels,
                     activePanel = activePanel,
-                    showNumbers = true,
+                    // Numbers belong to correction mode (and the companion's map). On the main
+                    // screen in normal reading the focus highlight shows the active panel without
+                    // numbers; drawing the numbered map here only flashes the badges for a frame
+                    // before the focus view replaces it -- visible whenever panels resolve fast,
+                    // e.g. a page with a saved correction.
+                    showNumbers = correctionMode,
                     isCorrectionMode = correctionMode,
                     onPanelTap = { panelIndex ->
                         activity.panelReadingController.selectPanel(key, panelIndex)
