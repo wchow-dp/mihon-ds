@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.app.ActivityOptions
 import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.Bundle
@@ -198,6 +199,26 @@ class MainActivity : BaseActivity() {
             return
         }
 
+        // The main UI belongs on the primary display. On a dual-screen device the companion has its
+        // own launcher, and tapping the app icon there launches MainActivity on the secondary
+        // display. The dual-screen logic then assumes MainActivity is on the primary screen and
+        // keeps trying to put the companion dashboard on the display MainActivity itself occupies,
+        // which spins up DualScreenActivity a couple of times a second. Bounce to the primary
+        // display before any of that starts, so the icon on either screen opens the app the same way.
+        if (currentDisplayId() != Display.DEFAULT_DISPLAY) {
+            val options = ActivityOptions.makeBasic()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                options.setLaunchDisplayId(Display.DEFAULT_DISPLAY)
+            }
+            startActivity(
+                Intent(this, MainActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK),
+                options.toBundle(),
+            )
+            finish()
+            return
+        }
+
         val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         displayManager.registerDisplayListener(displayListener, null)
 
@@ -377,6 +398,18 @@ class MainActivity : BaseActivity() {
             lifecycleScope.launchIO {
                 chapterCache.clear()
             }
+        }
+    }
+
+    /**
+     * The display this activity is currently shown on, across API levels (Activity.display is 30+).
+     */
+    private fun currentDisplayId(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            display?.displayId ?: Display.DEFAULT_DISPLAY
+        } else {
+            @Suppress("DEPRECATION")
+            windowManager.defaultDisplay.displayId
         }
     }
 
