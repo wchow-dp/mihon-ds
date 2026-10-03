@@ -132,6 +132,8 @@ import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.collectAsState
 import uy.kohesive.injekt.injectLazy
 
+private const val DUAL_SCREEN_START_DEBOUNCE_MS = 1000L
+
 class MainActivity : BaseActivity() {
 
     private val libraryPreferences: LibraryPreferences by injectLazy()
@@ -401,6 +403,14 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    // Guards against the companion start/finish feedback loop. DualScreenActivity.onDestroy calls
+    // DualScreenState.close(), which flips activeScreen, which this class collects and reacts to by
+    // starting the companion again. When something keeps finishing the companion (e.g. the main
+    // window contending for the same display), that becomes a start/finish loop several times a
+    // second. Refusing to restart within a short window of the last start breaks the cycle while
+    // still allowing the single legitimate start.
+    private var lastDualScreenStartElapsedMs = 0L
+
     /**
      * The display this activity is currently shown on, across API levels (Activity.display is 30+).
      */
@@ -456,6 +466,10 @@ class MainActivity : BaseActivity() {
         val activeScreen = DualScreenState.activeScreen.value
 
         if (presentationDisplay != null && dualScreenEnabled && (alwaysShowDashboard || activeScreen != null)) {
+            val nowMs = android.os.SystemClock.elapsedRealtime()
+            if (nowMs - lastDualScreenStartElapsedMs < DUAL_SCREEN_START_DEBOUNCE_MS) return
+            lastDualScreenStartElapsedMs = nowMs
+
             val options = android.app.ActivityOptions.makeBasic()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 options.setLaunchDisplayId(presentationDisplay.displayId)

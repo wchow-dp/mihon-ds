@@ -77,12 +77,13 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 ### Fixed
 - **Opening the app from the companion screen no longer makes it spin.** The companion display has
   its own launcher, and tapping the app icon there launched the main window on the companion. The
-  dual-screen logic assumes the main window is on the primary screen, so it kept trying to put the
-  companion dashboard on the display the main window was already occupying -- starting that activity
-  a couple of times a second, with the app stuck flickering. The main window now moves itself to the
-  primary display when it is launched on a secondary one, so the icon on either screen opens the app
-  the same way: reader UI on the primary, dashboard on the companion. (Only this fork has a companion
-  activity, so only this fork had the loop.)
+  dual-screen logic assumes the main window is on the primary screen, so it kept restarting the
+  companion dashboard on the display the main window was already occupying -- a start/finish loop
+  several times a second, with the app stuck flickering. Two changes stop it: the dashboard will not
+  restart within a second of the last start, which breaks the feedback loop at its source; and the
+  main window moves itself to the primary display when launched on a secondary one, so opening the
+  app from the companion lands the reader UI on the primary and the dashboard on the companion.
+  (Only this fork has a companion activity, so only this fork had the loop.)
 
 - **Panel highlights and the backdrop are independent again.** Turning off the backdrop ("Backdrop
   on secondary screen", or the main screen's focus effect) also stopped the panel highlights from
