@@ -1,3 +1,68 @@
+# EPUB reader polish — release candidate
+
+This candidate adds a dedicated EPUB settings tab with a tappable table of contents,
+font and spacing controls, margins, four page colours, an appearance preview and a
+reset action. Text now preserves bold, italic, lists and line breaks, with improved
+wrapping and punctuation spacing. Continuous text layout removes page-edge margins
+for scrolling. Reading position follows the text when typography changes.
+
+Use Apply to open book after changing layout settings; your text position is retained.
+Paged layouts start spine sections and major headings on a fresh page. EPUB refresh
+flashes are suppressed by default, and page-turn animation is available in EPUB settings. EPUB text still uses the existing
+image reader; text selection, search, annotations and full publisher CSS are not
+included. Contents are now in Settings > Contents, replacing the experimental contents
+pages. See `docs/epub-release-checklist.md` for validation and upgrade notes.
+
+Reading tools now show chapter/section progress and whole-book percentage, highlight
+current contents entries, save bookmarks by text location, and offer a return action
+after navigation jumps. Book appearance is independent, with reusable day/night
+presets and an explicit default-for-new-books action. EPUB page-turn animation can
+be toggled without changing manga transitions. Animation timing uses the existing
+pager; this candidate does not add a speed slider or a page-curl effect.
+
+Backups and restore now offer an independent EPUB data option for bookmarks,
+reading positions, per-book appearance and presets. Existing backups remain readable.
+Restoring merges bookmarks, while saved appearance and positions replace current
+values. EPUB-only restores do not reschedule library updates or automatic backups.
+Book files are not embedded in backups and must be copied separately.
+
+Library filters now include All, Books (EPUB), and Manga. Local entries with both
+formats appear in both views; entries without scanned chapter lists remain in All
+and Manga until their chapter list is loaded. These are library filters, not a new
+book importer or a separate database.
+
+EPUB reading data now uses a fingerprint of package metadata and ordered spine
+contents. An unchanged book keeps its reading data after an external rename or
+move, including ZIP recompression. Open older books once at their old path to
+migrate legacy bookmarks/settings before moving them. Altered package metadata or
+text produces a new identity. This does not automatically remove duplicate library
+entries or migrate data for a book already moved before its first upgrade open.
+
+Browse > Sources now has an Import book action. It previews EPUB title, authors,
+language, series and description; title and author can be edited before copying.
+The importer checks readable local EPUBs for matching identities, writes book and
+ComicInfo metadata into a hidden staging folder and publishes it only after the
+copy completes. Original files are retained. Imported books are available in Local
+source and must be added to the library there. Import size is limited to 256 MB.
+
+EPUB settings now offer Selectable text on the main screen. Native text selection
+supports copying and Android text actions; search scans the whole book and jumps
+to the existing page containing a match. Page progress uses the existing incognito
+and resume rules. Illustrations and paired-screen layouts remain in the regular
+reader. This is an optional text view, not yet a full replacement text engine;
+persistent highlights, annotations and clickable footnotes remain unimplemented.
+
+Book sources now provide OPDS 1 catalogue navigation, supported feed search,
+pagination and explicit EPUB download/import. Individually installable JSON source
+definitions for Gutenberg and configurable Calibre live in book-source-extensions/.
+These are declarative book extensions, not manga APK extensions. Authentication,
+OPDS 2, paid/borrowed/DRM acquisition and Anna's Archive/Z-Library are not implemented.
+No separate remote GitHub repository has been created. Live access needs testing.
+
+This candidate requires CI and device verification before a public release.
+
+---
+
 # Mihon DS 0.2.4
 
 > **Credits.** Mihon DS is not my work. The dual-screen fork was created by

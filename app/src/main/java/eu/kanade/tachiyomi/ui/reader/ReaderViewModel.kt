@@ -28,6 +28,7 @@ import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.online.HttpSource
 import eu.kanade.tachiyomi.ui.reader.loader.ChapterLoader
 import eu.kanade.tachiyomi.ui.reader.loader.DownloadPageLoader
+import eu.kanade.tachiyomi.ui.reader.loader.EpubPageLoader
 import eu.kanade.tachiyomi.ui.reader.model.InsertPage
 import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
@@ -47,6 +48,7 @@ import kotlin.getValue
 import kotlin.time.Clock
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,6 +62,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import tachiyomi.core.common.preference.toggle
 import tachiyomi.core.common.util.lang.launchIO
@@ -252,7 +255,8 @@ class ReaderViewModel @JvmOverloads constructor(
                     currentChapter.requestedPage = chapterPageIndex
                     currentChapter.requestedPageFromResume = true
                 } else if (!currentChapter.chapter.read) {
-                    currentChapter.requestedPage = currentChapter.chapter.last_page_read
+                    currentChapter.requestedPage = (currentChapter.pageLoader as? EpubPageLoader)?.restoredPageIndex()
+                        ?: currentChapter.chapter.last_page_read
                     currentChapter.requestedPageFromResume = true
                 }
                 chapterId = currentChapter.chapter.id!!
@@ -548,6 +552,7 @@ class ReaderViewModel @JvmOverloads constructor(
         chapterPageIndex = pageIndex
 
         if (!incognitoMode && page.status !is Page.State.Error) {
+            (readerChapter.pageLoader as? EpubPageLoader)?.savePosition(pageIndex)
             readerChapter.chapter.last_page_read = pageIndex
 
             if (readerChapter.pages?.lastIndex == pageIndex) {
@@ -800,6 +805,57 @@ class ReaderViewModel @JvmOverloads constructor(
         mutableState.update { it.copy(dialog = Dialog.PageActions(page)) }
     }
 
+    fun rememberEpubReturnPosition() {
+        val chapter = state.value.currentChapter ?: return
+        val epub = chapter.pageLoader as? EpubPageLoader ?: return
+        val offset = epub.offsetForPage((state.value.currentPage - 1).coerceAtLeast(0))
+        mutableState.update { it.copy(epubReturnPosition = chapter.chapter.url to offset) }
+    }
+
+    fun clearEpubReturnPosition() {
+        mutableState.update { it.copy(epubReturnPosition = null) }
+    }
+
+    fun applyEpubLayout() {
+        if (state.value.dialog == Dialog.Loading) return
+        val chapter = state.value.currentChapter ?: return
+        val epub = chapter.pageLoader as? EpubPageLoader ?: return
+        val pageIndex = (state.value.currentPage - 1).coerceAtLeast(0)
+        showLoadingDialog()
+        // Keep the archive alive if the user leaves the reader during pagination.
+        chapter.ref()
+        viewModelScope.launchIO {
+            try {
+                val reflow = epub.prepareLayout(pageIndex)
+                withUIContext {
+                    if (state.value.currentChapter === chapter && chapter.pageLoader === epub) {
+                        reflow.commit()
+                        chapter.requestedPage = reflow.pageIndex
+                        chapter.requestedPageFromResume = true
+                        chapterPageIndex = reflow.pageIndex
+                        chapter.state = ReaderChapter.State.Loaded(reflow.pages.onEach { it.chapter = chapter })
+                        mutableState.update { it.copy(currentPage = reflow.pageIndex + 1) }
+                        eventChannel.send(Event.ReloadViewerChapters)
+                    }
+                }
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                eventChannel.send(Event.EpubLayoutError)
+            } finally {
+                withContext(NonCancellable + Dispatchers.Main) {
+                    chapter.unref()
+                    if (state.value.dialog == Dialog.Loading) closeDialog()
+                }
+            }
+        }
+    }
+
+    fun openEpubTextReader() {
+        if (state.value.currentChapter?.pageLoader is EpubPageLoader) {
+            mutableState.update { it.copy(dialog = Dialog.EpubText) }
+        }
+    }
+
     fun openSettingsDialog() {
         mutableState.update { it.copy(dialog = Dialog.Settings) }
     }
@@ -973,6 +1029,7 @@ class ReaderViewModel @JvmOverloads constructor(
         val bookmarked: Boolean = false,
         val isLoadingAdjacentChapter: Boolean = false,
         val currentPage: Int = -1,
+        val epubReturnPosition: Pair<String, Long>? = null,
 
         /**
          * Viewer used to display the pages (pager, webtoon, ...).
@@ -991,6 +1048,7 @@ class ReaderViewModel @JvmOverloads constructor(
 
     sealed interface Dialog {
         data object Loading : Dialog
+        data object EpubText : Dialog
         data object Settings : Dialog
         data object ReadingModeSelect : Dialog
         data object OrientationModeSelect : Dialog
@@ -999,6 +1057,7 @@ class ReaderViewModel @JvmOverloads constructor(
 
     sealed interface Event {
         data object ReloadViewerChapters : Event
+        data object EpubLayoutError : Event
         data object PageChanged : Event
         data class SetOrientation(val orientation: Int) : Event
         data class SetCoverResult(val result: SetAsCoverResult) : Event
