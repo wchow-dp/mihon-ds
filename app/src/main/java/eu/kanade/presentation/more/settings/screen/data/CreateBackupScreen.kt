@@ -1,5 +1,6 @@
 package eu.kanade.presentation.more.settings.screen.data
 
+import mihon.core.dualscreen.DualScreenState
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -70,6 +71,7 @@ class CreateBackupScreen : Screen() {
                 onClickAction = {
                     if (!BackupCreateJob.isManualJobRunning(context)) {
                         try {
+                            DualScreenState.suppressMainScreenLeaveMomentarily()
                             chooseBackupDir.launch(BackupCreator.getFilename())
                         } catch (e: ActivityNotFoundException) {
                             context.toast(MR.strings.file_picker_error)

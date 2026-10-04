@@ -1,5 +1,6 @@
 package eu.kanade.presentation.more.settings.screen
 
+import mihon.core.dualscreen.DualScreenState
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -183,6 +184,7 @@ object SettingsDataScreen : SearchableSettings {
             subtitle = storageLocationText(storagePreferences.baseStorageDirectory),
             onClick = {
                 try {
+                    DualScreenState.suppressMainScreenLeaveMomentarily()
                     pickStorageLocation.launch(null)
                 } catch (e: ActivityNotFoundException) {
                     context.toast(MR.strings.file_picker_error)
@@ -247,6 +249,7 @@ object SettingsDataScreen : SearchableSettings {
                                             }
 
                                             // no need to catch because it's wrapped with a chooser
+                                            DualScreenState.suppressMainScreenLeaveMomentarily()
                                             chooseBackup.launch("*/*")
                                         } else {
                                             context.toast(MR.strings.restore_in_progress)
@@ -447,6 +450,7 @@ object SettingsDataScreen : SearchableSettings {
                 options = exportOptions,
                 onConfirm = { options ->
                     exportOptions = options
+                    DualScreenState.suppressMainScreenLeaveMomentarily()
                     saveFileLauncher.launch("mihon_library.csv")
                 },
                 onDismissRequest = { showDialog = false },

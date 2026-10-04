@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 
+
+private const val LEAVE_SUPPRESS_WINDOW_MS = 2000L
+
 object DualScreenState {
     /**
      * Controls the content displayed on the secondary screen.
@@ -134,7 +137,20 @@ object DualScreenState {
     )
     val mainScreenLeaveRequests = _mainScreenLeaveRequests.asSharedFlow()
 
+    // Set right before the app opens a system picker (file chooser). On a dual-screen device the
+    // picker opens on the companion display, which backgrounds the companion dashboard and looks
+    // just like the user dismissing it -- so the leave-with-companion behaviour would send the whole
+    // app to the background and the restore/backup picker appeared to close the app. A picker the app
+    // itself opened is not a dismissal, so leave requests are dropped for a short window around it.
+    @Volatile
+    private var suppressLeaveUntilElapsedMs = 0L
+
+    fun suppressMainScreenLeaveMomentarily() {
+        suppressLeaveUntilElapsedMs = android.os.SystemClock.elapsedRealtime() + LEAVE_SUPPRESS_WINDOW_MS
+    }
+
     fun requestMainScreenLeave() {
+        if (android.os.SystemClock.elapsedRealtime() < suppressLeaveUntilElapsedMs) return
         _mainScreenLeaveRequests.tryEmit(Unit)
     }
 

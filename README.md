@@ -51,6 +51,8 @@ Code) and verified on-device before each release.
 
 **0.2.4 (release 6)**
 
+*   **Restoring a backup no longer closes the app in dual-screen mode** (nor do the other file
+    pickers). The picker opening on the companion was mistaken for dismissing the companion.
 *   **Wide spreads show whole on a landscape screen** instead of being rotated sideways or split
     apart. New setting **"Only split or rotate on a tall screen"** (on by default) controls it.
 *   **Rotate a page from a bound key** — cycle, or jump to 90° / 180° / 270° — for spreads printed

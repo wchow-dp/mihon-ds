@@ -75,6 +75,12 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   away.
 
 ### Fixed
+- **Restoring a backup (and other file pickers) no longer closes the app in dual-screen mode.** The
+  system file picker opens on the companion display, which backgrounded the companion dashboard; the
+  "leave the app when the companion is dismissed" behaviour read that as a dismissal and sent the
+  whole app to the background, so the app appeared to crash. A picker the app opens itself is not a
+  dismissal, so that leave is now suppressed while a picker is opening. Covers restore, backup
+  folder, library export, storage location and colour-profile pickers.
 - **The main screen no longer flashes panel numbers while navigating.** On a page with a saved
   AI-training correction, stepping between panels briefly flashed the panel-number badges on the main
   screen. The main screen drew the numbered panel map for a frame before the numberless focus view

@@ -34,6 +34,11 @@ uninstall. (Only the jump *onto* the first signed build required an uninstall.)
 
 ## Fixed
 
+- **Restoring a backup no longer closes the app in dual-screen mode.** The file picker opens on the
+  companion screen, which the app mistook for you dismissing the companion and backgrounded itself.
+  Fixed for the restore picker and the other file pickers (backup folder, library export, storage
+  location, colour profile).
+
 - **The companion no longer goes black while reading.** Several distinct causes are fixed: the main
   app and the reader fighting over the second screen, the second display reconfiguring mid-load, the
   companion window being briefly detached, and an interrupted page load never being retried.

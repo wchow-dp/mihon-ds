@@ -1,5 +1,6 @@
 package eu.kanade.presentation.more.settings.screen
 
+import mihon.core.dualscreen.DualScreenState
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -374,6 +375,7 @@ object SettingsAdvancedScreen : SearchableSettings {
                     title = stringResource(MR.strings.pref_display_profile),
                     subtitle = basePreferences.displayProfile.get(),
                     onClick = {
+                        DualScreenState.suppressMainScreenLeaveMomentarily()
                         chooseColorProfile.launch(arrayOf("*/*"))
                     },
                 ),
