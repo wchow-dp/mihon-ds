@@ -17,6 +17,17 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   "Changes in this fork" section. Internal fixes stay here only.
 - Entries say what changed and why it mattered, not which files moved.
 
+## [Unreleased]
+
+### Fixed
+
+- **The dual-screen setting no longer switches itself off.** The app turns dual-screen mode off
+  when it can't find a second screen, so a single-screen device isn't left stuck. On the Thor the
+  bottom screen can briefly report itself off (asleep, or still waking when Android restarts the
+  app), and that wrote the setting off for good, so the toggle seemed to untick at random. The app
+  now remembers when it was the one that turned the setting off, and turns it back on as soon as
+  the second screen is back. A setting you change yourself is left alone.
+
 ## [0.2.4-r6] - 2026-10-03
 
 ### Added

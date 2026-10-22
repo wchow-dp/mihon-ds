@@ -150,19 +150,40 @@ class MainActivity : BaseActivity() {
     private var navigator: Navigator? = null
 
     private val displayListener = object : DisplayManager.DisplayListener {
-        override fun onDisplayAdded(displayId: Int) = checkAndStartDualScreenActivity()
-        override fun onDisplayRemoved(displayId: Int) {
-            if (preferences.enableDualScreenMode().get()) {
-                val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-                val hasSecondary = displayManager.displays.any {
-                    it.displayId != Display.DEFAULT_DISPLAY && it.state == Display.STATE_ON
-                }
-                if (!hasSecondary) {
-                    preferences.enableDualScreenMode().set(false)
-                }
-            }
+        override fun onDisplayAdded(displayId: Int) {
+            restoreAutoDisabledDualScreen()
+            checkAndStartDualScreenActivity()
         }
-        override fun onDisplayChanged(displayId: Int) {}
+        override fun onDisplayRemoved(displayId: Int) {
+            if (!hasActiveSecondaryDisplay()) autoDisableDualScreen()
+        }
+
+        // A secondary display that was off coming back on is a change, not an add.
+        override fun onDisplayChanged(displayId: Int) = restoreAutoDisabledDualScreen()
+    }
+
+    private fun hasActiveSecondaryDisplay(): Boolean {
+        val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+        return displayManager.displays.any {
+            it.displayId != Display.DEFAULT_DISPLAY && it.state == Display.STATE_ON
+        }
+    }
+
+    // Turn dual-screen mode off so the user isn't stuck without the secondary display, but remember
+    // that the app did it. On the Thor the second screen can briefly report off (screen asleep,
+    // still waking when the app restarts), and writing the user's setting off for good made the
+    // companion toggle seem to untick itself at random.
+    private fun autoDisableDualScreen() {
+        if (!preferences.enableDualScreenMode().get()) return
+        preferences.dualScreenAutoDisabled().set(true)
+        preferences.enableDualScreenMode().set(false)
+    }
+
+    private fun restoreAutoDisabledDualScreen() {
+        if (!preferences.dualScreenAutoDisabled().get()) return
+        if (preferences.enableDualScreenMode().get() || !hasActiveSecondaryDisplay()) return
+        preferences.dualScreenAutoDisabled().set(false)
+        preferences.enableDualScreenMode().set(true)
     }
 
     init {
@@ -224,19 +245,15 @@ class MainActivity : BaseActivity() {
         val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         displayManager.registerDisplayListener(displayListener, null)
 
-        // Auto-disable DS mode on startup so users aren't stuck if the secondary display is gone
-        if (preferences.enableDualScreenMode().get()) {
-            val hasSecondary = displayManager.displays.any {
-                it.displayId != Display.DEFAULT_DISPLAY && it.state == Display.STATE_ON
-            }
-            if (!hasSecondary) {
-                preferences.enableDualScreenMode().set(false)
-            }
-        }
+        // Auto-disable DS mode on startup so users aren't stuck if the secondary display is gone,
+        // and turn it back on if only the app had turned it off and the display is back.
+        if (hasActiveSecondaryDisplay()) restoreAutoDisabledDualScreen() else autoDisableDualScreen()
 
         preferences.enableDualScreenMode().changes()
             .onEach { enabled ->
                 if (enabled) {
+                    // On, by the user or by the restore above: nothing left to restore.
+                    preferences.dualScreenAutoDisabled().set(false)
                     checkAndStartDualScreenActivity()
                 } else {
                     DualScreenState.close()

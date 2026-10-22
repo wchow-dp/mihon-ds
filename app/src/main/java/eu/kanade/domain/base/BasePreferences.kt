@@ -19,9 +19,16 @@ class BasePreferences(
 
     val incognitoMode: Preference<Boolean> = preferenceStore.getBoolean(Preference.appStateKey("incognito_mode"), false)
 
-    // On by default: this is a dual-screen build, and MainActivity turns it back off at startup
-    // if no secondary display is present, so a single-screen device is not left in a broken state.
+    // On by default: this is a dual-screen build, and MainActivity turns it off while no secondary
+    // display is present, so a single-screen device is not left in a broken state.
     fun enableDualScreenMode() = preferenceStore.getBoolean(Preference.appStateKey("enable_dual_screen_mode"), true)
+
+    // Set when MainActivity turned dual-screen mode off because the secondary display was missing,
+    // rather than the user turning it off, so it can be turned back on once the display returns.
+    fun dualScreenAutoDisabled() = preferenceStore.getBoolean(
+        Preference.appStateKey("dual_screen_auto_disabled"),
+        false,
+    )
 
     fun secondaryDisplayId() = preferenceStore.getInt(Preference.appStateKey("secondary_display_id"), -1)
 
