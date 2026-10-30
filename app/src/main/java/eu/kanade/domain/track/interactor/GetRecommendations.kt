@@ -1,5 +1,6 @@
 package eu.kanade.domain.track.interactor
 
+import dev.zacsweers.metro.Inject
 import eu.kanade.domain.track.model.toDbTrack
 import eu.kanade.tachiyomi.data.track.TrackerManager
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
@@ -8,6 +9,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
 import tachiyomi.domain.track.interactor.GetTracks
 
+@Inject
 class GetRecommendations(
     private val getTracks: GetTracks,
     private val trackerManager: TrackerManager,

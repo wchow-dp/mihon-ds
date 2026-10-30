@@ -25,10 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
-import android.view.inputmethod.InputMethodManager
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
 import eu.kanade.domain.base.BasePreferences
 import cafe.adriel.voyager.navigator.CurrentScreen
 import eu.kanade.tachiyomi.ui.base.activity.BaseActivity

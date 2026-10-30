@@ -21,11 +21,8 @@ import eu.kanade.presentation.util.DefaultNavigatorScreenTransition
 import eu.kanade.presentation.util.LocalBackPress
 import eu.kanade.presentation.util.Screen
 import eu.kanade.presentation.util.isTabletUi
-import eu.kanade.domain.base.BasePreferences
 import mihon.core.dualscreen.DualScreenState
 import tachiyomi.presentation.core.components.TwoPanelBox
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
 
 class SettingsScreen(
     private val destination: Int? = null,

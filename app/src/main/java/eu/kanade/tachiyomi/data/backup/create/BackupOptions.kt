@@ -14,12 +14,6 @@ data class BackupOptions(
     val extensionStores: Boolean = true,
     val sourceSettings: Boolean = true,
     val privateSettings: Boolean = false,
-
-    // SY -->
-    val customInfo: Boolean = true,
-    val mergedManga: Boolean = true,
-    val savedSearches: Boolean = true,
-    // SY <--
 ) {
 
     fun asBooleanArray() = booleanArrayOf(
@@ -33,12 +27,6 @@ data class BackupOptions(
         extensionStores,
         sourceSettings,
         privateSettings,
-
-        // SY -->
-        customInfo,
-        mergedManga,
-        savedSearches,
-        // SY <--
     )
 
     fun canCreate() = libraryEntries || categories || appSettings || extensionStores || sourceSettings
@@ -79,12 +67,6 @@ data class BackupOptions(
                 setter = { options, enabled -> options.copy(readEntries = enabled) },
                 enabled = { it.libraryEntries },
             ),
-            Entry(
-                label = MR.strings.merged_entries,
-                getter = BackupOptions::mergedManga,
-                setter = { options, enabled -> options.copy(mergedManga = enabled) },
-                enabled = { it.libraryEntries },
-            ),
         )
 
         val settingsOptions = listOf(
@@ -122,12 +104,6 @@ data class BackupOptions(
             extensionStores = array[7],
             sourceSettings = array[8],
             privateSettings = array[9],
-
-            // SY -->
-            customInfo = array.getOrElse(10) { true },
-            mergedManga = array.getOrElse(11) { true },
-            savedSearches = array.getOrElse(12) { true },
-            // SY <--
         )
     }
 

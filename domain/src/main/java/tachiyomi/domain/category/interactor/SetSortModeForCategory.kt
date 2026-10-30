@@ -1,5 +1,6 @@
 package tachiyomi.domain.category.interactor
 
+import dev.zacsweers.metro.Inject
 import kotlin.random.Random
 import tachiyomi.domain.category.model.Category
 import tachiyomi.domain.category.repository.CategoryRepository
@@ -7,6 +8,7 @@ import tachiyomi.domain.library.model.LibrarySort
 import tachiyomi.domain.library.model.plus
 import tachiyomi.domain.library.service.LibraryPreferences
 
+@Inject
 class SetSortModeForCategory(
     private val preferences: LibraryPreferences,
     private val categoryRepository: CategoryRepository,

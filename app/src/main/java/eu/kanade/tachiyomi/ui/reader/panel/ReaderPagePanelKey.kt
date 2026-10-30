@@ -1,6 +1,6 @@
 package eu.kanade.tachiyomi.ui.reader.panel
 
-import eu.kanade.tachiyomi.data.database.models.Chapter
+import tachiyomi.domain.chapter.model.Chapter
 import eu.kanade.tachiyomi.ui.reader.model.InsertPage
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 

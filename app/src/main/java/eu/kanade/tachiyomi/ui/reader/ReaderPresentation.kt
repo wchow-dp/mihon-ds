@@ -2,7 +2,6 @@ package eu.kanade.tachiyomi.ui.reader
 
 import android.app.Presentation
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.Display

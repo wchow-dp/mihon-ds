@@ -1,0 +1,27 @@
+-- Mihon DS: its own 14.sqm created manga_merger, so its databases arrive here at version 15 having
+-- skipped upstream's 14.sqm. Do that migration's Kitsu rescale for them, recognising them by the
+-- table only the fork created. Then drop manga_merger: nothing ever wrote to it, and its foreign
+-- keys point at `mangas`, which 17.sqm rebuilds, so it would fail the foreign key check in 19.sqm.
+UPDATE manga_sync
+SET score = score * 2
+WHERE sync_id = 3
+AND EXISTS (SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'manga_merger');
+
+CREATE TABLE IF NOT EXISTS manga_merger(_id INTEGER NOT NULL PRIMARY KEY);
+DROP TABLE manga_merger;
+
+-- Remove the sync scaffolding: version, is_syncing and last_modified_at.
+
+DROP TRIGGER update_manga_version;
+DROP TRIGGER update_last_modified_at_mangas;
+DROP TRIGGER update_chapter_and_manga_version;
+DROP TRIGGER update_last_modified_at_chapters;
+DROP TRIGGER insert_manga_category_update_version;
+
+ALTER TABLE mangas DROP COLUMN version;
+ALTER TABLE mangas DROP COLUMN is_syncing;
+ALTER TABLE mangas DROP COLUMN last_modified_at;
+
+ALTER TABLE chapters DROP COLUMN version;
+ALTER TABLE chapters DROP COLUMN is_syncing;
+ALTER TABLE chapters DROP COLUMN last_modified_at;

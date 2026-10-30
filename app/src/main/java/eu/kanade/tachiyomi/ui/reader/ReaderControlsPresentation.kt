@@ -274,7 +274,7 @@ class ReaderControlsPresentation(
                 btnNextChapter.isEnabled = state.viewerChapters?.nextChapter != null
 
                 val resolvedMode = ReadingMode.fromPreference(activity.viewModel.getMangaReadingMode())
-                btnDisplayMode.setImageResource(resolvedMode.iconRes)
+                btnDisplayMode.setImageResource(resolvedMode.viewIconRes())
                 btnDisplayMode.imageTintList = ColorStateList.valueOf(Color.WHITE)
 
                 val isRtl = resolvedMode == ReadingMode.RIGHT_TO_LEFT
@@ -439,4 +439,14 @@ class ReaderControlsPresentation(
 
     override val onBackPressedDispatcher: OnBackPressedDispatcher
         get() = activity.onBackPressedDispatcher
+}
+
+// Upstream moved ReadingMode's icons to Compose vectors; this panel is a View layout, so it keeps drawables
+private fun ReadingMode.viewIconRes(): Int = when (this) {
+    ReadingMode.DEFAULT -> R.drawable.ic_reader_default_24dp
+    ReadingMode.LEFT_TO_RIGHT -> R.drawable.ic_reader_ltr_24dp
+    ReadingMode.RIGHT_TO_LEFT -> R.drawable.ic_reader_rtl_24dp
+    ReadingMode.VERTICAL -> R.drawable.ic_reader_vertical_24dp
+    ReadingMode.WEBTOON -> R.drawable.ic_reader_webtoon_24dp
+    ReadingMode.CONTINUOUS_VERTICAL -> R.drawable.ic_reader_continuous_vertical_24dp
 }

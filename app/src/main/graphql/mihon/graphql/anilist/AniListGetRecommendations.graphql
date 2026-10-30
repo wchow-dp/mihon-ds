@@ -1,0 +1,13 @@
+query AniListGetRecommendations(
+  $manga_id: Int!,
+) {
+  Media(id: $manga_id, type: MANGA) {
+    recommendations(sort: [RATING_DESC]) {
+      nodes {
+        mediaRecommendation {
+          ...MangaFragment
+        }
+      }
+    }
+  }
+}

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,7 +27,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -37,19 +35,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import coil3.compose.AsyncImage
 import eu.kanade.presentation.components.relativeDateText
 import eu.kanade.presentation.manga.components.MangaCover
 import eu.kanade.presentation.util.formatChapterNumber
-import eu.kanade.tachiyomi.util.lang.toLocalDate
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.time.Clock
@@ -60,7 +55,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mihon.core.dualscreen.DualScreenState
-import mihon.core.viewmodel.StateViewModel
 import tachiyomi.domain.history.interactor.GetHistory
 import tachiyomi.domain.history.model.HistoryWithRelations
 import tachiyomi.domain.manga.model.asMangaCover
@@ -68,14 +62,22 @@ import tachiyomi.domain.updates.interactor.GetUpdates
 import tachiyomi.domain.updates.model.UpdatesWithRelations
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import androidx.lifecycle.ViewModel
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import dev.zacsweers.metrox.viewmodel.metroViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 object CompanionDashboardScreen : Screen {
 
     @Composable
     override fun Content() {
-        val viewModel = viewModel<CompanionDashboardScreenModel>()
+        val viewModel = metroViewModel<CompanionDashboardScreenModel>()
         val state = viewModel.state.collectAsState().value
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -347,7 +349,7 @@ object CompanionDashboardScreen : Screen {
                         )
                     }
                     Text(
-                        text = relativeDateText(history.readAt?.time?.toLocalDate()),
+                        text = relativeDateText(history.readAt),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -395,11 +397,17 @@ object CompanionDashboardScreen : Screen {
     }
 }
 
+@Inject
+@ViewModelKey
+@ContributesIntoMap(AppScope::class, binding = binding<ViewModel>())
 class CompanionDashboardScreenModel(
-    private val getHistory: GetHistory = Injekt.get(),
-    private val getUpdates: GetUpdates = Injekt.get(),
-    private val downloadManager: eu.kanade.tachiyomi.data.download.DownloadManager = Injekt.get(),
-) : StateViewModel<CompanionDashboardScreenModel.State>(State()) {
+    private val getHistory: GetHistory,
+    private val getUpdates: GetUpdates,
+    private val downloadManager: eu.kanade.tachiyomi.data.download.DownloadManager,
+) : ViewModel() {
+
+    private val mutableState = MutableStateFlow(State())
+    val state: StateFlow<State> = mutableState.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -407,7 +415,7 @@ class CompanionDashboardScreenModel(
                 .collectLatest { history ->
                     val lastRead = history.firstOrNull()
                     val todayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                    val dailyCount = history.count { (it.readAt?.time ?: 0L) >= todayStart }
+                    val dailyCount = history.count { (it.readAt?.toEpochMilliseconds() ?: 0L) >= todayStart }
                     
                     mutableState.update { 
                         it.copy(

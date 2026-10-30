@@ -82,17 +82,14 @@ object SettingsSpanningScreen : SearchableSettings {
 
     @Composable
     private fun getHingeGroup(readerPref: ReaderPreferences): Preference.PreferenceGroup {
-        val manualHingeGap by readerPref.manualHingeGap().collectAsState()
-
         return Preference.PreferenceGroup(
             title = stringResource(MR.strings.pref_hinge_gap),
             preferenceItems = persistentListOf(
                 Preference.PreferenceItem.SliderPreference(
-                    value = manualHingeGap,
+                    preference = readerPref.manualHingeGap(),
                     valueRange = 0..200,
                     title = stringResource(MR.strings.pref_hinge_gap),
-                    valueString = "${manualHingeGap}px",
-                    onValueChanged = { readerPref.manualHingeGap().set(it) },
+                    valueText = { "${it}px" },
                 ),
                 Preference.PreferenceItem.InfoPreference(
                     title = stringResource(MR.strings.pref_hinge_presets),
@@ -135,7 +132,6 @@ object SettingsSpanningScreen : SearchableSettings {
         val hasSecondaryDisplay = detectedDisplays.isNotEmpty()
         val numberFormat = remember { NumberFormat.getPercentInstance() }
         val secondaryDisplayScrollSensitivityPref = readerPref.secondaryDisplayScrollSensitivity()
-        val secondaryDisplayScrollSensitivity by secondaryDisplayScrollSensitivityPref.collectAsState()
 
         val items = mutableListOf<Preference.PreferenceItem<out Any, out Any>>()
 
@@ -148,7 +144,6 @@ object SettingsSpanningScreen : SearchableSettings {
                 } else {
                     stringResource(MR.strings.pref_dual_screen_no_secondary_display)
                 },
-                enabled = hasSecondaryDisplay,
             )
         )
 
@@ -177,14 +172,13 @@ object SettingsSpanningScreen : SearchableSettings {
             )
             items.add(
                 Preference.PreferenceItem.SliderPreference(
-                    value = secondaryDisplayScrollSensitivity,
+                    preference = secondaryDisplayScrollSensitivityPref,
                     valueRange = ReaderPreferences.let {
                         it.SECONDARY_DISPLAY_SCROLL_SENSITIVITY_MIN..it.SECONDARY_DISPLAY_SCROLL_SENSITIVITY_MAX
                     },
                     title = stringResource(MR.strings.pref_secondary_display_scroll_sensitivity),
                     subtitle = stringResource(MR.strings.pref_secondary_display_scroll_sensitivity_summary),
-                    valueString = numberFormat.format(secondaryDisplayScrollSensitivity / 100f),
-                    onValueChanged = { secondaryDisplayScrollSensitivityPref.set(it) },
+                    valueText = { numberFormat.format(it / 100f) },
                 )
             )
             items.add(

@@ -2,16 +2,14 @@ package eu.kanade.presentation.history
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import eu.kanade.tachiyomi.ui.history.HistoryViewModel
-import java.util.Date
+import tachiyomi.domain.history.model.HistoryWithRelations
+import tachiyomi.domain.manga.model.MangaCover
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
-import kotlin.time.toJavaInstant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import tachiyomi.domain.history.model.HistoryWithRelations
-import tachiyomi.domain.manga.model.MangaCover
 
 class HistoryviewModelStateProvider : PreviewParameterProvider<HistoryViewModel.State> {
 
@@ -99,14 +97,14 @@ class HistoryviewModelStateProvider : PreviewParameterProvider<HistoryViewModel.
                         mangaId = Random.nextLong(),
                         title = "Test Title",
                         chapterNumber = Random.nextDouble(),
-                        readAt = Date.from(Clock.System.now().toJavaInstant()),
+                        readAt = Clock.System.now(),
                         readDuration = Random.nextLong(),
                         coverData = MangaCover(
                             mangaId = Random.nextLong(),
                             sourceId = Random.nextLong(),
                             isMangaFavorite = Random.nextBoolean(),
                             url = "https://example.com/cover.png",
-                            lastModified = Random.nextLong(),
+                            lastModified = Instant.fromEpochMilliseconds(Random.nextLong()),
                         ),
                     ),
                 ),

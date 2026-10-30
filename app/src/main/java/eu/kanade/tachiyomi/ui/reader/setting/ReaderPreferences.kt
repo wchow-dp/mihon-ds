@@ -3,6 +3,9 @@ package eu.kanade.tachiyomi.ui.reader.setting
 import android.os.Build
 import androidx.compose.ui.graphics.BlendMode
 import dev.icerock.moko.resources.StringResource
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
 import eu.kanade.tachiyomi.ui.reader.input.ReaderInputProfile
 import eu.kanade.tachiyomi.ui.reader.input.ReaderInputProfileJson
 import eu.kanade.tachiyomi.ui.reader.panel.PanelFocusEffect
@@ -16,6 +19,8 @@ import tachiyomi.core.common.preference.getEnum
 import tachiyomi.core.common.preference.getEnumSet
 import tachiyomi.i18n.MR
 
+@Inject
+@SingleIn(AppScope::class)
 class ReaderPreferences(
     private val preferenceStore: PreferenceStore,
     private val json: Json,
@@ -24,6 +29,11 @@ class ReaderPreferences(
     // region General
 
     val pageTransitions: Preference<Boolean> = preferenceStore.getBoolean("pref_enable_transitions_key", true)
+
+    val loadAheadOnlyOverWifi: Preference<Boolean> = preferenceStore.getBoolean(
+        "pref_reader_load_ahead_only_over_wifi",
+        true,
+    )
 
     val flashOnPageChange: Preference<Boolean> = preferenceStore.getBoolean("pref_reader_flash", false)
 

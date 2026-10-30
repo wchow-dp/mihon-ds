@@ -1,5 +1,7 @@
 package tachiyomi.core.common.util.lang
 
+// Mihon DS: upstream removed these helpers in v0.21. The fork's own code still uses them.
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.DelicateCoroutinesApi

@@ -13,7 +13,7 @@ jobs:
     # forks do not have. Kept rather than deleted so upstream merges stay conflict-free;
     # the job is skipped here instead of failing on every release.
     if: github.repository == 'mihonapp/mihon'
-    runs-on: 'ubuntu-24.04'
+    runs-on: 'ubuntu-26.04'
 
     steps:
       - name: Update website

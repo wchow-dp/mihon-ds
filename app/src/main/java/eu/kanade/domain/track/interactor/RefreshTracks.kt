@@ -1,24 +1,27 @@
 package eu.kanade.domain.track.interactor
 
+import dev.zacsweers.metro.Inject
 import eu.kanade.domain.track.model.toDbTrack
 import eu.kanade.domain.track.model.toDomainTrack
 import eu.kanade.tachiyomi.data.track.Tracker
 import eu.kanade.tachiyomi.data.track.TrackerManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
 import tachiyomi.domain.track.interactor.GetTracks
-import tachiyomi.domain.track.interactor.InsertTrack
+import tachiyomi.domain.track.interactor.UpsertTrack
 
 enum class TrackProgressSyncMode {
     EnhancedTrackersOnly,
     AllTrackersFromRemote,
 }
 
+@Inject
 class RefreshTracks(
     private val getTracks: GetTracks,
     private val trackerManager: TrackerManager,
-    private val insertTrack: InsertTrack,
+    private val upsertTrack: UpsertTrack,
     private val syncChapterProgressWithTrack: SyncChapterProgressWithTrack,
 ) {
 
@@ -37,7 +40,7 @@ class RefreshTracks(
                 .map { it to trackerManager.get(it.trackerId) }
                 .filter { (_, service) -> service?.isLoggedIn == true }
                 .map { (track, service) ->
-                    async {
+                    async(Dispatchers.IO) {
                         return@async try {
                             val tracker = service!!
                             val dbTrack = track.toDbTrack()
@@ -49,7 +52,7 @@ class RefreshTracks(
                                     tracker.fetchRemoteTrack(dbTrack)?.toDomainTrack() ?: return@async null
                                 }
                             }
-                            insertTrack.await(updatedTrack)
+                            upsertTrack.await(updatedTrack)
                             when (progressSyncMode) {
                                 TrackProgressSyncMode.EnhancedTrackersOnly -> {
                                     syncChapterProgressWithTrack.await(mangaId, updatedTrack, tracker)

@@ -19,18 +19,17 @@ import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderProgressIndicator
 import eu.kanade.tachiyomi.ui.webview.WebViewActivity
 import eu.kanade.tachiyomi.widget.ViewPagerAdapter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import okio.Buffer
 import okio.BufferedSource
 import tachiyomi.core.common.i18n.stringResource
-import tachiyomi.core.common.util.lang.launchIO
-import tachiyomi.core.common.util.lang.withIOContext
-import tachiyomi.core.common.util.lang.withUIContext
 import tachiyomi.core.common.util.system.ImageUtil
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.i18n.MR
@@ -129,7 +128,7 @@ class PagerPageHolder(
         val loader = page.chapter.pageLoader ?: return
 
         supervisorScope {
-            launchIO {
+            launch(Dispatchers.IO) {
                 loader.loadPage(page)
             }
             page.statusFlow.collectLatest { state ->
@@ -185,8 +184,10 @@ class PagerPageHolder(
         val streamFn = page.stream ?: return
 
         try {
-            val loadedImage = withIOContext {
-                val processedImage = streamFn().use { process(item, Buffer().readFrom(it)) }
+            val buffer = withContext(Dispatchers.IO) { streamFn().use { Buffer().readFrom(it) } }
+            // Splitting, merging and sampling the background decode the image, which is CPU work
+            val loadedImage = withContext(Dispatchers.Default) {
+                val processedImage = process(item, buffer)
                 val source = processedImage.source
                 val isAnimated = ImageUtil.isAnimatedAndSupported(source)
                 val background = if (!isAnimated && viewer.config.automaticBackground) {
@@ -221,8 +222,8 @@ class PagerPageHolder(
                     background = background,
                 )
             }
-            withUIContext {
-                if (!isAttachedToWindow) return@withUIContext
+            withContext(Dispatchers.Main) {
+                if (!isAttachedToWindow) return@withContext
                 loadedImage.detectionInput?.let { detectionInput ->
                     viewer.activity.panelReadingController.onPageImageReady(detectionInput)
                 }
@@ -258,7 +259,7 @@ class PagerPageHolder(
             }
         } catch (e: Throwable) {
             logcat(LogPriority.ERROR, e)
-            withUIContext {
+            withContext(Dispatchers.Main) {
                 setError(e)
             }
         }

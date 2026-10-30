@@ -20,7 +20,7 @@ class ReaderSettingsViewModel(
     readerState: StateFlow<ReaderViewModel.State>,
     val onChangeReadingMode: (ReadingMode) -> Unit,
     val onChangeOrientation: (ReaderOrientation) -> Unit,
-    val preferences: ReaderPreferences = Injekt.get(),
+    val preferences: ReaderPreferences,
     val basePreferences: eu.kanade.domain.base.BasePreferences = Injekt.get(),
 ) : ViewModel() {
 
