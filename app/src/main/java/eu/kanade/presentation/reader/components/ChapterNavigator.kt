@@ -75,16 +75,24 @@ fun ChapterNavigator(
 ) {
     val haptic = LocalHapticFeedback.current
 
-    val state = remember(totalPages) {
-        SliderState(
-            value = currentPage.toFloat(),
-            steps = totalPages - 2,
-            valueRange = 1f..totalPages.toFloat(),
-        )
+    // No slider without at least two pages. totalPages is -1 while a chapter's page list is still
+    // loading or failed to load, and building a SliderState from it crashes the app. Backport of
+    // upstream mihonapp/mihon#3941.
+    val state = if (totalPages > 1) {
+        remember(totalPages) {
+            SliderState(
+                value = currentPage.toFloat(),
+                steps = totalPages - 2,
+                valueRange = 1f..totalPages.toFloat(),
+            )
+        }.also {
+            it.value = currentPage.toFloat()
+            it.onValueChange = { value -> onPageIndexChange(value.roundToInt() - 1) }
+            it.onValueChangeFinished = onPageIndexChangeFinished
+        }
+    } else {
+        null
     }
-    state.value = currentPage.toFloat()
-    state.onValueChange = { onPageIndexChange(it.roundToInt() - 1) }
-    state.onValueChangeFinished = onPageIndexChangeFinished
 
     val interactionSource = remember { MutableInteractionSource() }
     val sliderDragged by interactionSource.collectIsDraggedAsState()
@@ -143,7 +151,7 @@ fun ChapterNavigator(
 @Composable
 fun HorizontalChapterNavigator(
     isRtl: Boolean,
-    state: SliderState,
+    state: SliderState?,
     onNextChapter: () -> Unit,
     enabledNext: Boolean,
     onPreviousChapter: () -> Unit,
@@ -179,7 +187,7 @@ fun HorizontalChapterNavigator(
                 )
             }
 
-            if (totalPages > 1) {
+            if (state != null) {
                 CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
                     Row(
                         modifier = Modifier
@@ -228,7 +236,7 @@ fun HorizontalChapterNavigator(
 
 @Composable
 fun VerticalChapterNavigator(
-    state: SliderState,
+    state: SliderState?,
     onNextChapter: () -> Unit,
     enabledNext: Boolean,
     onPreviousChapter: () -> Unit,
@@ -259,7 +267,7 @@ fun VerticalChapterNavigator(
             )
         }
 
-        if (totalPages > 1) {
+        if (state != null) {
             Column(
                 modifier = Modifier
                     .weight(1f)

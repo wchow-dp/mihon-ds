@@ -21,6 +21,13 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 
 ### Fixed
 
+- **The reader no longer crashes while a chapter's pages are still loading or failed to load.**
+  With the reader menu open on either screen, the page slider was built from a page count of -1
+  and threw, closing the app. It showed up with AllManga, whose chapters can sit without a page
+  list. The main screen's slider takes upstream Mihon's fix (mihonapp/mihon#3941, released after
+  the v0.20.4 this fork is based on); the companion screen's slider, which is this fork's own,
+  gets the same guard.
+
 - **The dual-screen setting no longer switches itself off.** The app turns dual-screen mode off
   when it can't find a second screen, so a single-screen device isn't left stuck. On the Thor the
   bottom screen can briefly report itself off (asleep, or still waking when Android restarts the

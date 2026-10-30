@@ -382,7 +382,9 @@ class ReaderPresentation(
                     enabledNext = state.viewerChapters?.nextChapter != null,
                     onPreviousChapter = { activity.loadPreviousChapter() },
                     enabledPrevious = state.viewerChapters?.prevChapter != null,
-                    currentPage = displayPageNum.coerceIn(1, state.totalPages),
+                    // totalPages is -1 while the chapter's page list is loading or failed to load;
+                    // coerceIn throws on an empty range, which crashed the app.
+                    currentPage = displayPageNum.coerceIn(1, state.totalPages.coerceAtLeast(1)),
                     totalPages = state.totalPages,
                     onPageIndexChange = { newPageIndex ->
                         val currentReadingMode = ReadingMode.fromPreference(
@@ -396,7 +398,7 @@ class ReaderPresentation(
                         } else {
                             newPageIndex - 1
                         }
-                        activity.moveToPageIndex(primaryPageIndex.coerceIn(0, state.totalPages - 1))
+                        activity.moveToPageIndex(primaryPageIndex.coerceIn(0, (state.totalPages - 1).coerceAtLeast(0)))
                     },
                     onPageIndexChangeFinished = { },
                     readingMode = readingMode,
