@@ -17,6 +17,40 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   "Changes in this fork" section. Internal fixes stay here only.
 - Entries say what changed and why it mattered, not which files moved.
 
+## [Unreleased]
+
+### Changed
+
+- **Based on upstream Mihon v0.21.3** (from v0.20.4). Brings upstream's faster, lower-memory
+  backups, its reworked download queue, the lower-memory webtoon renderer, and its crash fixes.
+  The database is rebuilt on first launch (upstream migrations 15-19); on a copy of a real DS
+  library at schema 15 it came through intact: 70 entries, 28,093 chapters, 3,517 history rows,
+  and a clean foreign key check.
+- **Recommendations from AniList use upstream's GraphQL client.** The hand-built query depended
+  on DTOs upstream removed.
+- **"Show entry" in the download queue** is carried onto upstream's new queue, and still opens
+  the entry on the main screen in dual-screen mode.
+
+### Removed
+
+- **SyncYomi.** Upstream v0.21 drops the database columns it needs. With it goes a library-update
+  hook that pushed each newly fetched chapter number to trackers, which marked unread chapters as
+  read there.
+- **Merged entries.** Only the table, a placeholder source and a backup checkbox existed; nothing
+  ever wrote an entry. The table is dropped during the database upgrade.
+
+### Other
+
+- Upstream replaced Injekt with Metro. The fork's own code still looks dependencies up through
+  Injekt; `MetroInjektRegistrar` now serves any type `AppGraph` exposes, so exposing one is a
+  single line there. `AppGraph` is kept from R8 because that path is reflective.
+- Upstream renamed the `preview` build type to `nightly`; the fork keeps `preview`, which CI
+  builds and publishes.
+- Upstream's removed coroutine helpers (`launchIO`, `withIOContext`, ...) and the Material icons
+  dependency are restored for the fork's own code.
+- `15.sqm` also performs upstream `14.sqm`'s Kitsu score rescale for DS databases, which reached
+  version 15 through the fork's own 14.sqm and so skipped upstream's.
+
 ## [0.2.4-r7] - 2026-10-30
 
 ### Fixed
