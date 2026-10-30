@@ -49,6 +49,14 @@ What these builds change for you, newest first. Internal fixes and the full hist
 [CHANGELOG-DS.md](CHANGELOG-DS.md). The changes in this fork are made with AI assistance (Claude
 Code) and verified on-device before each release.
 
+**0.2.4 (release 7)**
+
+*   **The dual-screen setting no longer switches itself off.** The app still turns it off while no
+    second screen is found, but now turns it back on once the screen returns. A setting you change
+    yourself is left alone.
+*   **The reader no longer crashes while a chapter's pages are loading or failed to load** (seen
+    with AllManga).
+
 **0.2.4 (release 6)**
 
 *   **Restoring a backup no longer closes the app in dual-screen mode** (nor do the other file
