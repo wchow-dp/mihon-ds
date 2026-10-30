@@ -23,9 +23,11 @@ import tachiyomi.domain.chapter.interactor.GetChaptersByMangaId
 import tachiyomi.domain.chapter.interactor.UpdateChapter
 import tachiyomi.domain.chapter.model.Chapter
 import tachiyomi.domain.chapter.model.ChapterUpdate
+import tachiyomi.domain.chapter.model.ChapterSummary
+import tachiyomi.domain.chapter.model.ChapterRemoteUpdate
 import tachiyomi.domain.chapter.repository.ChapterRepository
 import tachiyomi.domain.track.interactor.GetTracks
-import tachiyomi.domain.track.interactor.InsertTrack
+import tachiyomi.domain.track.interactor.UpsertTrack
 import tachiyomi.domain.track.model.Track
 import tachiyomi.domain.track.repository.TrackRepository
 import eu.kanade.tachiyomi.data.database.models.Track as DbTrack
@@ -149,10 +151,10 @@ class RefreshTracksTest {
         return RefreshTracks(
             getTracks = GetTracks(trackRepository),
             trackerManager = trackerManager,
-            insertTrack = InsertTrack(trackRepository),
+            upsertTrack = UpsertTrack(trackRepository),
             syncChapterProgressWithTrack = SyncChapterProgressWithTrack(
                 updateChapter = UpdateChapter(chapterRepository),
-                insertTrack = InsertTrack(trackRepository),
+                upsertTrack = UpsertTrack(trackRepository),
                 getChaptersByMangaId = GetChaptersByMangaId(chapterRepository),
             ),
         )
@@ -189,8 +191,8 @@ class RefreshTracksTest {
             status = status,
             score = 0.0,
             remoteUrl = "",
-            startDate = 0,
-            finishDate = 0,
+            startDate = null,
+            finishDate = null,
             private = false,
         )
     }
@@ -200,8 +202,6 @@ class RefreshTracksTest {
     ) : ChapterRepository {
         val updates = mutableListOf<ChapterUpdate>()
 
-        override suspend fun addAll(chapters: List<Chapter>): List<Chapter> = error("unused")
-
         override suspend fun update(chapterUpdate: ChapterUpdate) {
             updates += chapterUpdate
         }
@@ -210,7 +210,15 @@ class RefreshTracksTest {
             updates += chapterUpdates
         }
 
-        override suspend fun removeChaptersWithIds(chapterIds: List<Long>) = error("unused")
+        override suspend fun updateFromRemote(
+            removedIds: List<Long>,
+            added: List<Chapter>,
+            updated: List<ChapterRemoteUpdate>,
+        ): List<Chapter> = error("unused")
+
+        override suspend fun getChaptersByMangaIds(mangaIds: List<Long>): Map<Long, List<Chapter>> = error("unused")
+
+        override suspend fun getChapterSummaryByMangaId(mangaId: Long): ChapterSummary = error("unused")
 
         override suspend fun getChapterByMangaId(mangaId: Long, applyScanlatorFilter: Boolean): List<Chapter> {
             return chapters
@@ -241,17 +249,21 @@ class RefreshTracksTest {
 
         override suspend fun getTracksByMangaId(mangaId: Long): List<Track> = tracks
 
+        override suspend fun getTracksByMangaIds(mangaIds: List<Long>): Map<Long, List<Track>> = error("unused")
+
+        override suspend fun getTracks(): List<Track> = error("unused")
+
         override fun getTracksAsFlow(): Flow<List<Track>> = emptyFlow()
 
         override fun getTracksByMangaIdAsFlow(mangaId: Long): Flow<List<Track>> = emptyFlow()
 
         override suspend fun delete(mangaId: Long, trackerId: Long) = error("unused")
 
-        override suspend fun insert(track: Track) {
+        override suspend fun upsert(track: Track) {
             inserted += track
         }
 
-        override suspend fun insertAll(tracks: List<Track>) {
+        override suspend fun upsertAll(tracks: List<Track>) {
             inserted += tracks
         }
     }
@@ -299,6 +311,7 @@ class RefreshTracksTest {
             }
             return remoteTrack
         }
+        override suspend fun updateUserConfig() = Unit
         override suspend fun login(username: String, password: String) = Unit
         override fun logout() = Unit
         override fun getUsername(): String = "username"
