@@ -57,6 +57,10 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   builds and publishes.
 - Upstream's removed coroutine helpers (`launchIO`, `withIOContext`, ...) and the Material icons
   dependency are restored for the fork's own code.
+- Only MainActivity collects `DualScreenState.mainScreenEvents`. The companion also collected it, to
+  bring the main screen forward, and a channel hands each event to one collector, so it could
+  swallow the screen MainActivity was meant to open. Nothing calls `openOnMainScreen` yet, so this
+  never showed; the companion now has its own `mainScreenFocusRequests`.
 - `15.sqm` also performs upstream `14.sqm`'s Kitsu score rescale for DS databases, which reached
   version 15 through the fork's own 14.sqm and so skipped upstream's.
 

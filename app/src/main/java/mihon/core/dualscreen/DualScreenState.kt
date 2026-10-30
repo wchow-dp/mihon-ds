@@ -41,7 +41,8 @@ object DualScreenState {
 
     /**
      * Events sent from the secondary screen back to the primary activity.
-     * Used for navigation that must happen on the main screen context.
+     * Used for navigation that must happen on the main screen context. Collected only by
+     * MainActivity; see mainScreenFocusRequests for the companion's side.
      */
     private val _mainScreenEvents = Channel<MainScreenEvent>(
         capacity = 1,
@@ -92,7 +93,17 @@ object DualScreenState {
 
     fun openOnMainScreen(screen: Screen) {
         _mainScreenEvents.trySend(MainScreenEvent.OpenScreen(screen))
+        _mainScreenFocusRequests.tryEmit(Unit)
     }
+
+    // Lets the companion bring the main screen forward when something opens there. Separate from
+    // mainScreenEvents, which only MainActivity may collect: a channel hands each event to a single
+    // collector, so a second one would swallow the screen MainActivity was meant to open.
+    private val _mainScreenFocusRequests = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    val mainScreenFocusRequests = _mainScreenFocusRequests.asSharedFlow()
 
     /**
      * A search started from a screen on the companion, such as tapping a genre tag on an entry,
@@ -102,8 +113,8 @@ object DualScreenState {
      */
     data class MainScreenSearch(val query: String, val sourceId: Long, val genre: Boolean)
 
-    // A separate flow rather than a MainScreenEvent: both activities collect mainScreenEvents,
-    // and a channel hands each event to only one of them.
+    // A separate flow rather than a MainScreenEvent, which only MainActivity collects, so the
+    // search keeps its own shape and the companion can't intercept it.
     private val _mainScreenSearches = kotlinx.coroutines.flow.MutableSharedFlow<MainScreenSearch>(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
