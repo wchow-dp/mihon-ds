@@ -387,6 +387,21 @@ class MainActivity : BaseActivity() {
                             }
                         }
                     }
+
+                    launch {
+                        // Searches from the companion run where single-screen would have run them: in the
+                        // source being browsed, or in the library
+                        DualScreenState.mainScreenSearches.collect { search ->
+                            val screen = navigator.lastItem
+                            when {
+                                screen is BrowseSourceScreen && screen.sourceId == search.sourceId -> {
+                                    if (search.genre) screen.searchGenre(search.query) else screen.search(search.query)
+                                }
+                                screen is HomeScreen -> screen.search(search.query)
+                                else -> navigator.push(BrowseSourceScreen(search.sourceId, search.query))
+                            }
+                        }
+                    }
                 }
                 LaunchedEffect(navigator.lastItem) {
                     (navigator.lastItem as? BrowseSourceScreen)?.sourceId

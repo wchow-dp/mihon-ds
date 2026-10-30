@@ -155,8 +155,8 @@ class MangaScreen(
             onFilterButtonClicked = viewModel::showSettingsDialog,
             onRefresh = viewModel::fetchAllFromSource,
             onContinueReading = { continueReading(context, viewModel.getNextUnreadChapter()) },
-            onSearch = { query, global -> scope.launch { performSearch(navigator, query, global) } },
-            onRecommendationClicked = { scope.launch { performSearch(navigator, it.title, global = true) } },
+            onSearch = { query, global -> scope.launch { performSearch(navigator, query, global, viewModel.source!!.id) } },
+            onRecommendationClicked = { scope.launch { performSearch(navigator, it.title, global = true, viewModel.source!!.id) } },
             onCoverClicked = viewModel::showCoverDialog,
             onShareClicked = { shareManga(context, viewModel.manga, viewModel.source) }.takeIf { isHttpSource },
             onDownloadActionClicked = viewModel::runDownloadAction.takeIf { !successState.source.isLocalOrStub() },
@@ -376,11 +376,13 @@ class MangaScreen(
      *
      * @param query the search query to the parent controller
      */
-    private suspend fun performSearch(navigator: Navigator, query: String, global: Boolean) {
+    private suspend fun performSearch(navigator: Navigator, query: String, global: Boolean, sourceId: Long) {
         if (global) {
             navigator.push(GlobalSearchScreen(query))
             return
         }
+
+        if (searchOnMainScreen(navigator, query, sourceId, genre = false)) return
 
         if (navigator.size < 2) {
             return
@@ -399,11 +401,27 @@ class MangaScreen(
     }
 
     /**
+     * In dual-screen mode this screen opens on the companion, where the screen behind it is the
+     * dashboard rather than the library or source it was opened from, so a search from here had
+     * nowhere to go. It runs on the main screen instead.
+     *
+     * @return false when this screen isn't on the companion, leaving the search to the caller.
+     */
+    private fun searchOnMainScreen(navigator: Navigator, query: String, sourceId: Long, genre: Boolean): Boolean {
+        if (!Injekt.get<BasePreferences>().enableDualScreenMode().get()) return false
+        if (navigator.items.any { it is HomeScreen || it is BrowseSourceScreen }) return false
+        DualScreenState.requestMainScreenSearch(DualScreenState.MainScreenSearch(query, sourceId, genre))
+        return true
+    }
+
+    /**
      * Performs a genre search using the provided genre name.
      *
      * @param genreName the search genre to the parent controller
      */
     private suspend fun performGenreSearch(navigator: Navigator, genreName: String, source: Source) {
+        if (searchOnMainScreen(navigator, genreName, source.id, genre = source is HttpSource)) return
+
         if (navigator.size < 2) {
             return
         }
@@ -413,7 +431,7 @@ class MangaScreen(
             navigator.pop()
             previousController.searchGenre(genreName)
         } else {
-            performSearch(navigator, genreName, global = false)
+            performSearch(navigator, genreName, global = false, source.id)
         }
     }
 

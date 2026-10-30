@@ -31,6 +31,15 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
 - **"Show entry" in the download queue** is carried onto upstream's new queue, and still opens
   the entry on the main screen in dual-screen mode.
 
+### Fixed
+
+- **Tapping a genre tag on an entry does something in dual-screen mode.** The entry opens on the
+  companion, and a tag searches the screen behind the entry; on the companion that is the
+  dashboard, so the tap was silently ignored. It now searches on the main screen, as single-screen
+  does: in the source being browsed when it is the entry's source, in the library when the library
+  is open, and otherwise by opening the entry's source with the search. Present since mis0suppe's
+  original Mihon DS.
+
 ### Removed
 
 - **SyncYomi.** Upstream v0.21 drops the database columns it needs. With it goes a library-update

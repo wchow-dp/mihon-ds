@@ -94,6 +94,26 @@ object DualScreenState {
         _mainScreenEvents.trySend(MainScreenEvent.OpenScreen(screen))
     }
 
+    /**
+     * A search started from a screen on the companion, such as tapping a genre tag on an entry,
+     * to run on the main screen.
+     *
+     * @param genre true when [query] is a genre of the source [sourceId].
+     */
+    data class MainScreenSearch(val query: String, val sourceId: Long, val genre: Boolean)
+
+    // A separate flow rather than a MainScreenEvent: both activities collect mainScreenEvents,
+    // and a channel hands each event to only one of them.
+    private val _mainScreenSearches = kotlinx.coroutines.flow.MutableSharedFlow<MainScreenSearch>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    val mainScreenSearches = _mainScreenSearches.asSharedFlow()
+
+    fun requestMainScreenSearch(search: MainScreenSearch) {
+        _mainScreenSearches.tryEmit(search)
+    }
+
     fun triggerRotationUpdate() {
         _rotationEvents.tryEmit(Unit)
     }
