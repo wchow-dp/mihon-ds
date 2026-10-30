@@ -2,6 +2,9 @@ package eu.kanade.tachiyomi.ui.reader.panel
 
 import android.content.Context
 import android.content.SharedPreferences
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority
 import tachiyomi.core.common.util.system.logcat
 import java.util.Locale
@@ -18,6 +21,8 @@ import java.util.Locale
  * moment a pattern matches a page other than the one it was trained on.
  * Callers still speak in raw indices; the translation happens here.
  */
+@Inject
+@SingleIn(AppScope::class)
 class PanelCorrectionStore(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences("panel_order_corrections", Context.MODE_PRIVATE)
