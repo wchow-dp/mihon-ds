@@ -10,6 +10,7 @@
 *.dex binary
 *.apk binary
 *.zst binary
+*.aar binary
 
 # Images
 *.webp binary

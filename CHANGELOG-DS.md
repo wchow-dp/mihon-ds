@@ -35,6 +35,12 @@ Categories follow upstream's convention: `Added`, `Changed`, `Improved`, `Remove
   now remembers when it was the one that turned the setting off, and turns it back on as soon as
   the second screen is back. A setting you change yourself is left alone.
 
+### Other
+
+- **Builds no longer depend on JitPack for FlexibleAdapter.** JitPack's build of the pinned
+  commit disappeared, which broke CI for every build of this fork. The exact artifact earlier
+  builds used is vendored under `gradle/local-maven`. Upstream Mihon dropped the library in v0.21.
+
 ## [0.2.4-r6] - 2026-10-03
 
 ### Added

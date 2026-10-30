@@ -20,6 +20,12 @@ dependencyResolutionManagement {
 
     @Suppress("UnstableApiUsage")
     repositories {
+        // JitPack's build of FlexibleAdapter c8013533 is gone ("No build artifacts found"), so the
+        // exact artifact earlier builds resolved is vendored here. Upstream Mihon dropped the
+        // library in v0.21; this can go once the fork is past that.
+        maven(url = settingsDir.resolve("gradle/local-maven")) {
+            content { includeGroup("com.github.arkon.FlexibleAdapter") }
+        }
         google()
         mavenCentral()
         maven(url = "https://www.jitpack.io")
