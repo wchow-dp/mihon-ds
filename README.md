@@ -7,11 +7,13 @@
 ### Dual-Screen Fork of Mihon
 A specialized fork of [Mihon](https://mihon.app) optimized for devices with secondary physical displays (like the AYN Thor, AYANEO Flip DS, and external monitors). This fork is capable of running side-by-side with the official app.
 
-**This repository is a personal build, not original work.** The dual-screen fork was created by
+**The foundation here is not my work.** The dual-screen fork was created by
 [mis0suppe](https://github.com/mis0suppe/mihon-ds) and extended by
 [frazse](https://github.com/frazse/mihon-ds); Mihon itself is by the
-[Mihon team](https://github.com/mihonapp/mihon) and contributors. Everything below is their work.
-This fork exists only to keep that work current with upstream Mihon.
+[Mihon team](https://github.com/mihonapp/mihon) and contributors. The features and enhancements
+listed below are theirs. This fork keeps that work current with upstream Mihon and adds its own
+fixes and features. Those are listed under [Changes in this fork](#changes-in-this-fork), so it's
+clear what came from where.
 
 [![License: Apache-2.0](https://img.shields.io/github/license/mihonapp/mihon?labelColor=27303D&color=0877d2)](/LICENSE)
 
@@ -38,9 +40,11 @@ Built by [frazse](https://github.com/frazse) on top of [mis0suppe/mihon-ds](http
 They are credited here, not claimed:
 
 *   **Layout Memory (Manual Panel Training):** A "Human-in-the-Loop" solution for panel detection errors. Enter **Correction Mode** in the reader to drag-and-drop panel numbers and fix the reading order. The app calculates a fuzzy "Geometric DNA" for the page and remembers your fix globally across all manga titles.
-*   **Instant Synchronization:** Removed the hardcoded 30-second delay for SyncYomi. Synchronization now triggers **instantly** upon app launch, resume, or manual command.
 *   **Flicker-Free Reader Transitions:** Eliminated the 1-frame "flash" of the panel overlay during transitions. Visual effects are now hard-blocked and the view hierarchy is cleaned up when Focus Effects are disabled.
 *   **Stabilized Dual-Screen Sync:** Unified the rendering logic across both primary and secondary displays to prevent stale layout artifacts on multi-screen devices.
+
+frazse's port of SyncYomi sync, including its instant-sync change, is no longer included: Mihon
+v0.21 removed the database columns it relied on.
 
 ---
 
