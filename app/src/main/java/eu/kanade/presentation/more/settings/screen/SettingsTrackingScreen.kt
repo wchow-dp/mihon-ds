@@ -102,7 +102,10 @@ object SettingsTrackingScreen : SearchableSettings {
         val navigator = LocalNavigator.currentOrThrow
         PreferenceScaffold(
             titleRes = getTitleRes(),
-            onBackPressed = handleBack ?: { navigator.pop(); Unit },
+            onBackPressed = handleBack ?: {
+                navigator.pop()
+                Unit
+            },
             actions = { AppBarAction() },
             itemsProvider = { getPreferences(onShowDialog = { dialog = it }) },
         )
@@ -132,7 +135,6 @@ object SettingsTrackingScreen : SearchableSettings {
         val trackPreferences = remember { context.appGraph.trackPreferences }
         val trackerManager = remember { context.appGraph.trackerManager }
         val sourceManager = remember { context.appGraph.sourceManager }
-
 
         val installedSources by produceState(initialValue = emptyList()) { value = sourceManager.getAll() }
         val enhancedTrackers = trackerManager.trackers
@@ -200,7 +202,9 @@ object SettingsTrackingScreen : SearchableSettings {
                     ),
                     Preference.PreferenceItem.TrackerPreference(
                         tracker = trackerManager.mangaUpdates,
-                        login = { onShowDialog(TrackingDialog.Login(trackerManager.mangaUpdates, MR.strings.username)) },
+                        login = {
+                            onShowDialog(TrackingDialog.Login(trackerManager.mangaUpdates, MR.strings.username))
+                        },
                         logout = { onShowDialog(TrackingDialog.Logout(trackerManager.mangaUpdates)) },
                     ),
                     Preference.PreferenceItem.TrackerPreference(

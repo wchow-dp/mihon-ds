@@ -5,5 +5,5 @@ package eu.kanade.tachiyomi.ui.reader.model
  */
 data class ReaderPagePair(
     val first: ReaderPage,
-    val second: ReaderPage? = null
+    val second: ReaderPage? = null,
 )

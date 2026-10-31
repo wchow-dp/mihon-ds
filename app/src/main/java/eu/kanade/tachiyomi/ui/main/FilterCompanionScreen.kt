@@ -22,12 +22,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -59,7 +59,7 @@ sealed class FilterCompanionScreen : Screen {
         override fun Content() {
             val settingsScreenModel = viewModel<LibrarySettingsViewModel>()
             val scope = rememberCoroutineScope()
-            
+
             val categories by Injekt.get<GetCategories>().subscribe().collectAsState(emptyList())
             val category = categories.find { it.id == categoryId }
 
@@ -77,7 +77,7 @@ sealed class FilterCompanionScreen : Screen {
                         navigateUp = { DualScreenState.close() },
                         scrollBehavior = scrollBehavior,
                     )
-                }
+                },
             ) { paddingValues ->
                 Column(modifier = Modifier.padding(paddingValues)) {
                     PrimaryTabRow(
@@ -105,7 +105,7 @@ sealed class FilterCompanionScreen : Screen {
                             modifier = Modifier
                                 .fillMaxSize()
                                 .verticalScroll(rememberScrollState())
-                                .padding(vertical = 8.dp)
+                                .padding(vertical = 8.dp),
                         ) {
                             when (page) {
                                 0 -> FilterPage(viewModel = settingsScreenModel)
@@ -169,12 +169,12 @@ sealed class FilterCompanionScreen : Screen {
                         navigateUp = { DualScreenState.close() },
                         scrollBehavior = scrollBehavior,
                     )
-                }
+                },
             ) { paddingValues ->
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+                        .padding(paddingValues),
                 ) {
                     stickyHeader {
                         Row(

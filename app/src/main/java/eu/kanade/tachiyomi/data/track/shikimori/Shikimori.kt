@@ -8,9 +8,9 @@ import eu.kanade.tachiyomi.data.track.DeletableTracker
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
 import eu.kanade.tachiyomi.data.track.shikimori.dto.SMOAuth
 import kotlinx.serialization.json.Json
-import tachiyomi.domain.track.model.Track as DomainTrack
 import tachiyomi.i18n.MR
 import uy.kohesive.injekt.injectLazy
+import tachiyomi.domain.track.model.Track as DomainTrack
 
 class Shikimori(id: Long) : BaseTracker(id, "Shikimori"), DeletableTracker {
 

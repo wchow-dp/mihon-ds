@@ -19,10 +19,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
 import com.cheonjaeung.compose.grid.SimpleGridCells
 import com.cheonjaeung.compose.grid.VerticalGrid
-import java.time.DayOfWeek
-import java.time.format.TextStyle
-import java.time.temporal.WeekFields
-import java.util.Locale
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.minusMonth
@@ -31,6 +27,10 @@ import kotlinx.datetime.toJavaDayOfWeek
 import mihon.core.designsystem.utils.isExpandedWidthWindow
 import mihon.core.designsystem.utils.isMediumWidthWindow
 import tachiyomi.presentation.core.components.material.padding
+import java.time.DayOfWeek
+import java.time.format.TextStyle
+import java.time.temporal.WeekFields
+import java.util.Locale
 
 private val FontSize = 16.sp
 private const val DAYS_OF_WEEK = 7

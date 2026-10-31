@@ -155,8 +155,12 @@ class MangaScreen(
             onFilterButtonClicked = viewModel::showSettingsDialog,
             onRefresh = viewModel::fetchAllFromSource,
             onContinueReading = { continueReading(context, viewModel.getNextUnreadChapter()) },
-            onSearch = { query, global -> scope.launch { performSearch(navigator, query, global, viewModel.source!!.id) } },
-            onRecommendationClicked = { scope.launch { performSearch(navigator, it.title, global = true, viewModel.source!!.id) } },
+            onSearch = { query, global ->
+                scope.launch { performSearch(navigator, query, global, viewModel.source!!.id) }
+            },
+            onRecommendationClicked = {
+                scope.launch { performSearch(navigator, it.title, global = true, viewModel.source!!.id) }
+            },
             onCoverClicked = viewModel::showCoverDialog,
             onShareClicked = { shareManga(context, viewModel.manga, viewModel.source) }.takeIf { isHttpSource },
             onDownloadActionClicked = viewModel::runDownloadAction.takeIf { !successState.source.isLocalOrStub() },

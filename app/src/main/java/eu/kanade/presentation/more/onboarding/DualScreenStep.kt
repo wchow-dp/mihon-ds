@@ -1,5 +1,8 @@
 package eu.kanade.presentation.more.onboarding
 
+import android.content.Context
+import android.hardware.display.DisplayManager
+import android.view.Display
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -13,15 +16,12 @@ import androidx.compose.ui.unit.dp
 import eu.kanade.domain.base.BasePreferences
 import eu.kanade.presentation.more.settings.widget.ListPreferenceWidget
 import eu.kanade.presentation.more.settings.widget.SwitchPreferenceWidget
+import kotlinx.collections.immutable.toImmutableMap
+import tachiyomi.i18n.MR
+import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.collectAsState
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
-import tachiyomi.i18n.MR
-import tachiyomi.presentation.core.i18n.stringResource
-import android.content.Context
-import android.hardware.display.DisplayManager
-import android.view.Display
-import kotlinx.collections.immutable.toImmutableMap
 
 internal class DualScreenStep : OnboardingStep {
 
@@ -34,12 +34,12 @@ internal class DualScreenStep : OnboardingStep {
         val dualScreenEnabled by basePreferences.enableDualScreenMode().collectAsState()
         val secondaryDisplayId by basePreferences.secondaryDisplayId().collectAsState()
         val swapRotation by basePreferences.swapPresentationRotation().collectAsState()
-        
+
         val context = remember { Injekt.get<android.app.Application>() }
         val displayManager = remember { context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager }
-        
+
         // Dynamically detect available displays excluding the default one to populate the selection list
-        val detectedDisplays = remember { 
+        val detectedDisplays = remember {
             displayManager.displays
                 .filter { it.displayId != Display.DEFAULT_DISPLAY }
                 .map { it.displayId }

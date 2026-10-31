@@ -9,12 +9,12 @@ import eu.kanade.tachiyomi.data.track.model.TrackSearch
 import eu.kanade.tachiyomi.source.ConfigurableSource
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.sourcePreferences
-import java.security.MessageDigest
 import kotlinx.coroutines.runBlocking
 import tachiyomi.domain.manga.model.Manga
 import tachiyomi.domain.source.service.SourceManager
-import tachiyomi.domain.track.model.Track as DomainTrack
 import tachiyomi.i18n.MR
+import java.security.MessageDigest
+import tachiyomi.domain.track.model.Track as DomainTrack
 
 class Kavita(id: Long) : BaseTracker(id, "Kavita"), EnhancedTracker {
 

@@ -293,7 +293,6 @@ class MigrationListViewModel(
                 }
 
                 navigateBack()
-
             } finally {
                 state.update { it.copy(dialog = null) }
                 migrateJob = null
@@ -315,7 +314,6 @@ class MigrationListViewModel(
             val manga = items.find { it.manga.id == mangaId } ?: return@launch
             val target = (manga.searchResult.value as? SearchResult.Success)?.manga ?: return@launch
             migrateManga(current = manga.manga, target = target, replace = replace)
-
 
             removeManga(mangaId)
         }

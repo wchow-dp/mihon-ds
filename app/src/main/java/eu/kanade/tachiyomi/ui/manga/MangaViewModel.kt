@@ -50,7 +50,6 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.chapter.getNextUnread
 import eu.kanade.tachiyomi.util.removeCovers
 import eu.kanade.tachiyomi.util.system.toast
-import kotlin.math.floor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -66,6 +65,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -83,6 +83,7 @@ import tachiyomi.core.common.preference.TriState
 import tachiyomi.core.common.preference.mapAsCheckboxState
 import tachiyomi.core.common.util.lang.SubscriberGate
 import tachiyomi.core.common.util.lang.pausedWhileUnsubscribed
+import tachiyomi.core.common.util.lang.withUIContext
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.category.interactor.GetCategories
 import tachiyomi.domain.category.interactor.SetMangaCategories
@@ -104,11 +105,10 @@ import tachiyomi.domain.manga.model.MangaWithChapterCount
 import tachiyomi.domain.manga.model.applyFilter
 import tachiyomi.domain.source.service.SourceManager
 import tachiyomi.domain.track.interactor.GetTracks
-import kotlinx.coroutines.flow.map
-import tachiyomi.core.common.util.lang.withUIContext
 import tachiyomi.i18n.MR
 import tachiyomi.source.local.isLocal
 import uy.kohesive.injekt.api.get
+import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 
 @AssistedInject
@@ -589,7 +589,6 @@ class MangaViewModel(
 
         viewModelScope.launch {
             updateManga.awaitUpdateFavorite(manga.id, true)
-
         }
     }
 
@@ -606,7 +605,6 @@ class MangaViewModel(
     private fun moveMangaToCategory(categoryIds: List<Long>) {
         viewModelScope.launch {
             setMangaCategories.await(mangaId, categoryIds)
-
         }
     }
 
@@ -902,6 +900,7 @@ class MangaViewModel(
     }
 
     // KMK -->
+
     /**
      * Starts the service that updates the chapter marked as read in sync services. This operation
      * will run in a background thread and errors are ignored.
@@ -1134,7 +1133,6 @@ class MangaViewModel(
     }
 
     // Chapters list - end
-
 
     sealed interface Dialog {
         data class ChangeCategory(

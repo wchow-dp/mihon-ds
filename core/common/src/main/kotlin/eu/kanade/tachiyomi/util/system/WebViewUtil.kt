@@ -9,12 +9,12 @@ import android.webkit.WebView
 import androidx.webkit.UserAgentMetadata
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
-import kotlin.coroutines.resume
 import kotlinx.coroutines.suspendCancellableCoroutine
 import logcat.LogPriority
 import okhttp3.Headers
 import tachiyomi.core.common.util.system.logcat
 import java.util.Locale
+import kotlin.coroutines.resume
 
 object WebViewUtil {
     private const val CHROME_PACKAGE = "com.android.chrome"

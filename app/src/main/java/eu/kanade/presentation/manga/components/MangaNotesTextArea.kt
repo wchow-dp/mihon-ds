@@ -39,7 +39,6 @@ import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults.richTextEditorColors
 import eu.kanade.tachiyomi.ui.manga.notes.MangaNotesScreen
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -54,6 +53,7 @@ import mihon.icons.materialsymbols.rounded.FormatUnderlined
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun MangaNotesTextArea(

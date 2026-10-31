@@ -51,8 +51,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
-import mihon.core.dualscreen.DualScreenState
 import kotlinx.coroutines.launch
+import mihon.core.dualscreen.DualScreenState
 import mihon.feature.migration.dialog.MigrateMangaDialog
 import mihon.icons.materialsymbols.MaterialSymbols
 import mihon.icons.materialsymbols.rounded.FilterList
@@ -213,10 +213,10 @@ data class BrowseSourceScreen(
                                                 onReset = viewModel::resetFilters,
                                                 onFilter = { viewModel.search(filters = state.filters) },
                                                 onUpdate = viewModel::setFilters,
-                                            )
+                                            ),
                                         )
                                         DualScreenState.openScreen(
-                                            FilterCompanionScreen.Source(sourceId = sourceId)
+                                            FilterCompanionScreen.Source(sourceId = sourceId),
                                         )
                                     } else {
                                         viewModel.openFilterSheet()

@@ -2,10 +2,10 @@ package tachiyomi.data
 
 import app.cash.sqldelight.ColumnAdapter
 import eu.kanade.tachiyomi.source.model.UpdateStrategy
+import kotlinx.serialization.json.JsonObject
 import mihon.core.common.extensions.toByteArray
 import mihon.core.common.extensions.toJsonObject
 import kotlin.time.Instant
-import kotlinx.serialization.json.JsonObject
 
 object InstantColumnAdapter : ColumnAdapter<Instant, Long> {
     override fun decode(databaseValue: Long): Instant = Instant.fromEpochMilliseconds(databaseValue)

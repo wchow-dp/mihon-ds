@@ -18,7 +18,6 @@ import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsViewModel
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
-import java.text.NumberFormat
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.CheckboxItem
 import tachiyomi.presentation.core.components.HeadingItem
@@ -26,6 +25,7 @@ import tachiyomi.presentation.core.components.SettingsChipRow
 import tachiyomi.presentation.core.components.SliderItem
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.collectAsState
+import java.text.NumberFormat
 
 @Composable
 internal fun ColumnScope.ReadingModePage(viewModel: ReaderSettingsViewModel) {
@@ -164,8 +164,11 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
         SliderItem(
             label = stringResource(MR.strings.pref_panel_transition_duration),
             value = panelTransitionMillis,
-            valueRange = PanelReadingSettings.PANEL_TRANSITION_MIN_MILLIS..PanelReadingSettings.PANEL_TRANSITION_MAX_MILLIS,
-            steps = (PanelReadingSettings.PANEL_TRANSITION_MAX_MILLIS / PanelReadingSettings.PANEL_TRANSITION_STEP_MILLIS) - 1,
+            valueRange =
+            PanelReadingSettings.PANEL_TRANSITION_MIN_MILLIS..PanelReadingSettings.PANEL_TRANSITION_MAX_MILLIS,
+            steps =
+            (PanelReadingSettings.PANEL_TRANSITION_MAX_MILLIS / PanelReadingSettings.PANEL_TRANSITION_STEP_MILLIS) -
+                1,
             valueString = if (panelTransitionMillis == 0) {
                 stringResource(MR.strings.pref_panel_transition_instant)
             } else {
@@ -220,7 +223,8 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
             SliderItem(
                 label = stringResource(MR.strings.pref_panel_focus_strength),
                 value = panelFocusStrength,
-                valueRange = PanelReadingSettings.PANEL_FOCUS_STRENGTH_MIN..PanelReadingSettings.PANEL_FOCUS_STRENGTH_MAX,
+                valueRange =
+                PanelReadingSettings.PANEL_FOCUS_STRENGTH_MIN..PanelReadingSettings.PANEL_FOCUS_STRENGTH_MAX,
                 steps = 19,
                 valueString = "$panelFocusStrength%",
                 onChange = {
@@ -234,8 +238,10 @@ private fun ColumnScope.PagerViewerSettings(viewModel: ReaderSettingsViewModel) 
         SettingsChipRow(MR.strings.pref_panel_reading_direction) {
             val directions = remember {
                 listOf(
-                    eu.kanade.tachiyomi.ui.reader.panel.PanelReadingDirection.LEFT_TO_RIGHT to MR.strings.panel_reading_direction_ltr,
-                    eu.kanade.tachiyomi.ui.reader.panel.PanelReadingDirection.RIGHT_TO_LEFT to MR.strings.panel_reading_direction_rtl,
+                    eu.kanade.tachiyomi.ui.reader.panel.PanelReadingDirection.LEFT_TO_RIGHT to
+                        MR.strings.panel_reading_direction_ltr,
+                    eu.kanade.tachiyomi.ui.reader.panel.PanelReadingDirection.RIGHT_TO_LEFT to
+                        MR.strings.panel_reading_direction_rtl,
                 )
             }
             directions.map { (direction, title) ->

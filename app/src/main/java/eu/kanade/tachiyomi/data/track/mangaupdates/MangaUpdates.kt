@@ -8,8 +8,8 @@ import eu.kanade.tachiyomi.data.track.DeletableTracker
 import eu.kanade.tachiyomi.data.track.mangaupdates.dto.MUListItem
 import eu.kanade.tachiyomi.data.track.mangaupdates.dto.MURating
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
-import tachiyomi.domain.track.model.Track as DomainTrack
 import tachiyomi.i18n.MR
+import tachiyomi.domain.track.model.Track as DomainTrack
 
 class MangaUpdates(id: Long) : BaseTracker(id, "MangaUpdates"), DeletableTracker {
 

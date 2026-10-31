@@ -5,5 +5,5 @@ package eu.kanade.tachiyomi.ui.reader.model
  */
 data class ReaderItemPair(
     val first: Any,
-    val second: Any? = null
+    val second: Any? = null,
 )

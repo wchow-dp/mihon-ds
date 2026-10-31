@@ -79,14 +79,14 @@ object PanelOrderEstimator {
 
     private data class SplitCandidate(
         val groups: Pair<List<ReaderPanel>, List<ReaderPanel>>,
-        val interception: Float
+        val interception: Float,
     )
 
     private fun tryAxis(
         panels: List<ReaderPanel>,
         threshold: Float,
         horizontal: Boolean,
-        rtl: Boolean
+        rtl: Boolean,
     ): SplitCandidate? {
         val candidates = if (horizontal) {
             (panels.map { it.bounds.top } + panels.map { it.bounds.bottom }).distinct().sorted()
@@ -120,17 +120,29 @@ object PanelOrderEstimator {
 
         for (panel in panels) {
             val sideResult = if (horizontal) {
-                if (panel.bounds.bottom <= pivot) SideResult(0, 0f)
-                else if (panel.bounds.top >= pivot) SideResult(1, 0f)
-                else crossingInterception(panel.bounds.top, panel.bounds.bottom, pivot, threshold)
+                if (panel.bounds.bottom <= pivot) {
+                    SideResult(0, 0f)
+                } else if (panel.bounds.top >= pivot) {
+                    SideResult(1, 0f)
+                } else {
+                    crossingInterception(panel.bounds.top, panel.bounds.bottom, pivot, threshold)
+                }
             } else if (rtl) {
-                if (panel.bounds.left >= pivot) SideResult(0, 0f)
-                else if (panel.bounds.right <= pivot) SideResult(1, 0f)
-                else crossingInterception(-panel.bounds.right, -panel.bounds.left, -pivot, threshold)
+                if (panel.bounds.left >= pivot) {
+                    SideResult(0, 0f)
+                } else if (panel.bounds.right <= pivot) {
+                    SideResult(1, 0f)
+                } else {
+                    crossingInterception(-panel.bounds.right, -panel.bounds.left, -pivot, threshold)
+                }
             } else {
-                if (panel.bounds.right <= pivot) SideResult(0, 0f)
-                else if (panel.bounds.left >= pivot) SideResult(1, 0f)
-                else crossingInterception(panel.bounds.left, panel.bounds.right, pivot, threshold)
+                if (panel.bounds.right <= pivot) {
+                    SideResult(0, 0f)
+                } else if (panel.bounds.left >= pivot) {
+                    SideResult(1, 0f)
+                } else {
+                    crossingInterception(panel.bounds.left, panel.bounds.right, pivot, threshold)
+                }
             }
 
             if (sideResult.side == -1) return null

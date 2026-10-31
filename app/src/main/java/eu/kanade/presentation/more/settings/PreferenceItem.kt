@@ -49,7 +49,7 @@ fun StatusWrapper(
 ) {
     val enabled = item.visible
     val highlighted = item.title == highlightKey
-    
+
     if (hideOnDisabled) {
         AnimatedVisibility(
             visible = enabled,

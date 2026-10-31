@@ -1,3 +1,6 @@
+// Mihon DS: long call chains here predate the line-length check; wrapping them by hand risks the reader
+@file:Suppress("ktlint:standard:max-line-length")
+
 package eu.kanade.tachiyomi.ui.reader
 
 import android.app.Presentation
@@ -5,19 +8,19 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Display
 import android.view.GestureDetector
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
-import android.view.Display
-import android.view.Gravity
 import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
-import android.widget.ImageView
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.core.content.ContextCompat
@@ -29,18 +32,18 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import eu.kanade.tachiyomi.R
-import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
+import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
-import androidx.recyclerview.widget.LinearLayoutManager
 import mihon.core.dualscreen.DualScreenState
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
@@ -69,7 +72,15 @@ class ReaderControlsPresentation(
     outerContext: Context,
     display: Display,
     private val activity: ReaderActivity,
-) : Presentation(outerContext, display, R.style.Theme_Tachiyomi), LifecycleOwner, SavedStateRegistryOwner, ViewModelStoreOwner, OnBackPressedDispatcherOwner {
+) : Presentation(
+    outerContext,
+    display,
+    R.style.Theme_Tachiyomi,
+),
+    LifecycleOwner,
+    SavedStateRegistryOwner,
+    ViewModelStoreOwner,
+    OnBackPressedDispatcherOwner {
 
     private val lifecycleRegistry = LifecycleRegistry(this)
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
@@ -127,7 +138,9 @@ class ReaderControlsPresentation(
         val btnBookMode = dashboard.findViewById<ImageButton>(R.id.btn_book_mode)
         val touchpadArea = dashboard.findViewById<View>(R.id.touchpad_area)
         val touchpadIndicator = dashboard.findViewById<android.widget.ImageView>(R.id.iv_touchpad_indicator)
-        val recyclerPreviews = dashboard.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recycler_page_previews)
+        val recyclerPreviews = dashboard.findViewById<androidx.recyclerview.widget.RecyclerView>(
+            R.id.recycler_page_previews,
+        )
         val middleContainer = dashboard.findViewById<ViewGroup>(R.id.middle_container)
         val btnViewMode = dashboard.findViewById<ImageButton>(R.id.btn_view_mode)
 
@@ -169,47 +182,54 @@ class ReaderControlsPresentation(
 
         var isPanningMode = false
 
-        val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-                if (isPanningMode) {
-                    activity.handleExternalPan(-distanceX, -distanceY)
-                } else {
-                    activity.handleExternalScroll(distanceY)
+        val gestureDetector = GestureDetector(
+            context,
+            object : GestureDetector.SimpleOnGestureListener() {
+                override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+                    if (isPanningMode) {
+                        activity.handleExternalPan(-distanceX, -distanceY)
+                    } else {
+                        activity.handleExternalScroll(distanceY)
+                    }
+                    return true
                 }
-                return true
-            }
 
-            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-                if (!isPanningMode) {
-                    activity.handleExternalFling(velocityY)
+                override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                    if (!isPanningMode) {
+                        activity.handleExternalFling(velocityY)
+                    }
+                    return true
                 }
-                return true
-            }
 
-            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                if (activity.isZoomed()) {
-                    isPanningMode = !isPanningMode
-                    touchpadIndicator.setImageResource(
-                        if (isPanningMode) R.drawable.ic_drag_handle_24dp else R.drawable.ic_touchpad_scroll_24dp
-                    )
+                override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                    if (activity.isZoomed()) {
+                        isPanningMode = !isPanningMode
+                        touchpadIndicator.setImageResource(
+                            if (isPanningMode) R.drawable.ic_drag_handle_24dp else R.drawable.ic_touchpad_scroll_24dp,
+                        )
+                    }
+                    return false
                 }
-                return false
-            }
 
-            override fun onDoubleTap(e: MotionEvent): Boolean {
-                activity.handleExternalZoomReset()
-                isPanningMode = false
-                touchpadIndicator.setImageResource(R.drawable.ic_touchpad_scroll_24dp)
-                return true
-            }
-        })
+                override fun onDoubleTap(e: MotionEvent): Boolean {
+                    activity.handleExternalZoomReset()
+                    isPanningMode = false
+                    touchpadIndicator.setImageResource(R.drawable.ic_touchpad_scroll_24dp)
+                    return true
+                }
+            },
+        )
 
-        val scaleGestureDetector = ScaleGestureDetector(context, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-            override fun onScale(detector: ScaleGestureDetector): Boolean {
-                activity.handleExternalScale(detector.scaleFactor)
-                return true
-            }
-        })
+        val scaleGestureDetector =
+            ScaleGestureDetector(
+                context,
+                object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                    override fun onScale(detector: ScaleGestureDetector): Boolean {
+                        activity.handleExternalScale(detector.scaleFactor)
+                        return true
+                    }
+                },
+            )
 
         touchpadArea.setOnTouchListener { _, event ->
             scaleGestureDetector.onTouchEvent(event)
@@ -255,47 +275,53 @@ class ReaderControlsPresentation(
                 .sample(100L)
                 .distinctUntilChanged { old, new ->
                     old.currentPage == new.currentPage &&
-                    old.totalPages == new.totalPages &&
-                    old.currentChapter?.chapter?.id == new.currentChapter?.chapter?.id &&
-                    old.viewerChapters?.prevChapter == new.viewerChapters?.prevChapter &&
-                    old.viewerChapters?.nextChapter == new.viewerChapters?.nextChapter
+                        old.totalPages == new.totalPages &&
+                        old.currentChapter?.chapter?.id == new.currentChapter?.chapter?.id &&
+                        old.viewerChapters?.prevChapter == new.viewerChapters?.prevChapter &&
+                        old.viewerChapters?.nextChapter == new.viewerChapters?.nextChapter
                 }
                 .collect { state ->
-                val currentPage = state.currentPage
-                val totalPages = state.totalPages
+                    val currentPage = state.currentPage
+                    val totalPages = state.totalPages
 
-                pageSeeker.max = (totalPages - 1).coerceAtLeast(0)
-                pageSeeker.progress = (currentPage - 1).coerceAtLeast(0)
+                    pageSeeker.max = (totalPages - 1).coerceAtLeast(0)
+                    pageSeeker.progress = (currentPage - 1).coerceAtLeast(0)
 
-                textCurrentPage.text = "$currentPage / $totalPages"
-                textCurrentChapter.text = state.currentChapter?.chapter?.name ?: ""
+                    textCurrentPage.text = "$currentPage / $totalPages"
+                    textCurrentChapter.text = state.currentChapter?.chapter?.name ?: ""
 
-                btnPrevChapter.isEnabled = state.viewerChapters?.prevChapter != null
-                btnNextChapter.isEnabled = state.viewerChapters?.nextChapter != null
+                    btnPrevChapter.isEnabled = state.viewerChapters?.prevChapter != null
+                    btnNextChapter.isEnabled = state.viewerChapters?.nextChapter != null
 
-                val resolvedMode = ReadingMode.fromPreference(activity.viewModel.getMangaReadingMode())
-                btnDisplayMode.setImageResource(resolvedMode.viewIconRes())
-                btnDisplayMode.imageTintList = ColorStateList.valueOf(Color.WHITE)
+                    val resolvedMode = ReadingMode.fromPreference(activity.viewModel.getMangaReadingMode())
+                    btnDisplayMode.setImageResource(resolvedMode.viewIconRes())
+                    btnDisplayMode.imageTintList = ColorStateList.valueOf(Color.WHITE)
 
-                val isRtl = resolvedMode == ReadingMode.RIGHT_TO_LEFT
-                val direction = if (isRtl) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
-                pageSeeker.layoutDirection = direction
-                recyclerPreviews.layoutDirection = direction
+                    val isRtl = resolvedMode == ReadingMode.RIGHT_TO_LEFT
+                    val direction = if (isRtl) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
+                    pageSeeker.layoutDirection = direction
+                    recyclerPreviews.layoutDirection = direction
 
-                val pages = state.currentChapter?.pages
-                if (pages != null) {
-                    adapter.submitList(pages)
-                    val currentReaderPage = pages.getOrNull(currentPage - 1)
-                    if (currentReaderPage != null) {
-                        adapter.setCurrentPage(currentReaderPage)
-                        recyclerPreviews.scrollToPosition(currentPage - 1)
+                    val pages = state.currentChapter?.pages
+                    if (pages != null) {
+                        adapter.submitList(pages)
+                        val currentReaderPage = pages.getOrNull(currentPage - 1)
+                        if (currentReaderPage != null) {
+                            adapter.setCurrentPage(currentReaderPage)
+                            recyclerPreviews.scrollToPosition(currentPage - 1)
+                        }
                     }
-                }
 
-                val isWebtoon = resolvedMode == ReadingMode.WEBTOON || resolvedMode == ReadingMode.CONTINUOUS_VERTICAL
-                updateMiddleAreaVisibility(isWebtoon)
-                updateNavigationButtons(middleContainer as androidx.constraintlayout.widget.ConstraintLayout, btnPrevPage, btnNextPage, resolvedMode)
-            }
+                    val isWebtoon =
+                        resolvedMode == ReadingMode.WEBTOON || resolvedMode == ReadingMode.CONTINUOUS_VERTICAL
+                    updateMiddleAreaVisibility(isWebtoon)
+                    updateNavigationButtons(
+                        middleContainer as androidx.constraintlayout.widget.ConstraintLayout,
+                        btnPrevPage,
+                        btnNextPage,
+                        resolvedMode,
+                    )
+                }
         }
     }
 
@@ -329,14 +355,54 @@ class ReaderControlsPresentation(
             btnNext.setImageResource(R.drawable.ic_chevron_down_24dp)
 
             // Vertical chain: 50/50 split
-            constraintSet.connect(btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.TOP, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.TOP)
-            constraintSet.connect(btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.BOTTOM, btnNext.id, androidx.constraintlayout.widget.ConstraintSet.TOP)
-            constraintSet.connect(btnNext.id, androidx.constraintlayout.widget.ConstraintSet.TOP, btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.BOTTOM)
-            constraintSet.connect(btnNext.id, androidx.constraintlayout.widget.ConstraintSet.BOTTOM, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.BOTTOM)
-            constraintSet.connect(btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.START, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.START)
-            constraintSet.connect(btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.END, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.END)
-            constraintSet.connect(btnNext.id, androidx.constraintlayout.widget.ConstraintSet.START, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.START)
-            constraintSet.connect(btnNext.id, androidx.constraintlayout.widget.ConstraintSet.END, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.END)
+            constraintSet.connect(
+                btnPrev.id,
+                androidx.constraintlayout.widget.ConstraintSet.TOP,
+                androidx.constraintlayout.widget.ConstraintSet.PARENT_ID,
+                androidx.constraintlayout.widget.ConstraintSet.TOP,
+            )
+            constraintSet.connect(
+                btnPrev.id,
+                androidx.constraintlayout.widget.ConstraintSet.BOTTOM,
+                btnNext.id,
+                androidx.constraintlayout.widget.ConstraintSet.TOP,
+            )
+            constraintSet.connect(
+                btnNext.id,
+                androidx.constraintlayout.widget.ConstraintSet.TOP,
+                btnPrev.id,
+                androidx.constraintlayout.widget.ConstraintSet.BOTTOM,
+            )
+            constraintSet.connect(
+                btnNext.id,
+                androidx.constraintlayout.widget.ConstraintSet.BOTTOM,
+                androidx.constraintlayout.widget.ConstraintSet.PARENT_ID,
+                androidx.constraintlayout.widget.ConstraintSet.BOTTOM,
+            )
+            constraintSet.connect(
+                btnPrev.id,
+                androidx.constraintlayout.widget.ConstraintSet.START,
+                androidx.constraintlayout.widget.ConstraintSet.PARENT_ID,
+                androidx.constraintlayout.widget.ConstraintSet.START,
+            )
+            constraintSet.connect(
+                btnPrev.id,
+                androidx.constraintlayout.widget.ConstraintSet.END,
+                androidx.constraintlayout.widget.ConstraintSet.PARENT_ID,
+                androidx.constraintlayout.widget.ConstraintSet.END,
+            )
+            constraintSet.connect(
+                btnNext.id,
+                androidx.constraintlayout.widget.ConstraintSet.START,
+                androidx.constraintlayout.widget.ConstraintSet.PARENT_ID,
+                androidx.constraintlayout.widget.ConstraintSet.START,
+            )
+            constraintSet.connect(
+                btnNext.id,
+                androidx.constraintlayout.widget.ConstraintSet.END,
+                androidx.constraintlayout.widget.ConstraintSet.PARENT_ID,
+                androidx.constraintlayout.widget.ConstraintSet.END,
+            )
             constraintSet.constrainWidth(btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.MATCH_CONSTRAINT)
             constraintSet.constrainHeight(btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.MATCH_CONSTRAINT)
             constraintSet.constrainWidth(btnNext.id, androidx.constraintlayout.widget.ConstraintSet.MATCH_CONSTRAINT)
@@ -348,10 +414,30 @@ class ReaderControlsPresentation(
             btnNext.setImageResource(R.drawable.ic_chevron_right_24dp)
 
             // Horizontal chain: 50/50 split
-            constraintSet.connect(btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.START, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.START)
-            constraintSet.connect(btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.END, btnNext.id, androidx.constraintlayout.widget.ConstraintSet.START)
-            constraintSet.connect(btnNext.id, androidx.constraintlayout.widget.ConstraintSet.START, btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.END)
-            constraintSet.connect(btnNext.id, androidx.constraintlayout.widget.ConstraintSet.END, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.END)
+            constraintSet.connect(
+                btnPrev.id,
+                androidx.constraintlayout.widget.ConstraintSet.START,
+                androidx.constraintlayout.widget.ConstraintSet.PARENT_ID,
+                androidx.constraintlayout.widget.ConstraintSet.START,
+            )
+            constraintSet.connect(
+                btnPrev.id,
+                androidx.constraintlayout.widget.ConstraintSet.END,
+                btnNext.id,
+                androidx.constraintlayout.widget.ConstraintSet.START,
+            )
+            constraintSet.connect(
+                btnNext.id,
+                androidx.constraintlayout.widget.ConstraintSet.START,
+                btnPrev.id,
+                androidx.constraintlayout.widget.ConstraintSet.END,
+            )
+            constraintSet.connect(
+                btnNext.id,
+                androidx.constraintlayout.widget.ConstraintSet.END,
+                androidx.constraintlayout.widget.ConstraintSet.PARENT_ID,
+                androidx.constraintlayout.widget.ConstraintSet.END,
+            )
             constraintSet.centerVertically(btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID)
             constraintSet.centerVertically(btnNext.id, androidx.constraintlayout.widget.ConstraintSet.PARENT_ID)
             constraintSet.constrainWidth(btnPrev.id, androidx.constraintlayout.widget.ConstraintSet.MATCH_CONSTRAINT)
@@ -403,7 +489,7 @@ class ReaderControlsPresentation(
         } else {
             dashboard.layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
+                ViewGroup.LayoutParams.MATCH_PARENT,
             )
             dashboard.rotation = rotation
         }

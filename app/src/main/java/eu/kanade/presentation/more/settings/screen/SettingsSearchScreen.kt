@@ -66,7 +66,7 @@ class SettingsSearchScreen : Screen() {
         val navigator = LocalNavigator.currentOrThrow
         val softKeyboardController = LocalSoftwareKeyboardController.current
         val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
+        val keyboardController = LocalSoftwareKeyboardController.current
         val focusRequester = remember { FocusRequester() }
         val listState = rememberLazyListState()
 

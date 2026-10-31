@@ -9,5 +9,4 @@ object ReaderPanelReadingMode {
     ): Boolean {
         return panelReadingEnabled && ReadingMode.isPagerType(readingModePreference)
     }
-
 }

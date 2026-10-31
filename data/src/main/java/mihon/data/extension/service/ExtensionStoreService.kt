@@ -7,7 +7,6 @@ import eu.kanade.tachiyomi.extension.model.Extension
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.network.awaitSuccess
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromByteArray
@@ -24,6 +23,7 @@ import okio.BufferedSource
 import okio.buffer
 import okio.gzip
 import tachiyomi.core.common.util.system.logcat
+import kotlin.coroutines.cancellation.CancellationException
 
 @Inject
 @SingleIn(AppScope::class)

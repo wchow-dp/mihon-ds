@@ -24,7 +24,7 @@ import tachiyomi.core.common.util.lang.withUIContext
 import java.io.BufferedInputStream
 
 class ReaderPagePreviewAdapter(
-    private val onPageClick: (ReaderPage) -> Unit
+    private val onPageClick: (ReaderPage) -> Unit,
 ) : RecyclerView.Adapter<ReaderPagePreviewAdapter.PagePreviewHolder>() {
 
     private var pages: List<ReaderPage> = emptyList()

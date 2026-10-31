@@ -106,11 +106,15 @@ class PanelCorrectionStore(context: Context) {
         if (panels.isEmpty()) return "empty"
 
         // 1. Find bounding box of all panels to normalize
-        var minL = Float.MAX_VALUE; var minT = Float.MAX_VALUE
-        var maxR = Float.MIN_VALUE; var maxB = Float.MIN_VALUE
+        var minL = Float.MAX_VALUE
+        var minT = Float.MAX_VALUE
+        var maxR = Float.MIN_VALUE
+        var maxB = Float.MIN_VALUE
         for (p in panels) {
-            minL = minOf(minL, p.bounds.left); minT = minOf(minT, p.bounds.top)
-            maxR = maxOf(maxR, p.bounds.right); maxB = maxOf(maxB, p.bounds.bottom)
+            minL = minOf(minL, p.bounds.left)
+            minT = minOf(minT, p.bounds.top)
+            maxR = maxOf(maxR, p.bounds.right)
+            maxB = maxOf(maxB, p.bounds.bottom)
         }
         val w = maxOf(1f, maxR - minL)
         val h = maxOf(1f, maxB - minT)

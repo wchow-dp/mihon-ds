@@ -1,9 +1,9 @@
 package eu.kanade.tachiyomi.ui.reader.panel
 
-import kotlin.math.max
-import kotlin.math.min
 import logcat.LogPriority
 import tachiyomi.core.common.util.system.logcat
+import kotlin.math.max
+import kotlin.math.min
 
 object PanelSorter {
 
@@ -38,7 +38,7 @@ object PanelSorter {
                     valid,
                     rtl = rtl,
                     sourceWidth = pageWidth,
-                    sourceHeight = pageHeight
+                    sourceHeight = pageHeight,
                 )
 
                 result.forEachIndexed { index, it ->
@@ -101,18 +101,22 @@ object PanelSorter {
         if (panels.size <= 1 || depth > MAX_RECURSION_DEPTH) return panels
         val hCut = findHorizontalCut(panels)
         if (hCut != null) {
-            val top = panels.filter { it.centerY < hCut }; val bottom = panels.filter { it.centerY >= hCut }
+            val top = panels.filter { it.centerY < hCut }
+            val bottom = panels.filter { it.centerY >= hCut }
             if (top.isNotEmpty() && bottom.isNotEmpty()) {
                 return xyCut(top, direction, depth + 1) + xyCut(bottom, direction, depth + 1)
             }
         }
         val vCut = findVerticalCut(panels)
         if (vCut != null) {
-            val left = panels.filter { it.centerX < vCut }; val right = panels.filter { it.centerX >= vCut }
+            val left = panels.filter { it.centerX < vCut }
+            val right = panels.filter { it.centerX >= vCut }
             if (left.isNotEmpty() && right.isNotEmpty()) {
                 return when (direction) {
-                    PanelReadingDirection.RIGHT_TO_LEFT -> xyCut(right, direction, depth + 1) + xyCut(left, direction, depth + 1)
-                    PanelReadingDirection.LEFT_TO_RIGHT -> xyCut(left, direction, depth + 1) + xyCut(right, direction, depth + 1)
+                    PanelReadingDirection.RIGHT_TO_LEFT -> xyCut(right, direction, depth + 1) +
+                        xyCut(left, direction, depth + 1)
+                    PanelReadingDirection.LEFT_TO_RIGHT -> xyCut(left, direction, depth + 1) +
+                        xyCut(right, direction, depth + 1)
                 }
             }
         }
@@ -157,10 +161,12 @@ object PanelSorter {
         for (large in potentialContainers) {
             val constituents = filter { small ->
                 small !== large && large.area > small.area * 1.5f &&
-                large.bounds.contains(small.bounds, coverageThreshold = 0.90f)
+                    large.bounds.contains(small.bounds, coverageThreshold = 0.90f)
             }
             if (constituents.size >= 2) {
-                logcat(LogPriority.INFO) { "Discarding Row-Box ${large.id} in favor of ${constituents.size} constituents" }
+                logcat(LogPriority.INFO) {
+                    "Discarding Row-Box ${large.id} in favor of ${constituents.size} constituents"
+                }
                 toDiscard.add(large)
             }
         }
@@ -172,8 +178,10 @@ object PanelSorter {
     }
 
     private fun android.graphics.RectF.contains(other: android.graphics.RectF, coverageThreshold: Float): Boolean {
-        val left = max(this.left, other.left); val top = max(this.top, other.top)
-        val right = min(this.right, other.right); val bottom = min(this.bottom, other.bottom)
+        val left = max(this.left, other.left)
+        val top = max(this.top, other.top)
+        val right = min(this.right, other.right)
+        val bottom = min(this.bottom, other.bottom)
         if (right <= left || bottom <= top) return false
         val intersectionArea = (right - left) * (bottom - top)
         val otherArea = (other.right - other.left) * (other.bottom - other.top)
@@ -181,8 +189,10 @@ object PanelSorter {
     }
 
     private fun ReaderPanel.isDuplicateOf(other: ReaderPanel): Boolean {
-        val left = max(bounds.left, other.bounds.left); val top = max(bounds.top, other.bounds.top)
-        val right = min(bounds.right, other.bounds.right); val bottom = min(bounds.bottom, other.bounds.bottom)
+        val left = max(bounds.left, other.bounds.left)
+        val top = max(bounds.top, other.bounds.top)
+        val right = min(bounds.right, other.bounds.right)
+        val bottom = min(bounds.bottom, other.bounds.bottom)
         if (right <= left || bottom <= top) return false
         val intersection = (right - left) * (bottom - top)
         val union = area + other.area - intersection

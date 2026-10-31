@@ -99,7 +99,6 @@ object PanelFocusCalculator {
         val halfVisibleSize = visibleSize / 2f
         return coerceIn(halfVisibleSize, imageSizeFloat - halfVisibleSize)
     }
-
 }
 
 data class PanelFocusTarget(

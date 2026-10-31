@@ -1,8 +1,8 @@
 package eu.kanade.tachiyomi.ui.reader.panel
 
-import tachiyomi.domain.chapter.model.Chapter
 import eu.kanade.tachiyomi.ui.reader.model.InsertPage
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
+import tachiyomi.domain.chapter.model.Chapter
 
 fun ReaderPage.panelPageKey(
     renderVariant: PanelPageRenderVariant = PanelPageRenderVariant.FULL,

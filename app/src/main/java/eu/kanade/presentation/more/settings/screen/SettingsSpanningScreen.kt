@@ -144,7 +144,7 @@ object SettingsSpanningScreen : SearchableSettings {
                 } else {
                     stringResource(MR.strings.pref_dual_screen_no_secondary_display)
                 },
-            )
+            ),
         )
 
         // Only show sub-options if Dual-screen mode is actually enabled
@@ -154,21 +154,21 @@ object SettingsSpanningScreen : SearchableSettings {
                     preference = basePref.alwaysShowDashboard(),
                     title = stringResource(MR.strings.pref_always_show_dashboard),
                     subtitle = stringResource(MR.strings.pref_always_show_dashboard_summary),
-                )
+                ),
             )
             items.add(
                 Preference.PreferenceItem.SwitchPreference(
                     preference = basePref.closeCompanionOnLeave(),
                     title = stringResource(MR.strings.pref_close_companion_on_leave),
                     subtitle = stringResource(MR.strings.pref_close_companion_on_leave_summary),
-                )
+                ),
             )
             items.add(
                 Preference.PreferenceItem.SwitchPreference(
                     preference = basePref.leaveAppWithCompanion(),
                     title = stringResource(MR.strings.pref_leave_app_with_companion),
                     subtitle = stringResource(MR.strings.pref_leave_app_with_companion_summary),
-                )
+                ),
             )
             items.add(
                 Preference.PreferenceItem.SliderPreference(
@@ -179,7 +179,7 @@ object SettingsSpanningScreen : SearchableSettings {
                     title = stringResource(MR.strings.pref_secondary_display_scroll_sensitivity),
                     subtitle = stringResource(MR.strings.pref_secondary_display_scroll_sensitivity_summary),
                     valueText = { numberFormat.format(it / 100f) },
-                )
+                ),
             )
             items.add(
                 Preference.PreferenceItem.ListPreference(
@@ -187,14 +187,14 @@ object SettingsSpanningScreen : SearchableSettings {
                     entries = displayLabels.toImmutableMap(),
                     title = stringResource(MR.strings.pref_secondary_display_id),
                     subtitle = stringResource(MR.strings.pref_secondary_display_id_summary),
-                )
+                ),
             )
             items.add(
                 Preference.PreferenceItem.SwitchPreference(
                     preference = basePref.swapPresentationRotation(),
                     title = stringResource(MR.strings.pref_swap_presentation_rotation),
                     subtitle = stringResource(MR.strings.pref_swap_presentation_rotation_summary),
-                )
+                ),
             )
         }
 

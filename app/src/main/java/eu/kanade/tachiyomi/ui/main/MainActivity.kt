@@ -1,20 +1,20 @@
 package eu.kanade.tachiyomi.ui.main
 
 import android.animation.ValueAnimator
+import android.app.ActivityOptions
 import android.app.SearchManager
 import android.app.assist.AssistContent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.app.ActivityOptions
 import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.Display
 import android.view.KeyEvent
 import android.view.MotionEvent
-import android.os.SystemClock
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -104,10 +104,6 @@ import eu.kanade.tachiyomi.util.system.isBenchmarkBuildType
 import eu.kanade.tachiyomi.util.system.isNavigationBarNeedsScrim
 import eu.kanade.tachiyomi.util.system.updaterEnabled
 import eu.kanade.tachiyomi.util.view.setComposeContent
-import kotlin.time.Clock
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Instant
-import kotlin.time.times
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -121,9 +117,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.LogPriority
-import mihon.core.dualscreen.DualScreenState
 import mihon.app.di.AppGraph
 import mihon.app.di.appGraph
+import mihon.core.dualscreen.DualScreenState
 import mihon.core.metro.metroGraph
 import mihon.core.migration.Migrator
 import mihon.domain.database.repository.DatabaseRepository
@@ -140,9 +136,13 @@ import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.collectAsState
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 import kotlin.time.TimeSource
+import kotlin.time.times
 
 private const val DUAL_SCREEN_START_DEBOUNCE_MS = 1000L
 
@@ -536,7 +536,7 @@ class MainActivity : BaseActivity() {
 
         val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         val targetId = preferences.secondaryDisplayId().get()
-        
+
         // Try to find the user's preferred display, otherwise fallback to the first external one
         var presentationDisplay = if (targetId != -1 && targetId != Display.DEFAULT_DISPLAY) {
             displayManager.getDisplay(targetId)
@@ -545,9 +545,9 @@ class MainActivity : BaseActivity() {
         }
 
         if (presentationDisplay == null) {
-            presentationDisplay = displayManager.displays.find { 
-                it.displayId != Display.DEFAULT_DISPLAY && 
-                it.state != Display.STATE_OFF 
+            presentationDisplay = displayManager.displays.find {
+                it.displayId != Display.DEFAULT_DISPLAY &&
+                    it.state != Display.STATE_OFF
             }
         }
 

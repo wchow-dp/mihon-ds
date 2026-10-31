@@ -1,3 +1,6 @@
+// Mihon DS: long call chains here predate the line-length check; wrapping them by hand risks the reader
+@file:Suppress("ktlint:standard:max-line-length")
+
 package eu.kanade.tachiyomi.ui.reader.input
 
 import android.view.KeyEvent
@@ -75,8 +78,20 @@ object ReaderInputDefaults {
             add(default("default_paged_key_dpad_down_next_page", KeyEvent.KEYCODE_DPAD_DOWN, ReaderAction.NEXT_PAGE))
             add(default("default_paged_key_page_down_next_page", KeyEvent.KEYCODE_PAGE_DOWN, ReaderAction.NEXT_PAGE))
             add(default("default_paged_key_r1_next_page", KeyEvent.KEYCODE_BUTTON_R1, ReaderAction.NEXT_PAGE))
-            add(default("default_paged_key_dpad_up_previous_page", KeyEvent.KEYCODE_DPAD_UP, ReaderAction.PREVIOUS_PAGE))
-            add(default("default_paged_key_page_up_previous_page", KeyEvent.KEYCODE_PAGE_UP, ReaderAction.PREVIOUS_PAGE))
+            add(
+                default(
+                    "default_paged_key_dpad_up_previous_page",
+                    KeyEvent.KEYCODE_DPAD_UP,
+                    ReaderAction.PREVIOUS_PAGE,
+                ),
+            )
+            add(
+                default(
+                    "default_paged_key_page_up_previous_page",
+                    KeyEvent.KEYCODE_PAGE_UP,
+                    ReaderAction.PREVIOUS_PAGE,
+                ),
+            )
             add(default("default_paged_key_l1_previous_page", KeyEvent.KEYCODE_BUTTON_L1, ReaderAction.PREVIOUS_PAGE))
 
             if (options.volumeKeysEnabled) {

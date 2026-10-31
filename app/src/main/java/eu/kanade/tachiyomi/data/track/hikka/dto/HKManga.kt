@@ -4,10 +4,10 @@ import eu.kanade.tachiyomi.data.track.hikka.HikkaApi
 import eu.kanade.tachiyomi.data.track.hikka.stringToNumber
 import eu.kanade.tachiyomi.data.track.hikka.toTrackStatus
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
-import java.text.SimpleDateFormat
-import java.util.Locale
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Serializable
 data class HKManga(

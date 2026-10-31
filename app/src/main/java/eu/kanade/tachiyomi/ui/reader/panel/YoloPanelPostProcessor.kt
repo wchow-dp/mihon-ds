@@ -1,10 +1,10 @@
 package eu.kanade.tachiyomi.ui.reader.panel
 
 import android.graphics.RectF
-import kotlin.math.max
-import kotlin.math.min
 import logcat.LogPriority
 import tachiyomi.core.common.util.system.logcat
+import kotlin.math.max
+import kotlin.math.min
 
 object YoloPanelPostProcessor {
     private const val PANEL_CLASS_ID = 0
@@ -18,7 +18,9 @@ object YoloPanelPostProcessor {
     ): List<ReaderPanel> {
         logcat(LogPriority.DEBUG) { "Post-processing ${detections.size} raw detections" }
         detections.forEachIndexed { index, det ->
-            logcat(LogPriority.DEBUG) { "raw[$index] conf=${det[4]} bounds=[${det[0]}, ${det[1]}, ${det[2]}, ${det[3]}]" }
+            logcat(LogPriority.DEBUG) {
+                "raw[$index] conf=${det[4]} bounds=[${det[0]}, ${det[1]}, ${det[2]}, ${det[3]}]"
+            }
         }
         val candidates = detections
             .asSequence()
@@ -63,9 +65,13 @@ object YoloPanelPostProcessor {
             kept
         }
 
-        logcat(LogPriority.INFO) { "Post-processing ${detections.size} raw detections into ${boxes.size} filtered boxes" }
+        logcat(LogPriority.INFO) {
+            "Post-processing ${detections.size} raw detections into ${boxes.size} filtered boxes"
+        }
         boxes.forEachIndexed { i, box ->
-            logcat(LogPriority.DEBUG) { "Box $i: [${box.bounds.left}, ${box.bounds.top}, ${box.bounds.right}, ${box.bounds.bottom}] Conf: ${box.confidence}" }
+            logcat(LogPriority.DEBUG) {
+                "Box $i: [${box.bounds.left}, ${box.bounds.top}, ${box.bounds.right}, ${box.bounds.bottom}] Conf: ${box.confidence}"
+            }
         }
 
         return boxes

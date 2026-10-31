@@ -19,7 +19,6 @@ import eu.kanade.domain.ui.model.ThemeMode
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.ui.base.delegate.ThemingDelegate
 import eu.kanade.tachiyomi.util.lang.truncateCenter
-import java.io.File
 import logcat.LogPriority
 import mihon.app.di.appGraph
 import rikka.shizuku.ShizukuProvider
@@ -27,6 +26,7 @@ import rikka.sui.Sui
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.i18n.MR
+import java.io.File
 
 /**
  * Copies a string to clipboard

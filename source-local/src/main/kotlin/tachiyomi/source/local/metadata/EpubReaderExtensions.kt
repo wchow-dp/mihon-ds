@@ -2,10 +2,10 @@ package tachiyomi.source.local.metadata
 
 import eu.kanade.tachiyomi.source.model.SChapter
 import eu.kanade.tachiyomi.source.model.SManga
+import mihon.core.archive.EpubReader
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
-import mihon.core.archive.EpubReader
 
 /**
  * Fills manga and chapter metadata using this epub file's metadata.

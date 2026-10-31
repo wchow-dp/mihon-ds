@@ -31,7 +31,7 @@ object FoldableUtils {
      */
     fun getHingeBounds(info: WindowLayoutInfo): Rect? {
         val feature = getFoldingFeature(info) ?: return null
-        // We only care about hinges that split the screen (Surface Duo style) 
+        // We only care about hinges that split the screen (Surface Duo style)
         // or folds that are half-opened.
         return if (feature.state == FoldingFeature.State.HALF_OPENED || feature.isSeparating) {
             feature.bounds

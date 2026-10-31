@@ -30,7 +30,14 @@ interface SearchableSettings : Screen {
         val navigator = LocalNavigator.currentOrThrow
         PreferenceScaffold(
             titleRes = getTitleRes(),
-            onBackPressed = if (handleBack != null) handleBack::invoke else { { navigator.pop(); Unit } },
+            onBackPressed = if (handleBack != null) {
+                handleBack::invoke
+            } else {
+                {
+                    navigator.pop()
+                    Unit
+                }
+            },
             actions = { AppBarAction() },
             itemsProvider = { getPreferences() },
         )

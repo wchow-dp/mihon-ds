@@ -23,9 +23,9 @@ import mihon.app.di.appGraph
 import okhttp3.OkHttpClient
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.track.interactor.UpsertTrack
-import tachiyomi.domain.track.model.Track as DomainTrack
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
+import tachiyomi.domain.track.model.Track as DomainTrack
 
 abstract class BaseTracker(
     override val id: Long,

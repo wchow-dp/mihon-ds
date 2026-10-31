@@ -4,14 +4,14 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.Immutable
 import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.model.UpdateStrategy
-import java.io.ObjectStreamException
-import java.io.Serializable as JavaSerializable
-import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import mihon.core.common.extensions.EMPTY
 import tachiyomi.core.common.preference.TriState
+import java.io.ObjectStreamException
+import kotlin.time.Instant
+import java.io.Serializable as JavaSerializable
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable

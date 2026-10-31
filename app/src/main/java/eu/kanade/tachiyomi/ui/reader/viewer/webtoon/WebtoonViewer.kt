@@ -19,8 +19,6 @@ import eu.kanade.tachiyomi.ui.reader.model.ViewerChapters
 import eu.kanade.tachiyomi.ui.reader.panel.matchesPanelKey
 import eu.kanade.tachiyomi.ui.reader.viewer.Viewer
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.NavigationRegion
-import kotlin.math.max
-import kotlin.math.min
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -31,6 +29,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mihon.app.di.appGraph
 import tachiyomi.core.common.util.system.logcat
+import kotlin.math.max
+import kotlin.math.min
 
 internal enum class WebtoonReaderActionRoute {
     SCROLL_DOWN,
@@ -516,7 +516,7 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
                     },
                     onPanelSwap = { from, to ->
                         activity.panelReadingController.manuallySwapPanels(from, to)
-                    }
+                    },
                 )
             }
         }

@@ -10,8 +10,8 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.Surface
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.LocalActivityResultRegistryOwner
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -24,9 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import eu.kanade.domain.base.BasePreferences
-import cafe.adriel.voyager.navigator.CurrentScreen
 import eu.kanade.tachiyomi.ui.base.activity.BaseActivity
 import eu.kanade.tachiyomi.ui.reader.input.ReaderInputCaptureRegistry
 import eu.kanade.tachiyomi.util.view.setComposeContent
@@ -75,7 +75,7 @@ class DualScreenActivity : BaseActivity() {
                 LocalActivityResultRegistryOwner provides this,
                 DualScreenState.LocalNavigateUp provides {
                     DualScreenState.close()
-                }
+                },
             ) {
                 Box(
                     modifier = Modifier
@@ -91,7 +91,7 @@ class DualScreenActivity : BaseActivity() {
                                 Modifier
                                     .fillMaxSize()
                                     .rotate(rotation)
-                            }
+                            },
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -131,11 +131,13 @@ class DualScreenActivity : BaseActivity() {
                                     }
                                 }
                             }
-                            
+
                             launch {
                                 DualScreenState.mainScreenFocusRequests.collectLatest {
                                     val intent = Intent(this@DualScreenActivity, MainActivity::class.java)
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                                    intent.addFlags(
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT,
+                                    )
                                     startActivity(intent)
                                 }
                             }

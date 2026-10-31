@@ -37,8 +37,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import mihon.core.dualscreen.DualScreenState
 import kotlinx.coroutines.launch
+import mihon.core.dualscreen.DualScreenState
 import mihon.feature.support.SupportUsScreen
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
@@ -127,7 +127,9 @@ class MoreViewModel(
     val downloadQueueState: StateFlow<DownloadQueueState> = _downloadQueueState.asStateFlow()
 
     init {
-        val displayManager = Injekt.get<android.app.Application>().getSystemService(Context.DISPLAY_SERVICE) as android.hardware.display.DisplayManager
+        val displayManager = Injekt.get<android.app.Application>().getSystemService(
+            Context.DISPLAY_SERVICE,
+        ) as android.hardware.display.DisplayManager
         _detectedDisplays.value = displayManager.displays
             .filter { it.displayId != Display.DEFAULT_DISPLAY }
             .map { it.displayId }

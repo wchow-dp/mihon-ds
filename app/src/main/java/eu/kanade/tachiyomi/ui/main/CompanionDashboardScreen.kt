@@ -39,21 +39,28 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import coil3.compose.AsyncImage
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesIntoMap
+import dev.zacsweers.metro.Inject
+import dev.zacsweers.metro.binding
+import dev.zacsweers.metrox.viewmodel.ViewModelKey
+import dev.zacsweers.metrox.viewmodel.metroViewModel
 import eu.kanade.presentation.components.relativeDateText
 import eu.kanade.presentation.manga.components.MangaCover
 import eu.kanade.presentation.util.formatChapterNumber
-import java.time.LocalDate
-import java.time.ZoneId
-import kotlin.time.Clock
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.minus
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import mihon.core.dualscreen.DualScreenState
 import tachiyomi.domain.history.interactor.GetHistory
 import tachiyomi.domain.history.model.HistoryWithRelations
@@ -62,16 +69,9 @@ import tachiyomi.domain.updates.interactor.GetUpdates
 import tachiyomi.domain.updates.model.UpdatesWithRelations
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
-import androidx.lifecycle.ViewModel
-import dev.zacsweers.metro.AppScope
-import dev.zacsweers.metro.ContributesIntoMap
-import dev.zacsweers.metro.Inject
-import dev.zacsweers.metro.binding
-import dev.zacsweers.metrox.viewmodel.ViewModelKey
-import dev.zacsweers.metrox.viewmodel.metroViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import java.time.LocalDate
+import java.time.ZoneId
+import kotlin.time.Clock
 
 object CompanionDashboardScreen : Screen {
 
@@ -88,7 +88,7 @@ object CompanionDashboardScreen : Screen {
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
-                        .alpha(0.15f)
+                        .alpha(0.15f),
                 )
                 Box(
                     modifier = Modifier
@@ -97,29 +97,29 @@ object CompanionDashboardScreen : Screen {
                             Brush.verticalGradient(
                                 colors = listOf(
                                     MaterialTheme.colorScheme.background.copy(alpha = 0.6f),
-                                    MaterialTheme.colorScheme.background
-                                )
-                            )
-                        )
+                                    MaterialTheme.colorScheme.background,
+                                ),
+                            ),
+                        ),
                 )
             }
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 item {
                     Column {
                         Text(
                             text = "Companion Dashboard",
                             style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                         Text(
                             text = "Your reading hub",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -147,8 +147,8 @@ object CompanionDashboardScreen : Screen {
                         SectionHeader(title = "Recent Updates")
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                            )
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            ),
                         ) {
                             Column {
                                 val updates = state.recentUpdates.take(5)
@@ -158,7 +158,7 @@ object CompanionDashboardScreen : Screen {
                                     if (index < updates.size - 1) {
                                         HorizontalDivider(
                                             modifier = Modifier.padding(start = 60.dp),
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f),
                                         )
                                     }
                                 }
@@ -177,7 +177,7 @@ object CompanionDashboardScreen : Screen {
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -190,44 +190,44 @@ object CompanionDashboardScreen : Screen {
                 .fillMaxWidth()
                 .clickable { DualScreenState.openScreen(eu.kanade.tachiyomi.ui.download.DownloadQueueScreen) },
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-            )
+                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+            ),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Outlined.Download,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "${downloads.size} items in queue",
-                            style = MaterialTheme.typography.titleSmall
+                            style = MaterialTheme.typography.titleSmall,
                         )
                     }
                     Text(
                         text = "View All",
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(downloads.take(10)) { download ->
                         MangaCover.Square(
                             data = download.manga.asMangaCover(),
                             modifier = Modifier
                                 .size(40.dp)
-                                .clip(RoundedCornerShape(4.dp))
+                                .clip(RoundedCornerShape(4.dp)),
                         )
                     }
                     if (downloads.size > 10) {
@@ -237,13 +237,13 @@ object CompanionDashboardScreen : Screen {
                                     .size(40.dp)
                                     .background(
                                         MaterialTheme.colorScheme.surfaceVariant,
-                                        RoundedCornerShape(4.dp)
+                                        RoundedCornerShape(4.dp),
                                     ),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     text = "+${downloads.size - 10}",
-                                    style = MaterialTheme.typography.labelSmall
+                                    style = MaterialTheme.typography.labelSmall,
                                 )
                             }
                         }
@@ -257,51 +257,56 @@ object CompanionDashboardScreen : Screen {
     private fun StatsRow(dailyCount: Int, totalCount: Int) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             StatCard(
                 modifier = Modifier.weight(1f),
                 title = "Read Today",
                 value = dailyCount.toString(),
-                icon = Icons.Outlined.Schedule
+                icon = Icons.Outlined.Schedule,
             )
             StatCard(
                 modifier = Modifier.weight(1f),
                 title = "Total Read",
                 value = totalCount.toString(),
-                icon = Icons.Outlined.Book
+                icon = Icons.Outlined.Book,
             )
         }
     }
 
     @Composable
-    private fun StatCard(modifier: Modifier = Modifier, title: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    private fun StatCard(
+        modifier: Modifier = Modifier,
+        title: String,
+        value: String,
+        icon: androidx.compose.ui.graphics.vector.ImageVector,
+    ) {
         Card(
             modifier = modifier,
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
-            )
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+            ),
         ) {
             Row(
                 modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
                 Column(modifier = Modifier.padding(start = 12.dp)) {
                     Text(
                         text = value,
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                     Text(
                         text = title,
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                     )
                 }
             }
@@ -314,22 +319,22 @@ object CompanionDashboardScreen : Screen {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { DualScreenState.openScreen(eu.kanade.tachiyomi.ui.manga.MangaScreen(history.mangaId)) },
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         ) {
             Row(
-                modifier = Modifier.height(140.dp)
+                modifier = Modifier.height(140.dp),
             ) {
                 MangaCover.Book(
                     data = history.coverData,
                     modifier = Modifier
                         .fillMaxWidth(0.3f)
-                        .height(140.dp)
+                        .height(140.dp),
                 )
                 Column(
                     modifier = Modifier
                         .padding(16.dp)
                         .weight(1f),
-                    verticalArrangement = Arrangement.SpaceBetween
+                    verticalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Column {
                         Text(
@@ -337,21 +342,24 @@ object CompanionDashboardScreen : Screen {
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = stringResource(MR.strings.display_mode_chapter, formatChapterNumber(history.chapterNumber)),
+                            text = stringResource(
+                                MR.strings.display_mode_chapter,
+                                formatChapterNumber(history.chapterNumber),
+                            ),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.secondary,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                     Text(
                         text = relativeDateText(history.readAt),
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -365,32 +373,32 @@ object CompanionDashboardScreen : Screen {
                 .fillMaxWidth()
                 .clickable { DualScreenState.openScreen(eu.kanade.tachiyomi.ui.manga.MangaScreen(update.mangaId)) }
                 .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             MangaCover.Square(
                 data = update.coverData,
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(RoundedCornerShape(4.dp))
+                    .clip(RoundedCornerShape(4.dp)),
             )
             Column(
                 modifier = Modifier
                     .padding(start = 12.dp)
-                    .weight(1f)
+                    .weight(1f),
             ) {
                 Text(
                     text = update.mangaTitle,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = update.chapterName,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -416,13 +424,13 @@ class CompanionDashboardScreenModel(
                     val lastRead = history.firstOrNull()
                     val todayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
                     val dailyCount = history.count { (it.readAt?.toEpochMilliseconds() ?: 0L) >= todayStart }
-                    
-                    mutableState.update { 
+
+                    mutableState.update {
                         it.copy(
-                            lastRead = lastRead, 
+                            lastRead = lastRead,
                             dailyReadCount = dailyCount,
-                            totalReadCount = history.size
-                        ) 
+                            totalReadCount = history.size,
+                        )
                     }
                 }
         }
@@ -455,6 +463,6 @@ class CompanionDashboardScreenModel(
         val recentUpdates: List<UpdatesWithRelations> = emptyList(),
         val dailyReadCount: Int = 0,
         val totalReadCount: Int = 0,
-        val downloadQueue: List<eu.kanade.tachiyomi.data.download.model.Download> = emptyList()
+        val downloadQueue: List<eu.kanade.tachiyomi.data.download.model.Download> = emptyList(),
     )
 }

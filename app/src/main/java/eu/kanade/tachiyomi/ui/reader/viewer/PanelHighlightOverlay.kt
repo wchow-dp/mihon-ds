@@ -173,14 +173,16 @@ class PanelHighlightOverlay @JvmOverloads constructor(
                 pressedPanelIndex = hitRegion?.panelIndex
                 if (isCorrectionMode && hitRegion != null) {
                     draggedPanelIndex = hitRegion.panelIndex
-                    dragX = event.x; dragY = event.y
+                    dragX = event.x
+                    dragY = event.y
                     invalidate()
                 }
                 hitRegion != null
             }
             MotionEvent.ACTION_MOVE -> {
                 if (isCorrectionMode && draggedPanelIndex != null) {
-                    dragX = event.x; dragY = event.y
+                    dragX = event.x
+                    dragY = event.y
                     targetPanelIndex = hitRegion?.panelIndex?.takeIf { it != draggedPanelIndex }
                     invalidate()
                     true

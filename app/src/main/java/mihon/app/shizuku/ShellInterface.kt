@@ -48,9 +48,9 @@ import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.UserHandle
 import eu.kanade.tachiyomi.BuildConfig
+import rikka.shizuku.SystemServiceHelper
 import java.io.OutputStream
 import kotlin.system.exitProcess
-import rikka.shizuku.SystemServiceHelper
 
 class ShellInterface : IShellInterface.Stub() {
     private val userId = UserHandle::class.java

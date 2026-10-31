@@ -3,9 +3,9 @@ package eu.kanade.tachiyomi.util.system
 import android.content.Context
 import androidx.core.os.LocaleListCompat
 import eu.kanade.tachiyomi.ui.browse.source.SourcesViewModel
-import java.util.Locale
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.i18n.MR
+import java.util.Locale
 
 /**
  * Utility class to change the application's language in runtime.

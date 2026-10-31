@@ -7,8 +7,14 @@ class PanelReadingSettingsTest {
 
     @Test
     fun `transition duration is clamped to supported range`() {
-        assertEquals(PanelReadingSettings.PANEL_TRANSITION_MIN_MILLIS, PanelReadingSettings.normalizeTransitionMillis(-20))
-        assertEquals(PanelReadingSettings.PANEL_TRANSITION_MAX_MILLIS, PanelReadingSettings.normalizeTransitionMillis(1200))
+        assertEquals(
+            PanelReadingSettings.PANEL_TRANSITION_MIN_MILLIS,
+            PanelReadingSettings.normalizeTransitionMillis(-20),
+        )
+        assertEquals(
+            PanelReadingSettings.PANEL_TRANSITION_MAX_MILLIS,
+            PanelReadingSettings.normalizeTransitionMillis(1200),
+        )
     }
 
     @Test

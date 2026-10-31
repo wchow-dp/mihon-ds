@@ -2,13 +2,13 @@ package eu.kanade.domain.source.interactor
 
 import dev.zacsweers.metro.Inject
 import eu.kanade.domain.source.service.SourcePreferences
-import java.util.Collections
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import tachiyomi.core.common.util.lang.compareToWithCollator
 import tachiyomi.domain.source.model.Source
 import tachiyomi.domain.source.repository.SourceRepository
 import tachiyomi.source.local.isLocal
+import java.util.Collections
 
 @Inject
 class GetSourcesWithFavoriteCount(

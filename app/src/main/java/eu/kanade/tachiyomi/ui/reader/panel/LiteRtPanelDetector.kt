@@ -6,10 +6,10 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import logcat.LogPriority
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import logcat.LogPriority
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import tachiyomi.core.common.util.system.logcat
@@ -166,7 +166,7 @@ class LiteRtPanelDetector(
             modelContractValidated = true
             logcat(LogPriority.INFO) {
                 "Model validated. Input shape: ${interpreter.getInputTensor(0).shape().contentToString()}, " +
-                "Output shape: ${interpreter.getOutputTensor(0).shape().contentToString()}"
+                    "Output shape: ${interpreter.getOutputTensor(0).shape().contentToString()}"
             }
         }
         val outputTensor = interpreter.getOutputTensor(0)

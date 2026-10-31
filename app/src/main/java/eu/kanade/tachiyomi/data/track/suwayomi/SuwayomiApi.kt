@@ -9,6 +9,7 @@ import eu.kanade.tachiyomi.network.dataOrElse
 import eu.kanade.tachiyomi.source.ConfigurableSource
 import eu.kanade.tachiyomi.source.online.HttpSource
 import eu.kanade.tachiyomi.source.sourcePreferences
+import kotlinx.coroutines.Dispatchers
 import mihon.graphql.suwayomi.SuwayomiGetMangaQuery
 import mihon.graphql.suwayomi.SuwayomiGetMangaUnreadChaptersQuery
 import mihon.graphql.suwayomi.SuwayomiMarkAndDeleteChaptersMutation
@@ -16,7 +17,6 @@ import mihon.graphql.suwayomi.SuwayomiMarkChaptersReadMutation
 import mihon.graphql.suwayomi.SuwayomiUpdateMangaProgressMutation
 import tachiyomi.domain.source.service.SourceManager
 import java.security.MessageDigest
-import kotlinx.coroutines.Dispatchers
 
 class SuwayomiApi(
     private val trackerId: Long,

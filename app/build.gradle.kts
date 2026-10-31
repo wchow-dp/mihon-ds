@@ -8,8 +8,8 @@ import mihon.gradle.getLatestCommitSha
 import mihon.gradle.getLatestCommitTime
 import mihon.gradle.tasks.ReplaceShortcutsPlaceholderTask
 import java.io.FileInputStream
-import kotlin.io.encoding.Base64
 import java.util.Properties
+import kotlin.io.encoding.Base64
 
 plugins {
     alias(mihonx.plugins.android.application)

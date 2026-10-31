@@ -37,7 +37,10 @@ class BasePreferences(
 
     fun secondaryDisplayId() = preferenceStore.getInt(Preference.appStateKey("secondary_display_id"), -1)
 
-    fun swapPresentationRotation() = preferenceStore.getBoolean(Preference.appStateKey("swap_presentation_rotation"), false)
+    fun swapPresentationRotation() = preferenceStore.getBoolean(
+        Preference.appStateKey("swap_presentation_rotation"),
+        false,
+    )
 
     fun alwaysShowDashboard() = preferenceStore.getBoolean(Preference.appStateKey("always_show_dashboard"), true)
 

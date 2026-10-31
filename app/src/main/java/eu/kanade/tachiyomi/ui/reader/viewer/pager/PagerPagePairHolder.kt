@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.model.ChapterTransition
 import eu.kanade.tachiyomi.ui.reader.model.ReaderItemPair
-import eu.kanade.tachiyomi.widget.ViewPagerAdapter
+import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
+import eu.kanade.tachiyomi.widget.ViewPagerAdapter
 
 /**
  * A holder that contains two items (Pages or Transitions) side-by-side.
@@ -45,9 +45,11 @@ class PagerPagePairHolder(
             }
 
             if (gapWidth > 0) {
-                addView(View(context).apply {
-                    layoutParams = ViewGroup.LayoutParams(gapWidth, ViewGroup.LayoutParams.MATCH_PARENT)
-                })
+                addView(
+                    View(context).apply {
+                        layoutParams = ViewGroup.LayoutParams(gapWidth, ViewGroup.LayoutParams.MATCH_PARENT)
+                    },
+                )
             }
 
             addView(createItemView(pair.first), flexParams())
@@ -56,9 +58,11 @@ class PagerPagePairHolder(
             addView(createItemView(pair.first), flexParams())
 
             if (gapWidth > 0) {
-                addView(View(context).apply {
-                    layoutParams = ViewGroup.LayoutParams(gapWidth, ViewGroup.LayoutParams.MATCH_PARENT)
-                })
+                addView(
+                    View(context).apply {
+                        layoutParams = ViewGroup.LayoutParams(gapWidth, ViewGroup.LayoutParams.MATCH_PARENT)
+                    },
+                )
             }
 
             if (pair.second != null) {

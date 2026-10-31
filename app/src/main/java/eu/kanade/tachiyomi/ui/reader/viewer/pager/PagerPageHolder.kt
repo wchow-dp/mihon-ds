@@ -10,8 +10,8 @@ import eu.kanade.tachiyomi.databinding.ReaderErrorBinding
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.InsertPage
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
-import eu.kanade.tachiyomi.ui.reader.panel.PanelDetectionInput
 import eu.kanade.tachiyomi.ui.reader.panel.PanelDetectionImage
+import eu.kanade.tachiyomi.ui.reader.panel.PanelDetectionInput
 import eu.kanade.tachiyomi.ui.reader.panel.PanelPageKey
 import eu.kanade.tachiyomi.ui.reader.panel.PanelPageRenderVariant
 import eu.kanade.tachiyomi.ui.reader.panel.panelPageKey

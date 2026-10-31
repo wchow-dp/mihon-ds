@@ -9,8 +9,6 @@ import dev.zacsweers.metro.SingleIn
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.util.storage.DiskUtil
 import eu.kanade.tachiyomi.util.storage.saveTo
-import java.io.File
-import java.io.IOException
 import kotlinx.serialization.json.Json
 import logcat.LogPriority
 import okhttp3.Response
@@ -18,6 +16,8 @@ import okio.buffer
 import okio.sink
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.domain.chapter.model.Chapter
+import java.io.File
+import java.io.IOException
 
 /**
  * Class used to create chapter cache

@@ -1,6 +1,5 @@
 package eu.kanade.presentation.more.settings.screen
 
-import mihon.core.dualscreen.DualScreenState
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -61,6 +60,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import mihon.app.di.appGraph
+import mihon.core.dualscreen.DualScreenState
 import mihon.icons.materialsymbols.MaterialSymbols
 import mihon.icons.materialsymbols.automirroredrounded.Help
 import tachiyomi.core.common.i18n.stringResource

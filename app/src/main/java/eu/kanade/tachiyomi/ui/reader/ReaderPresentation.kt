@@ -1,3 +1,6 @@
+// Mihon DS: long call chains here predate the line-length check; wrapping them by hand risks the reader
+@file:Suppress("ktlint:standard:max-line-length")
+
 package eu.kanade.tachiyomi.ui.reader
 
 import android.app.Presentation
@@ -5,6 +8,7 @@ import android.content.Context
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.Display
+import android.view.GestureDetector
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.Surface
@@ -12,6 +16,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.OnBackPressedDispatcherOwner
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
@@ -24,17 +30,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -43,32 +50,28 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.WebtoonLayoutManager
 import androidx.savedstate.SavedStateRegistry
-import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.WebtoonLayoutManager
-import android.view.GestureDetector
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.core.content.ContextCompat
-import eu.kanade.tachiyomi.R
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import eu.kanade.presentation.reader.appbars.ReaderAppBars
+import eu.kanade.presentation.reader.components.ChapterNavigatorType
+import eu.kanade.tachiyomi.R
+import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
-import eu.kanade.tachiyomi.ui.reader.panel.PanelPageRenderVariant
 import eu.kanade.tachiyomi.ui.reader.panel.PanelPageKey
+import eu.kanade.tachiyomi.ui.reader.panel.PanelPageRenderVariant
 import eu.kanade.tachiyomi.ui.reader.panel.PanelReadingSettings
 import eu.kanade.tachiyomi.ui.reader.panel.hasSameLogicalPage
 import eu.kanade.tachiyomi.ui.reader.panel.panelPageKey
-import eu.kanade.presentation.reader.components.ChapterNavigatorType
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingMode
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
-import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
-import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonRecyclerView
 import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonAdapter
-import eu.kanade.tachiyomi.source.model.Page
+import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonRecyclerView
+import eu.kanade.tachiyomi.ui.reader.viewer.webtoon.WebtoonViewer
 import eu.kanade.tachiyomi.util.view.setComposeContent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.collect
@@ -77,8 +80,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import logcat.LogPriority
-import okio.Buffer
 import mihon.core.dualscreen.DualScreenState
+import okio.Buffer
 import tachiyomi.core.common.util.lang.launchIO
 import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.system.ImageUtil
@@ -105,7 +108,14 @@ class ReaderPresentation(
     outerContext: Context,
     display: Display,
     private val activity: ReaderActivity,
-) : Presentation(outerContext, display), LifecycleOwner, SavedStateRegistryOwner, ViewModelStoreOwner, OnBackPressedDispatcherOwner {
+) : Presentation(
+    outerContext,
+    display,
+),
+    LifecycleOwner,
+    SavedStateRegistryOwner,
+    ViewModelStoreOwner,
+    OnBackPressedDispatcherOwner {
 
     private val lifecycleRegistry = LifecycleRegistry(this)
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
@@ -154,7 +164,7 @@ class ReaderPresentation(
             setBackgroundColor(backgroundColor)
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
+                ViewGroup.LayoutParams.MATCH_PARENT,
             )
             externalGestureDetector = gestureDetector
         }
@@ -175,14 +185,14 @@ class ReaderPresentation(
         composeView = androidx.compose.ui.platform.ComposeView(context).apply {
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
+                ViewGroup.LayoutParams.MATCH_PARENT,
             )
         }
         container?.addView(composeView!!)
 
         composeView?.setComposeContent {
             CompositionLocalProvider(
-                LocalOnBackPressedDispatcherOwner provides this
+                LocalOnBackPressedDispatcherOwner provides this,
             ) {
                 ReaderContent()
             }
@@ -281,16 +291,35 @@ class ReaderPresentation(
 
                             if (readingMode.direction == ReadingMode.Direction.Vertical) {
                                 (slideIntoContainer(direction, animationSpec = tween(300)) + fadeIn(tween(300)))
-                                    .togetherWith(slideOutOfContainer(direction, animationSpec = tween(300)) + fadeOut(tween(300)))
+                                    .togetherWith(
+                                        slideOutOfContainer(
+                                            direction,
+                                            animationSpec = tween(300),
+                                        ) + fadeOut(tween(300)),
+                                    )
                             } else {
-                                (slideInHorizontally(animationSpec = tween(300)) { if (direction == AnimatedContentTransitionScope.SlideDirection.Left) it else -it } + fadeIn(tween(300)))
-                                    .togetherWith(slideOutHorizontally(animationSpec = tween(300)) { if (direction == AnimatedContentTransitionScope.SlideDirection.Left) -it else it } + fadeOut(tween(300)))
+                                (
+                                    slideInHorizontally(animationSpec = tween(300)) {
+                                        if (direction == AnimatedContentTransitionScope.SlideDirection.Left) it else -it
+                                    } + fadeIn(tween(300))
+                                    )
+                                    .togetherWith(
+                                        slideOutHorizontally(animationSpec = tween(300)) {
+                                            if (direction ==
+                                                AnimatedContentTransitionScope.SlideDirection.Left
+                                            ) {
+                                                -it
+                                            } else {
+                                                it
+                                            }
+                                        } + fadeOut(tween(300)),
+                                    )
                             }
                         } else {
                             fadeIn(tween(300)) togetherWith fadeOut(tween(300))
                         }
                     },
-                    label = "PageTransition"
+                    label = "PageTransition",
                 ) { page ->
                     if (page != null) {
                         // Plain holder rather than state: written from the update lambda, and a
@@ -300,7 +329,11 @@ class ReaderPresentation(
                         AndroidView(
                             factory = { ctx ->
                                 ReaderPageImageView(ctx).apply {
-                                    layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                                    layoutParams =
+                                        FrameLayout.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                        )
                                 }
                             },
                             update = { view ->
@@ -339,13 +372,13 @@ class ReaderPresentation(
                                         },
                                         onPanelSwap = { from, to ->
                                             activity.panelReadingController.manuallySwapPanels(from, to)
-                                        }
+                                        },
                                     )
                                 } else {
                                     view.clearPanelFocus()
                                 }
                             },
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
                         )
                     } else {
                         Box(modifier = Modifier.fillMaxSize())
@@ -501,10 +534,16 @@ class ReaderPresentation(
             val layoutListener = object : android.view.View.OnLayoutChangeListener {
                 override fun onLayoutChange(
                     v: android.view.View?,
-                    left: Int, top: Int, right: Int, bottom: Int,
-                    oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int
+                    left: Int,
+                    top: Int,
+                    right: Int,
+                    bottom: Int,
+                    oldLeft: Int,
+                    oldTop: Int,
+                    oldRight: Int,
+                    oldBottom: Int,
                 ) {
-                     syncSecondaryPosition()
+                    syncSecondaryPosition()
                 }
             }
             secondaryRecycler.addOnLayoutChangeListener(layoutListener)
@@ -535,11 +574,12 @@ class ReaderPresentation(
             update = { recycler ->
                 if (recycler.adapter == null) {
                     recycler.adapter = secondaryAdapter
-                    recycler.layoutManager = WebtoonLayoutManager(context, context.resources.displayMetrics.heightPixels)
+                    recycler.layoutManager =
+                        WebtoonLayoutManager(context, context.resources.displayMetrics.heightPixels)
                     secondaryAdapter.setItems(primaryViewer.adapter.items)
                 }
             },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
     }
 
@@ -651,67 +691,76 @@ class ReaderPresentation(
     }
 
     private fun setupGestureDetector() {
-        gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onDown(e: MotionEvent): Boolean {
-                // Must return true for onFling to work
-                return true
-            }
-
-            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                handleSecondaryScreenTap()
-                return true
-            }
-
-            override fun onScroll(
-                e1: MotionEvent?,
-                e2: MotionEvent,
-                distanceX: Float,
-                distanceY: Float,
-            ): Boolean {
-                val readingMode = ReadingMode.fromPreference(activity.viewModel.getMangaReadingMode(resolveDefault = true))
-                if (readingMode.direction == ReadingMode.Direction.Vertical) {
-                    activity.handleExternalScroll(distanceY)
+        gestureDetector = GestureDetector(
+            context,
+            object : GestureDetector.SimpleOnGestureListener() {
+                override fun onDown(e: MotionEvent): Boolean {
+                    // Must return true for onFling to work
                     return true
                 }
-                return false
-            }
 
-            override fun onFling(
-                e1: MotionEvent?,
-                e2: MotionEvent,
-                velocityX: Float,
-                velocityY: Float,
-            ): Boolean {
-                val readingMode = ReadingMode.fromPreference(activity.viewModel.getMangaReadingMode(resolveDefault = true))
+                override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                    handleSecondaryScreenTap()
+                    return true
+                }
 
-                if (readingMode.direction == ReadingMode.Direction.Vertical) {
-                    if (readingMode.type == ReadingMode.ViewerType.Webtoon) {
-                         activity.handleExternalFling(velocityY)
-                         return true
+                override fun onScroll(
+                    e1: MotionEvent?,
+                    e2: MotionEvent,
+                    distanceX: Float,
+                    distanceY: Float,
+                ): Boolean {
+                    val readingMode = ReadingMode.fromPreference(
+                        activity.viewModel.getMangaReadingMode(resolveDefault = true),
+                    )
+                    if (readingMode.direction == ReadingMode.Direction.Vertical) {
+                        activity.handleExternalScroll(distanceY)
+                        return true
+                    }
+                    return false
+                }
+
+                override fun onFling(
+                    e1: MotionEvent?,
+                    e2: MotionEvent,
+                    velocityX: Float,
+                    velocityY: Float,
+                ): Boolean {
+                    val readingMode = ReadingMode.fromPreference(
+                        activity.viewModel.getMangaReadingMode(resolveDefault = true),
+                    )
+
+                    if (readingMode.direction == ReadingMode.Direction.Vertical) {
+                        if (readingMode.type == ReadingMode.ViewerType.Webtoon) {
+                            activity.handleExternalFling(velocityY)
+                            return true
+                        }
+
+                        val minVelocity = 500
+                        if (kotlin.math.abs(velocityY) > kotlin.math.abs(velocityX) &&
+                            kotlin.math.abs(velocityY) > minVelocity
+                        ) {
+                            if (velocityY > 0) activity.loadPreviousPage() else activity.loadNextPage()
+                            return true
+                        }
                     }
 
                     val minVelocity = 500
-                    if (kotlin.math.abs(velocityY) > kotlin.math.abs(velocityX) &&
-                        kotlin.math.abs(velocityY) > minVelocity) {
-                        if (velocityY > 0) activity.loadPreviousPage() else activity.loadNextPage()
+                    if (kotlin.math.abs(velocityX) > kotlin.math.abs(velocityY) &&
+                        kotlin.math.abs(velocityX) > minVelocity
+                    ) {
+                        val isRtl = readingMode == ReadingMode.RIGHT_TO_LEFT
+                        if (velocityX > 0) {
+                            if (isRtl) activity.loadNextPage() else activity.loadPreviousPage()
+                        } else {
+                            if (isRtl) activity.loadPreviousPage() else activity.loadNextPage()
+                        }
                         return true
                     }
+                    return false
                 }
-
-                val minVelocity = 500
-                if (kotlin.math.abs(velocityX) > kotlin.math.abs(velocityY) &&
-                    kotlin.math.abs(velocityX) > minVelocity) {
-                    val isRtl = readingMode == ReadingMode.RIGHT_TO_LEFT
-                    if (velocityX > 0) {
-                        if (isRtl) activity.loadNextPage() else activity.loadPreviousPage()
-                    } else {
-                        if (isRtl) activity.loadPreviousPage() else activity.loadNextPage()
-                    }
-                    return true
-                }
-                return false
-            }
-        })
+            },
+        )
     }
 
     private fun handleSecondaryScreenTap() {
@@ -780,7 +829,7 @@ class ReaderPresentation(
             } else {
                 dashboard.layoutParams = FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                 )
                 dashboard.rotation = rotation
             }

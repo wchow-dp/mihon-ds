@@ -10,9 +10,9 @@ import eu.kanade.tachiyomi.data.track.model.TrackSearch
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.json.Json
-import tachiyomi.domain.track.model.Track as DomainTrack
 import tachiyomi.i18n.MR
 import uy.kohesive.injekt.injectLazy
+import tachiyomi.domain.track.model.Track as DomainTrack
 
 class MangaBaka(id: Long) : BaseTracker(id, "MangaBaka"), DeletableTracker {
 

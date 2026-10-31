@@ -7,10 +7,9 @@ import eu.kanade.tachiyomi.source.model.FilterList
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-
 
 private const val LEAVE_SUPPRESS_WINDOW_MS = 2000L
 
@@ -46,14 +45,14 @@ object DualScreenState {
      */
     private val _mainScreenEvents = Channel<MainScreenEvent>(
         capacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
     val mainScreenEvents = _mainScreenEvents.receiveAsFlow()
 
     private val _rotationEvents = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(
         replay = 0,
         extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
     val rotationEvents = _rotationEvents.asSharedFlow()
 
@@ -146,7 +145,7 @@ object DualScreenState {
     private val _companionCloseRequests = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(
         replay = 0,
         extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
     val companionCloseRequests = _companionCloseRequests.asSharedFlow()
 
@@ -164,7 +163,7 @@ object DualScreenState {
     private val _mainScreenLeaveRequests = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(
         replay = 0,
         extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
     val mainScreenLeaveRequests = _mainScreenLeaveRequests.asSharedFlow()
 
@@ -184,7 +183,6 @@ object DualScreenState {
         if (android.os.SystemClock.elapsedRealtime() < suppressLeaveUntilElapsedMs) return
         _mainScreenLeaveRequests.tryEmit(Unit)
     }
-
 
     sealed interface MainScreenEvent {
         data class OpenScreen(val screen: Screen) : MainScreenEvent

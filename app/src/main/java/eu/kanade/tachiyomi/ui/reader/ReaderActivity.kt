@@ -1,3 +1,6 @@
+// Mihon DS: long call chains here predate the line-length check; wrapping them by hand risks the reader
+@file:Suppress("ktlint:standard:max-line-length")
+
 package eu.kanade.tachiyomi.ui.reader
 
 import android.annotation.SuppressLint
@@ -38,7 +41,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -108,10 +110,8 @@ import eu.kanade.tachiyomi.util.system.readerBackgroundColor
 import eu.kanade.tachiyomi.util.system.toShareIntent
 import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.view.setComposeContent
-import java.io.ByteArrayOutputStream
-import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -123,15 +123,18 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import logcat.LogPriority
+import mihon.app.di.AppGraph
 import mihon.core.dualscreen.DualScreenState
 import mihon.core.dualscreen.utils.FoldableUtils
-import mihon.app.di.AppGraph
 import mihon.core.metro.metroGraph
 import tachiyomi.core.common.Constants
 import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.core.common.util.system.logcat
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.util.collectAsState
+import java.io.ByteArrayOutputStream
+import kotlin.time.Duration.Companion.seconds
+import androidx.compose.ui.graphics.Color as ComposeColor
 
 class ReaderActivity : BaseActivity(), ReaderActionTarget {
 
@@ -505,7 +508,13 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
                 } else if (readerPreferences.autoAdjustHingeGap().get()) {
                     val hingeBounds = FoldableUtils.getHingeBounds(info)
                     if (hingeBounds != null) {
-                        val gap = if (hingeBounds.width() > hingeBounds.height()) hingeBounds.height() else hingeBounds.width()
+                        val gap = if (hingeBounds.width() >
+                            hingeBounds.height()
+                        ) {
+                            hingeBounds.height()
+                        } else {
+                            hingeBounds.width()
+                        }
                         if (gap > 0 && activeHingeGap.value != gap) {
                             activeHingeGap.value = gap
                             (viewModel.state.value.viewer as? eu.kanade.tachiyomi.ui.reader.viewer.pager.PagerViewer)?.refreshAdapter()
@@ -516,7 +525,8 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
             .launchIn(lifecycleScope)
 
         if (readerPreferences.autoDisableSideBySideOnStart().get() &&
-            readerPreferences.sideBySideMode().get()) {
+            readerPreferences.sideBySideMode().get()
+        ) {
             lifecycleScope.launch {
                 kotlinx.coroutines.delay(600L)
                 val info = FoldableUtils.windowLayoutInfoFlow(this@ReaderActivity).first()
@@ -634,11 +644,23 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
                         verticalAlignment = Alignment.Bottom,
                     ) {
                         ReaderPageIndicator(
-                            currentPage = if (isRtl) (state.currentPage + 1).coerceAtMost(state.totalPages) else state.currentPage,
+                            currentPage = if (isRtl) {
+                                (state.currentPage + 1).coerceAtMost(
+                                    state.totalPages,
+                                )
+                            } else {
+                                state.currentPage
+                            },
                             totalPages = state.totalPages,
                         )
                         ReaderPageIndicator(
-                            currentPage = if (isRtl) state.currentPage else (state.currentPage + 1).coerceAtMost(state.totalPages),
+                            currentPage = if (isRtl) {
+                                state.currentPage
+                            } else {
+                                (state.currentPage + 1).coerceAtMost(
+                                    state.totalPages,
+                                )
+                            },
                             totalPages = state.totalPages,
                         )
                     }
@@ -803,7 +825,8 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
         val controls = controlsPresentation
         val reader = readerPresentation
         if ((controls != null && !controls.isShowing) ||
-            (reader != null && !reader.isShowing)) {
+            (reader != null && !reader.isShowing)
+        ) {
             recreatePresentation()
         }
 
@@ -1048,7 +1071,11 @@ class ReaderActivity : BaseActivity(), ReaderActionTarget {
             },
             onClickSettings = viewModel::openSettingsDialog,
             companionPageEnabled = companionPageEnabled,
-            onClickDualScreenMode = if (dsModeEnabled) { { setCompanionPage(!companionPageEnabled) } } else null,
+            onClickDualScreenMode = if (dsModeEnabled) {
+                { setCompanionPage(!companionPageEnabled) }
+            } else {
+                null
+            },
             panelReadingEnabled = panelReadingEnabled,
             onClickPanelReading = if (isPagerType && panelReadingPreferenceEnabled) {
                 {

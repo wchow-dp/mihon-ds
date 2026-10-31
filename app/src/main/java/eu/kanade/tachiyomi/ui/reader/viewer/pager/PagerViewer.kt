@@ -26,11 +26,11 @@ import eu.kanade.tachiyomi.ui.reader.viewer.Viewer
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation.NavigationRegion
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import mihon.app.di.appGraph
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import mihon.app.di.appGraph
 import tachiyomi.core.common.util.system.logcat
 import kotlin.math.min
 
@@ -252,7 +252,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
                     },
                     onPanelSwap = { from, to ->
                         activity.panelReadingController.manuallySwapPanels(from, to)
-                    }
+                    },
                 )
             }
         }
@@ -277,9 +277,6 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
         return pager
     }
 
-    /**
-     * Returns the PagerPageHolder for the provided page
-     */
     /**
      * Manual rotation for one page, cleared as soon as the reader moves on.
      *
@@ -420,7 +417,6 @@ abstract class PagerViewer(val activity: ReaderActivity) : Viewer {
         val activeKey = activity.panelReadingController.state.value.key
         return activeKey.takeIf { page.matchesPanelKey(it) } ?: page.panelPageKey()
     }
-
 
     private fun isCurrentVisiblePage(page: ReaderPage, key: PanelPageKey): Boolean {
         return currentReaderPages().any { it == page && it.matchesPanelKey(key) }

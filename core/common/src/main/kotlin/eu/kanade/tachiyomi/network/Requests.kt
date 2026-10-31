@@ -2,7 +2,6 @@
 
 package eu.kanade.tachiyomi.network
 
-import kotlin.time.Duration.Companion.minutes
 import okhttp3.CacheControl
 import okhttp3.FormBody
 import okhttp3.Headers
@@ -10,6 +9,7 @@ import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 import okhttp3.RequestBody
+import kotlin.time.Duration.Companion.minutes
 
 private val DEFAULT_CACHE_CONTROL = CacheControl.Builder().maxAge(10.minutes).build()
 private val DEFAULT_HEADERS = Headers.Builder().build()

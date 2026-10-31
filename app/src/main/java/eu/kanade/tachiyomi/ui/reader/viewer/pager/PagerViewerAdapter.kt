@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import eu.kanade.tachiyomi.ui.reader.model.ChapterTransition
 import eu.kanade.tachiyomi.ui.reader.model.InsertPage
 import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
-import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.model.ReaderItemPair
+import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.model.ViewerChapters
 import eu.kanade.tachiyomi.ui.reader.viewer.calculateChapterGap
 import eu.kanade.tachiyomi.util.system.createReaderThemeContext
@@ -23,7 +23,7 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
      */
     var items: MutableList<Any> = mutableListOf()
         private set
-        
+
     private var lastSideBySideMode: Boolean = viewer.config.sideBySideMode
 
     /**
@@ -78,7 +78,7 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
      */
     fun setChapters(chapters: ViewerChapters, forceTransition: Boolean) {
         lastSideBySideMode = viewer.config.sideBySideMode
-        
+
         val newItems = mutableListOf<Any>()
 
         // Forces chapter transition if there is missing chapters
@@ -138,7 +138,7 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
 
         if (viewer.config.sideBySideMode) {
             val pairedItems = mutableListOf<Any>()
-            
+
             // Previous chapter buffer
             if (chapters.prevChapter != null) {
                 val prevPages = chapters.prevChapter.pages
@@ -242,7 +242,7 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
         if (lastSideBySideMode != viewer.config.sideBySideMode) {
             return POSITION_NONE
         }
-        
+
         if (view is PositionableView) {
             val item = view.item
             val position = items.indexOf(item)
@@ -250,7 +250,10 @@ class PagerViewerAdapter(private val viewer: PagerViewer) : ViewPagerAdapter() {
                 return position
             } else {
                 if (item is ReaderPage) {
-                    val pairPosition = items.indexOfFirst { it is ReaderItemPair && (it.first == item || it.second == item) }
+                    val pairPosition = items.indexOfFirst {
+                        it is ReaderItemPair &&
+                            (it.first == item || it.second == item)
+                    }
                     if (pairPosition != -1) return pairPosition
                 }
                 logcat { "Position for $item not found" }

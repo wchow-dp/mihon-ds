@@ -4,11 +4,11 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import logcat.LogPriority
 import tachiyomi.core.common.util.system.logcat
+import kotlin.time.Duration.Companion.seconds
 
 val Context.workManager: WorkManager
     get() = WorkManager.getInstance(this)

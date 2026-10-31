@@ -6,13 +6,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLocale
 import eu.kanade.domain.ui.UiPreferences
 import eu.kanade.tachiyomi.util.lang.toRelativeString
-import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import mihon.app.di.appGraph
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.i18n.stringResource
+import kotlin.time.Instant
 
 @Composable
 fun relativeDateText(

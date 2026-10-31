@@ -15,7 +15,7 @@ import android.view.ViewGroup
 open class SideBySideLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : ViewGroup(context, attrs, defStyleAttr) {
 
     var centerSingleChild: Boolean = false
@@ -23,7 +23,7 @@ open class SideBySideLayout @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)
-        
+
         setMeasuredDimension(width, height)
 
         var fixedWidth = 0
@@ -33,7 +33,7 @@ open class SideBySideLayout @JvmOverloads constructor(
         for (i in 0 until childCount) {
             val child = getChildAt(i)
             if (child.visibility == View.GONE) continue
-            
+
             val lp = child.layoutParams
             if (lp.width > 0) {
                 fixedWidth += lp.width
@@ -50,7 +50,7 @@ open class SideBySideLayout @JvmOverloads constructor(
             if (lp.width > 0) {
                 child.measure(
                     MeasureSpec.makeMeasureSpec(lp.width, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+                    MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY),
                 )
             }
         }
@@ -85,9 +85,9 @@ open class SideBySideLayout @JvmOverloads constructor(
         val width = r - l
         val height = b - t
         var currentX = 0
-        
+
         val visibleChildren = (0 until childCount).map { getChildAt(it) }.filter { it.visibility != View.GONE }
-        
+
         if (visibleChildren.size == 1 && centerSingleChild) {
             val child = visibleChildren[0]
             val childWidth = child.measuredWidth

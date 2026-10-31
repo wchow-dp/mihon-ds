@@ -1,13 +1,13 @@
 package mihon.data.extension.model
 
 import android.annotation.SuppressLint
-import eu.kanade.tachiyomi.extension.model.Extension as TachiyomiExtension
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.protobuf.ProtoNumber
 import mihon.data.extension.model.NetworkExtensionStore.ContentWarning
 import mihon.data.extension.model.NetworkExtensionStore.ExtensionList
 import mihon.domain.extension.model.ExtensionStore
+import eu.kanade.tachiyomi.extension.model.Extension as TachiyomiExtension
 import mihon.domain.extension.model.ContentWarning as DomainContentWarning
 
 @SuppressLint("UnsafeOptInUsageError")

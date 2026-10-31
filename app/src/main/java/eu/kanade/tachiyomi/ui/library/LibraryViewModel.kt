@@ -27,8 +27,6 @@ import eu.kanade.tachiyomi.source.model.SManga
 import eu.kanade.tachiyomi.source.online.HttpSource
 import eu.kanade.tachiyomi.util.chapter.getNextUnread
 import eu.kanade.tachiyomi.util.removeCovers
-import kotlin.random.Random
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -77,6 +75,8 @@ import tachiyomi.domain.track.interactor.GetTracksPerManga
 import tachiyomi.domain.track.model.Track
 import tachiyomi.source.local.isLocal
 import uy.kohesive.injekt.api.get
+import kotlin.random.Random
+import kotlin.time.Duration.Companion.seconds
 
 @Inject
 @ViewModelKey
@@ -572,7 +572,6 @@ class LibraryViewModel(
                     }
                 }
                 updateManga.awaitAll(toDelete)
-
             }
 
             if (deleteChapters) {
@@ -603,7 +602,6 @@ class LibraryViewModel(
 
                 setMangaCategories.await(manga.id, categoryIds)
             }
-
         }
     }
 

@@ -20,12 +20,12 @@ import androidx.core.graphics.get
 import androidx.core.graphics.green
 import androidx.core.graphics.red
 import eu.kanade.tachiyomi.util.system.GLUtil
-import java.io.InputStream
-import kotlin.math.abs
 import okio.Buffer
 import okio.BufferedSource
 import tachiyomi.decoder.Format
 import tachiyomi.decoder.ImageDecoder
+import java.io.InputStream
+import kotlin.math.abs
 
 object ImageUtil {
 

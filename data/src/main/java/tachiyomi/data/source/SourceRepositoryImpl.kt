@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.map
 import tachiyomi.data.Database
 import tachiyomi.data.subscribeToList
 import tachiyomi.domain.manga.interactor.NetworkToLocalManga
-import tachiyomi.domain.source.model.Source as DomainSource
 import tachiyomi.domain.source.model.SourceWithCount
 import tachiyomi.domain.source.model.StubSource
 import tachiyomi.domain.source.repository.SourcePagingSource
 import tachiyomi.domain.source.repository.SourceRepository
 import tachiyomi.domain.source.service.SourceManager
+import tachiyomi.domain.source.model.Source as DomainSource
 
 @Inject
 @SingleIn(AppScope::class)
